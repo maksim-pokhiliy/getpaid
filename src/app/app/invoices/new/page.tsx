@@ -40,6 +40,7 @@ import {
   CreateClientInput,
 } from "@app/shared/schemas";
 import { useClients, useCreateClient, useCreateInvoice, ApiError } from "@app/lib/api";
+import { useAutosave } from "@app/hooks";
 
 const currencies = [
   { value: "USD", label: "USD - US Dollar" },
@@ -68,7 +69,9 @@ export default function NewInvoicePage() {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    watch,
+    reset,
+    formState: { errors, isDirty },
   } = useForm<InvoiceFormInput>({
     resolver: zodResolver(invoiceFormSchema),
     defaultValues: {
@@ -87,6 +90,47 @@ export default function NewInvoicePage() {
 
   const createInvoiceMutation = useCreateInvoice();
 
+  // Watch all form values for autosave
+  const formValues = watch();
+
+  // Autosave functionality
+  const { restoreDraft, clearDraft, lastSaved } = useAutosave({
+    key: "invoice-draft-new",
+    data: formValues,
+    onRestore: (data) => {
+      reset(data);
+      toast.success("Draft restored");
+    },
+    enabled: isDirty,
+  });
+
+  const [showDraftBanner, setShowDraftBanner] = React.useState(false);
+
+  // Check for existing draft on mount
+  React.useEffect(() => {
+    const checkDraft = () => {
+      try {
+        const saved = localStorage.getItem("invoice-draft-new");
+        if (saved) {
+          setShowDraftBanner(true);
+        }
+      } catch {
+        // Ignore
+      }
+    };
+    checkDraft();
+  }, []);
+
+  const handleRestoreDraft = () => {
+    restoreDraft();
+    setShowDraftBanner(false);
+  };
+
+  const handleDiscardDraft = () => {
+    clearDraft();
+    setShowDraftBanner(false);
+  };
+
   const onSubmit = (data: InvoiceFormInput) => {
     setError(null);
     const transformedData = {
@@ -101,6 +145,7 @@ export default function NewInvoicePage() {
     };
     createInvoiceMutation.mutate(transformedData, {
       onSuccess: (invoice) => {
+        clearDraft(); // Clear autosaved draft on successful submit
         toast.success("Invoice created successfully!");
         router.push(`/app/invoices/${invoice.id}`);
       },
@@ -125,6 +170,35 @@ export default function NewInvoicePage() {
       <Breadcrumbs
         items={[{ label: "Invoices", href: "/app/invoices" }, { label: "New Invoice" }]}
       />
+
+      {showDraftBanner && (
+        <Alert
+          severity="info"
+          sx={{ mb: 3 }}
+          action={
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button size="small" color="inherit" onClick={handleDiscardDraft}>
+                Discard
+              </Button>
+              <Button size="small" variant="contained" onClick={handleRestoreDraft}>
+                Restore
+              </Button>
+            </Box>
+          }
+        >
+          You have an unsaved draft. Would you like to restore it?
+        </Alert>
+      )}
+
+      {lastSaved && isDirty && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ display: "block", mb: 2, textAlign: "right" }}
+        >
+          Draft saved {lastSaved.toLocaleTimeString()}
+        </Typography>
+      )}
 
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" fontWeight={700}>
