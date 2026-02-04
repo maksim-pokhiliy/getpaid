@@ -5,6 +5,7 @@ import { clientsApi, invoicesApi, senderProfileApi, publicApi } from "./client";
 import type { CreateClientInput, UpdateClientInput } from "@app/shared/schemas/client";
 import type { CreateInvoiceInput, UpdateInvoiceInput } from "@app/shared/schemas/invoice";
 import type { SenderProfileInput } from "@app/shared/schemas/sender-profile";
+import type { Client, InvoiceListItem, Invoice } from "@app/shared/schemas/api";
 
 // Query keys for cache management
 export const queryKeys = {
@@ -51,7 +52,20 @@ export function useDeleteClient() {
 
   return useMutation({
     mutationFn: (id: string) => clientsApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.clients });
+      const previousClients = queryClient.getQueryData<Client[]>(queryKeys.clients);
+      queryClient.setQueryData<Client[]>(queryKeys.clients, (old) =>
+        old?.filter((client) => client.id !== id)
+      );
+      return { previousClients };
+    },
+    onError: (_, __, context) => {
+      if (context?.previousClients) {
+        queryClient.setQueryData(queryKeys.clients, context.previousClients);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.clients });
     },
   });
@@ -101,7 +115,36 @@ export function useSendInvoice() {
 
   return useMutation({
     mutationFn: (id: string) => invoicesApi.send(id),
-    onSuccess: (_, id) => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.invoices });
+      await queryClient.cancelQueries({ queryKey: queryKeys.invoice(id) });
+
+      const previousInvoices = queryClient.getQueryData<InvoiceListItem[]>(queryKeys.invoices);
+      const previousInvoice = queryClient.getQueryData<Invoice>(queryKeys.invoice(id));
+
+      queryClient.setQueryData<InvoiceListItem[]>(queryKeys.invoices, (old) =>
+        old?.map((invoice) =>
+          invoice.id === id
+            ? { ...invoice, status: "SENT" as const, sentAt: new Date().toISOString() }
+            : invoice
+        )
+      );
+
+      queryClient.setQueryData<Invoice>(queryKeys.invoice(id), (old) =>
+        old ? { ...old, status: "SENT" as const, sentAt: new Date().toISOString() } : old
+      );
+
+      return { previousInvoices, previousInvoice };
+    },
+    onError: (_, id, context) => {
+      if (context?.previousInvoices) {
+        queryClient.setQueryData(queryKeys.invoices, context.previousInvoices);
+      }
+      if (context?.previousInvoice) {
+        queryClient.setQueryData(queryKeys.invoice(id), context.previousInvoice);
+      }
+    },
+    onSettled: (_, __, id) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.invoice(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.invoices });
     },
@@ -113,7 +156,36 @@ export function useMarkInvoicePaid() {
 
   return useMutation({
     mutationFn: (id: string) => invoicesApi.markPaid(id),
-    onSuccess: (_, id) => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.invoices });
+      await queryClient.cancelQueries({ queryKey: queryKeys.invoice(id) });
+
+      const previousInvoices = queryClient.getQueryData<InvoiceListItem[]>(queryKeys.invoices);
+      const previousInvoice = queryClient.getQueryData<Invoice>(queryKeys.invoice(id));
+
+      queryClient.setQueryData<InvoiceListItem[]>(queryKeys.invoices, (old) =>
+        old?.map((invoice) =>
+          invoice.id === id
+            ? { ...invoice, status: "PAID" as const, paidAt: new Date().toISOString() }
+            : invoice
+        )
+      );
+
+      queryClient.setQueryData<Invoice>(queryKeys.invoice(id), (old) =>
+        old ? { ...old, status: "PAID" as const, paidAt: new Date().toISOString() } : old
+      );
+
+      return { previousInvoices, previousInvoice };
+    },
+    onError: (_, id, context) => {
+      if (context?.previousInvoices) {
+        queryClient.setQueryData(queryKeys.invoices, context.previousInvoices);
+      }
+      if (context?.previousInvoice) {
+        queryClient.setQueryData(queryKeys.invoice(id), context.previousInvoice);
+      }
+    },
+    onSettled: (_, __, id) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.invoice(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.invoices });
     },
@@ -125,7 +197,20 @@ export function useDeleteInvoice() {
 
   return useMutation({
     mutationFn: (id: string) => invoicesApi.delete(id),
-    onSuccess: (_, id) => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.invoices });
+      const previousInvoices = queryClient.getQueryData<InvoiceListItem[]>(queryKeys.invoices);
+      queryClient.setQueryData<InvoiceListItem[]>(queryKeys.invoices, (old) =>
+        old?.filter((invoice) => invoice.id !== id)
+      );
+      return { previousInvoices };
+    },
+    onError: (_, __, context) => {
+      if (context?.previousInvoices) {
+        queryClient.setQueryData(queryKeys.invoices, context.previousInvoices);
+      }
+    },
+    onSettled: (_, __, id) => {
       queryClient.removeQueries({ queryKey: queryKeys.invoice(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.invoices });
     },
