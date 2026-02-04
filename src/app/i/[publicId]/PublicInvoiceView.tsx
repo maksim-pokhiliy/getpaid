@@ -16,9 +16,14 @@ import {
   Button,
   Alert,
   Divider,
+  alpha,
+  useTheme,
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import PaymentIcon from "@mui/icons-material/Payment";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import { Spinner } from "@app/components/feedback/Loading";
 
 interface InvoiceItem {
   id: string;
@@ -73,19 +78,16 @@ function formatDate(date: string) {
   }).format(new Date(date));
 }
 
-function getStatusColor(status: string) {
-  switch (status) {
-    case "PAID":
-      return "success";
-    case "OVERDUE":
-      return "error";
-    case "SENT":
-    case "VIEWED":
-      return "info";
-    default:
-      return "default";
-  }
-}
+const statusConfig: Record<
+  string,
+  { color: "success" | "error" | "info" | "warning" | "default"; label: string }
+> = {
+  PAID: { color: "success", label: "Paid" },
+  OVERDUE: { color: "error", label: "Overdue" },
+  SENT: { color: "info", label: "Sent" },
+  VIEWED: { color: "info", label: "Viewed" },
+  DRAFT: { color: "default", label: "Draft" },
+};
 
 export default function PublicInvoiceView({
   publicId,
@@ -94,6 +96,7 @@ export default function PublicInvoiceView({
   justPaid,
   wasCanceled,
 }: Props) {
+  const theme = useTheme();
   const [viewTracked, setViewTracked] = React.useState(false);
   const [isPayLoading, setIsPayLoading] = React.useState(false);
 
@@ -136,230 +139,286 @@ export default function PublicInvoiceView({
   const isPaid = invoice.status === "PAID";
   const isPayable = !isPaid && hasStripe;
   const isOverdue = invoice.status === "OVERDUE";
+  const status = statusConfig[invoice.status] || statusConfig.DRAFT;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      {justPaid && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          Payment successful! Thank you for your payment.
-        </Alert>
-      )}
-
-      {wasCanceled && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          Payment was canceled. You can try again when ready.
-        </Alert>
-      )}
-
-      <Paper
-        sx={{
-          p: 4,
-          "@media print": {
-            boxShadow: "none",
-            p: 0,
-          },
-        }}
-      >
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="md">
+        {/* Header */}
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1,
             mb: 4,
+            "@media print": { display: "none" },
+          }}
+        >
+          <ReceiptLongIcon sx={{ color: "primary.main", fontSize: 28 }} />
+          <Typography
+            variant="h5"
+            fontWeight={700}
+            sx={{
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Invox
+          </Typography>
+        </Box>
+
+        {justPaid && (
+          <Alert severity="success" icon={<CheckCircleIcon />} sx={{ mb: 3, borderRadius: 2 }}>
+            Payment successful! Thank you for your payment.
+          </Alert>
+        )}
+
+        {wasCanceled && (
+          <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+            Payment was canceled. You can try again when ready.
+          </Alert>
+        )}
+
+        <Paper
+          sx={{
+            p: { xs: 3, md: 5 },
+            borderRadius: 3,
             "@media print": {
-              mb: 2,
+              boxShadow: "none",
+              p: 0,
             },
           }}
         >
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Invoice
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              #{invoice.publicId}
-            </Typography>
-          </Box>
-          <Chip
-            label={invoice.status}
-            color={getStatusColor(invoice.status) as "success" | "error" | "info" | "default"}
+          {/* Invoice Header */}
+          <Box
             sx={{
-              "@media print": {
-                display: "none",
-              },
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              mb: 4,
             }}
-          />
-        </Box>
-
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-            gap: 4,
-            mb: 4,
-          }}
-        >
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              From
-            </Typography>
-            <Typography variant="body1" fontWeight={500}>
-              {invoice.sender.name}
-            </Typography>
-            {invoice.sender.address && (
-              <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: "pre-line" }}>
-                {invoice.sender.address}
-              </Typography>
-            )}
-            {invoice.sender.taxId && (
-              <Typography variant="body2" color="text.secondary">
-                Tax ID: {invoice.sender.taxId}
-              </Typography>
-            )}
-          </Box>
-
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              To
-            </Typography>
-            <Typography variant="body1" fontWeight={500}>
-              {invoice.client.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {invoice.client.email}
-            </Typography>
-          </Box>
-        </Box>
-
-        <Box sx={{ display: "flex", gap: 4, mb: 4 }}>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Invoice Date
-            </Typography>
-            <Typography variant="body1">{formatDate(invoice.createdAt)}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Due Date
-            </Typography>
-            <Typography variant="body1" color={isOverdue ? "error.main" : "text.primary"}>
-              {formatDate(invoice.dueDate)}
-            </Typography>
-          </Box>
-          {invoice.paidAt && (
+          >
             <Box>
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Paid Date
+              <Typography variant="h4" fontWeight={700} gutterBottom>
+                Invoice
               </Typography>
-              <Typography variant="body1" color="success.main">
-                {formatDate(invoice.paidAt)}
+              <Typography variant="body1" color="text.secondary" fontWeight={500}>
+                #{invoice.publicId}
               </Typography>
             </Box>
-          )}
-        </Box>
+            <Chip
+              label={status.label}
+              color={status.color}
+              sx={{
+                fontWeight: 600,
+                px: 1,
+                "@media print": { display: "none" },
+              }}
+            />
+          </Box>
 
-        <Divider sx={{ my: 3 }} />
+          {/* From/To Section */}
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+              gap: 4,
+              mb: 4,
+              p: 3,
+              borderRadius: 2,
+              bgcolor: alpha(theme.palette.primary.main, 0.02),
+            }}
+          >
+            <Box>
+              <Typography variant="overline" color="text.secondary" fontWeight={600}>
+                From
+              </Typography>
+              <Typography variant="h6" fontWeight={600} sx={{ mt: 1 }}>
+                {invoice.sender.name}
+              </Typography>
+              {invoice.sender.address && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ whiteSpace: "pre-line", mt: 0.5 }}
+                >
+                  {invoice.sender.address}
+                </Typography>
+              )}
+              {invoice.sender.taxId && (
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  Tax ID: {invoice.sender.taxId}
+                </Typography>
+              )}
+            </Box>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Description</TableCell>
-                <TableCell align="right">Qty</TableCell>
-                <TableCell align="right">Unit Price</TableCell>
-                <TableCell align="right">Amount</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {invoice.items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell align="right">{item.quantity}</TableCell>
-                  <TableCell align="right">
-                    {formatCurrency(item.unitPrice, invoice.currency)}
+            <Box>
+              <Typography variant="overline" color="text.secondary" fontWeight={600}>
+                Bill To
+              </Typography>
+              <Typography variant="h6" fontWeight={600} sx={{ mt: 1 }}>
+                {invoice.client.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {invoice.client.email}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Dates Section */}
+          <Box sx={{ display: "flex", gap: 4, mb: 4, flexWrap: "wrap" }}>
+            <Box>
+              <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                INVOICE DATE
+              </Typography>
+              <Typography variant="body1" fontWeight={500} sx={{ mt: 0.5 }}>
+                {formatDate(invoice.createdAt)}
+              </Typography>
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                DUE DATE
+              </Typography>
+              <Typography
+                variant="body1"
+                fontWeight={500}
+                color={isOverdue ? "error.main" : "text.primary"}
+                sx={{ mt: 0.5 }}
+              >
+                {formatDate(invoice.dueDate)}
+              </Typography>
+            </Box>
+            {invoice.paidAt && (
+              <Box>
+                <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                  PAID DATE
+                </Typography>
+                <Typography variant="body1" fontWeight={500} color="success.main" sx={{ mt: 0.5 }}>
+                  {formatDate(invoice.paidAt)}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          {/* Items Table */}
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>
+                    Qty
                   </TableCell>
-                  <TableCell align="right">
-                    {formatCurrency(item.amount, invoice.currency)}
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>
+                    Unit Price
+                  </TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600 }}>
+                    Amount
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {invoice.items.map((item) => (
+                  <TableRow key={item.id} sx={{ "&:last-child td": { border: 0 } }}>
+                    <TableCell>{item.description}</TableCell>
+                    <TableCell align="right">{item.quantity}</TableCell>
+                    <TableCell align="right">
+                      {formatCurrency(item.unitPrice, invoice.currency)}
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 500 }}>
+                      {formatCurrency(item.amount, invoice.currency)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-          <Box sx={{ width: 250 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mb: 1,
-              }}
-            >
-              <Typography>Subtotal</Typography>
-              <Typography>{formatCurrency(invoice.subtotal, invoice.currency)}</Typography>
-            </Box>
-            <Divider sx={{ my: 1 }} />
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography variant="h6">Total</Typography>
-              <Typography variant="h6">
-                {formatCurrency(invoice.total, invoice.currency)}
-              </Typography>
+          <Divider sx={{ my: 3 }} />
+
+          {/* Totals */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Box sx={{ minWidth: 280 }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
+                <Typography color="text.secondary">Subtotal</Typography>
+                <Typography>{formatCurrency(invoice.subtotal, invoice.currency)}</Typography>
+              </Box>
+              <Divider sx={{ my: 1.5 }} />
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Typography variant="h6" fontWeight={600}>
+                  Total Due
+                </Typography>
+                <Typography variant="h5" fontWeight={700} color="primary.main">
+                  {formatCurrency(invoice.total, invoice.currency)}
+                </Typography>
+              </Box>
             </Box>
           </Box>
-        </Box>
 
-        <Box
+          {/* Actions */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              mt: 5,
+              justifyContent: "center",
+              "@media print": { display: "none" },
+            }}
+          >
+            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint} size="large">
+              Print / Save PDF
+            </Button>
+
+            {isPayable && (
+              <Button
+                variant="contained"
+                startIcon={isPayLoading ? <Spinner size={20} /> : <PaymentIcon />}
+                onClick={handlePay}
+                disabled={isPayLoading}
+                size="large"
+              >
+                Pay Now
+              </Button>
+            )}
+
+            {isPaid && (
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<CheckCircleIcon />}
+                disabled
+                size="large"
+              >
+                Paid
+              </Button>
+            )}
+          </Box>
+        </Paper>
+
+        {/* Footer */}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          align="center"
           sx={{
-            display: "flex",
-            gap: 2,
             mt: 4,
-            justifyContent: "flex-end",
-            "@media print": {
-              display: "none",
-            },
+            "@media print": { display: "none" },
           }}
         >
-          <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
-            Print / Save as PDF
-          </Button>
-
-          {isPayable && (
-            <Button
-              variant="contained"
-              startIcon={<PaymentIcon />}
-              onClick={handlePay}
-              disabled={isPayLoading}
-            >
-              {isPayLoading ? "Loading..." : "Pay Now"}
-            </Button>
-          )}
-
-          {isPaid && (
-            <Button variant="contained" color="success" disabled>
-              Paid
-            </Button>
-          )}
-        </Box>
-      </Paper>
-
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        align="center"
-        sx={{
-          mt: 4,
-          "@media print": {
-            display: "none",
-          },
-        }}
-      >
-        Powered by Invox
-      </Typography>
-    </Container>
+          Powered by <strong>Invox</strong> - Simple Invoice Management
+        </Typography>
+      </Container>
+    </Box>
   );
 }

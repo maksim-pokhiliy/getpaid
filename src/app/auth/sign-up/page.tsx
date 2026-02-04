@@ -13,14 +13,34 @@ import {
   Paper,
   Link as MuiLink,
   Alert,
+  alpha,
+  useTheme,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import Link from "next/link";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Logo } from "@app/components/brand/Logo";
+import { Spinner } from "@app/components/feedback/Loading";
 import { signUpSchema, SignUpInput } from "@app/shared/schemas";
+
+const features = [
+  "Create professional invoices in minutes",
+  "Track payments and send reminders",
+  "Accept online payments via Stripe",
+  "Manage all your clients in one place",
+];
 
 export default function SignUpPage() {
   const router = useRouter();
+  const theme = useTheme();
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const {
     register,
@@ -57,70 +77,144 @@ export default function SignUpPage() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Paper sx={{ p: 4, width: "100%" }}>
-          <Typography variant="h4" component="h1" gutterBottom align="center">
-            Create Account
-          </Typography>
-          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
-            Start managing your invoices with Invox
-          </Typography>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <TextField
-              {...register("email")}
-              label="Email"
-              type="email"
-              fullWidth
-              margin="normal"
-              error={!!errors.email}
-              helperText={errors.email?.message}
-              autoComplete="email"
-            />
-            <TextField
-              {...register("password")}
-              label="Password"
-              type="password"
-              fullWidth
-              margin="normal"
-              error={!!errors.password}
-              helperText={errors.password?.message}
-              autoComplete="new-password"
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              size="large"
-              sx={{ mt: 2 }}
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating account..." : "Create Account"}
-            </Button>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          {/* Logo above form */}
+          <Box sx={{ mb: 4 }}>
+            <Logo size="large" />
           </Box>
 
-          <Typography variant="body2" align="center" sx={{ mt: 3 }}>
-            Already have an account?{" "}
-            <MuiLink component={Link} href="/auth/sign-in">
-              Sign in
-            </MuiLink>
+          <Paper sx={{ p: 5, width: "100%", borderRadius: 3 }}>
+            {/* Title */}
+            <Box sx={{ textAlign: "center", mb: 4 }}>
+              <Typography variant="h5" fontWeight={700} gutterBottom>
+                Create your account
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Start managing invoices like a pro
+              </Typography>
+            </Box>
+
+            {/* Features */}
+            <Box
+              sx={{
+                mb: 4,
+                p: 2.5,
+                borderRadius: 2,
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
+              }}
+            >
+              {features.map((feature) => (
+                <Box
+                  key={feature}
+                  sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 0.75 }}
+                >
+                  <CheckCircleIcon sx={{ fontSize: 18, color: "primary.main" }} />
+                  <Typography variant="body2" color="text.secondary">
+                    {feature}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+              <TextField
+                {...register("email")}
+                label="Email"
+                type="email"
+                fullWidth
+                margin="normal"
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                autoComplete="email"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                {...register("password")}
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                fullWidth
+                margin="normal"
+                error={!!errors.password}
+                helperText={errors.password?.message || "At least 8 characters"}
+                autoComplete="new-password"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        size="small"
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                size="large"
+                sx={{ mt: 3, py: 1.5 }}
+                disabled={isLoading}
+              >
+                {isLoading ? <Spinner size={24} /> : "Create Account"}
+              </Button>
+            </Box>
+
+            <Box
+              sx={{
+                mt: 4,
+                pt: 3,
+                borderTop: 1,
+                borderColor: "divider",
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="body2" color="text.secondary">
+                Already have an account?{" "}
+                <MuiLink component={Link} href="/auth/sign-in" sx={{ fontWeight: 600 }}>
+                  Sign in
+                </MuiLink>
+              </Typography>
+            </Box>
+          </Paper>
+
+          {/* Footer */}
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 4 }}>
+            &copy; {new Date().getFullYear()} Invox
           </Typography>
-        </Paper>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </Box>
   );
 }

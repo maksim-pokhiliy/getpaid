@@ -65,3 +65,38 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const user = await requireUser();
+    const body = await request.json();
+    const parsed = createSenderProfileSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          error: {
+            code: "VALIDATION_ERROR",
+            message: parsed.error.issues[0]?.message ?? "Invalid input",
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    const profile = await upsertSenderProfile(user.id, parsed.data);
+    return NextResponse.json(profile);
+  } catch (error) {
+    if (error instanceof AuthenticationError) {
+      return NextResponse.json(
+        { error: { code: "UNAUTHORIZED", message: "Unauthorized" } },
+        { status: 401 }
+      );
+    }
+    console.error("Update sender profile error:", error);
+    return NextResponse.json(
+      { error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" } },
+      { status: 500 }
+    );
+  }
+}
