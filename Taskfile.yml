@@ -1,0 +1,71 @@
+version: "3"
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  dev:
+    desc: Start development server
+    cmds:
+      - pnpm dev
+
+  build:
+    desc: Build for production
+    cmds:
+      - pnpm build
+
+  lint:
+    desc: Run ESLint
+    cmds:
+      - pnpm lint
+
+  typecheck:
+    desc: Run TypeScript type checking
+    cmds:
+      - pnpm typecheck
+
+  format:
+    desc: Format code with Prettier
+    cmds:
+      - pnpm format
+
+  format:check:
+    desc: Check code formatting
+    cmds:
+      - pnpm format:check
+
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - pnpm db:migrate
+
+  db:push:
+    desc: Push schema to database
+    cmds:
+      - pnpm db:push
+
+  db:studio:
+    desc: Open Prisma Studio
+    cmds:
+      - pnpm db:studio
+
+  followups:run:
+    desc: Run follow-up job processor
+    cmds:
+      - pnpm followups:run
+
+  setup:
+    desc: Initial project setup
+    cmds:
+      - pnpm install
+      - pnpm db:generate
+      - pnpm lefthook install
+
+  check:
+    desc: Run all checks (lint, typecheck, format)
+    cmds:
+      - pnpm lint
+      - pnpm typecheck
+      - pnpm format:check

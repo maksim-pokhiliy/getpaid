@@ -1,36 +1,178 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Invox - Invoice Management MVP
 
-## Getting Started
+A SaaS MVP for invoice management: create, send, track, and get paid.
 
-First, run the development server:
+## Features
+
+- User authentication (sign up, sign in)
+- Sender profile onboarding
+- Client management
+- Invoice creation with line items
+- Send invoices via email
+- Public invoice viewing
+- View tracking (when client opens invoice)
+- Automated follow-up reminders
+- Stripe Checkout integration for payments
+- Manual payment marking
+- Light/dark theme
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **UI:** MUI (Material UI)
+- **Database:** PostgreSQL with Prisma ORM
+- **Authentication:** NextAuth (Auth.js)
+- **Forms:** React Hook Form + Zod validation
+- **Data Fetching:** React Query
+- **Email:** Resend
+- **Payments:** Stripe Checkout
+
+## Prerequisites
+
+- Node.js 20+
+- pnpm 9+
+- PostgreSQL database
+- Resend account (for email)
+- Stripe account (for payments)
+
+## Setup
+
+### 1. Clone and install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy the example env file and fill in your values:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env
+```
 
-## Learn More
+Required environment variables:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/invox"
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+RESEND_API_KEY="re_your_api_key"
+EMAIL_FROM="invoices@yourdomain.com"
+STRIPE_SECRET_KEY="sk_test_your_key"
+STRIPE_WEBHOOK_SECRET="whsec_your_secret"
+APP_URL="http://localhost:3000"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. Setup database
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Generate Prisma client
+pnpm db:generate
 
-## Deploy on Vercel
+# Run migrations
+pnpm db:migrate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Or push schema directly (dev)
+pnpm db:push
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Start development server
+
+```bash
+pnpm dev
+```
+
+Visit http://localhost:3000
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint |
+| `pnpm typecheck` | Run TypeScript type checking |
+| `pnpm format` | Format code with Prettier |
+| `pnpm format:check` | Check code formatting |
+| `pnpm db:migrate` | Run database migrations |
+| `pnpm db:push` | Push schema to database |
+| `pnpm db:studio` | Open Prisma Studio |
+| `pnpm followups:run` | Process pending follow-up jobs |
+
+## Running Follow-ups
+
+The follow-up system sends reminder emails for unpaid invoices. Run the script manually or set up a cron job:
+
+```bash
+# Run once
+pnpm followups:run
+
+# Cron example (every hour)
+0 * * * * cd /path/to/invox && pnpm followups:run
+```
+
+## Stripe Webhook Setup
+
+### Local Development
+
+Use Stripe CLI to forward webhooks:
+
+```bash
+# Install Stripe CLI
+brew install stripe/stripe-cli/stripe
+
+# Login
+stripe login
+
+# Forward webhooks to local server
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+
+# Copy the webhook signing secret to .env
+```
+
+### Production
+
+1. Go to Stripe Dashboard > Developers > Webhooks
+2. Add endpoint: `https://yourdomain.com/api/stripe/webhook`
+3. Select events: `checkout.session.completed`
+4. Copy signing secret to `STRIPE_WEBHOOK_SECRET`
+
+## Project Structure
+
+```
+src/
+├── app/                    # Next.js routes and pages
+│   ├── api/               # API route handlers
+│   ├── app/               # Authenticated app pages
+│   ├── auth/              # Auth pages (sign-in, sign-up)
+│   └── i/[publicId]/      # Public invoice page
+├── components/            # React components
+│   ├── layout/           # Layout components
+│   ├── providers/        # Context providers
+│   └── theme/            # Theme configuration
+├── server/               # Server-side code
+│   ├── auth/             # Auth configuration
+│   ├── clients/          # Client service
+│   ├── db/               # Prisma client
+│   ├── email/            # Email service
+│   ├── followups/        # Follow-up service
+│   ├── invoices/         # Invoice service
+│   ├── sender-profile/   # Sender profile service
+│   └── stripe/           # Stripe service
+└── shared/               # Shared code
+    └── schemas/          # Zod validation schemas
+```
+
+## Architecture Rules
+
+- UI components never import Prisma directly
+- Route handlers call server services only
+- React Query hooks call API endpoints
+- All inputs validated with Zod schemas
+- Public pages use `publicId`, never internal `id`
+
+## License
+
+Private - All rights reserved
