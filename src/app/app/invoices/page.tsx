@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -24,20 +23,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { AppLayout } from "@app/components/layout/AppLayout";
 import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
 import { TableSkeleton } from "@app/components/feedback/Loading";
-
-interface Invoice {
-  id: string;
-  publicId: string;
-  status: string;
-  currency: string;
-  total: number;
-  dueDate: string;
-  createdAt: string;
-  client: {
-    name: string;
-    email: string;
-  };
-}
+import { useInvoices } from "@app/lib/api";
 
 function formatCurrency(amount: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -69,18 +55,7 @@ export default function InvoicesPage() {
   const router = useRouter();
   const theme = useTheme();
 
-  const {
-    data: invoices,
-    isLoading,
-    error,
-  } = useQuery<Invoice[]>({
-    queryKey: ["invoices"],
-    queryFn: async () => {
-      const response = await fetch("/api/invoices");
-      if (!response.ok) throw new Error("Failed to fetch invoices");
-      return response.json();
-    },
-  });
+  const { data: invoices, isLoading, error } = useInvoices();
 
   return (
     <AppLayout>

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useParams } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
   Button,
@@ -37,34 +36,7 @@ import { AppLayout } from "@app/components/layout/AppLayout";
 import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
 import { PageLoader, Spinner } from "@app/components/feedback/Loading";
 import { useToast } from "@app/components/feedback/Toast";
-
-interface InvoiceItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  amount: number;
-}
-
-interface Invoice {
-  id: string;
-  publicId: string;
-  status: string;
-  currency: string;
-  subtotal: number;
-  total: number;
-  dueDate: string;
-  sentAt: string | null;
-  viewedAt: string | null;
-  paidAt: string | null;
-  paymentMethod: string | null;
-  createdAt: string;
-  client: {
-    name: string;
-    email: string;
-  };
-  items: InvoiceItem[];
-}
+import { useInvoice, useSendInvoice, useMarkInvoicePaid, ApiError } from "@app/lib/api";
 
 function formatCurrency(amount: number, currency: string) {
   return new Intl.NumberFormat("en-US", {
@@ -104,68 +76,40 @@ const statusConfig: Record<
 
 export default function InvoiceDetailPage() {
   const params = useParams();
-  const queryClient = useQueryClient();
+  const invoiceId = params.id as string;
   const theme = useTheme();
   const toast = useToast();
   const [sendDialogOpen, setSendDialogOpen] = React.useState(false);
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = React.useState(false);
 
-  const {
-    data: invoice,
-    isLoading,
-    error,
-  } = useQuery<Invoice>({
-    queryKey: ["invoice", params.id],
-    queryFn: async () => {
-      const response = await fetch(`/api/invoices/${params.id}`);
-      if (!response.ok) throw new Error("Failed to fetch invoice");
-      return response.json();
-    },
-  });
+  const { data: invoice, isLoading, error } = useInvoice(invoiceId);
 
-  const sendMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/invoices/${params.id}/send`, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error?.message || "Failed to send invoice");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoice", params.id] });
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      setSendDialogOpen(false);
-      toast.success("Invoice sent successfully!", "Email Sent");
-    },
-    onError: (err: Error) => {
-      toast.error(err.message);
-    },
-  });
+  const sendMutation = useSendInvoice();
+  const markPaidMutation = useMarkInvoicePaid();
 
-  const markPaidMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/invoices/${params.id}/mark-paid`, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error?.message || "Failed to mark invoice as paid");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoice", params.id] });
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      setMarkPaidDialogOpen(false);
-      toast.success("Invoice marked as paid!", "Payment Recorded");
-    },
-    onError: (err: Error) => {
-      toast.error(err.message);
-    },
-  });
+  const handleSendInvoice = () => {
+    sendMutation.mutate(invoiceId, {
+      onSuccess: () => {
+        setSendDialogOpen(false);
+        toast.success("Invoice sent successfully!", "Email Sent");
+      },
+      onError: (err) => {
+        toast.error(err instanceof ApiError ? err.message : "Failed to send invoice");
+      },
+    });
+  };
+
+  const handleMarkPaid = () => {
+    markPaidMutation.mutate(invoiceId, {
+      onSuccess: () => {
+        setMarkPaidDialogOpen(false);
+        toast.success("Invoice marked as paid!", "Payment Recorded");
+      },
+      onError: (err) => {
+        toast.error(err instanceof ApiError ? err.message : "Failed to mark as paid");
+      },
+    });
+  };
 
   const copyPublicLink = () => {
     const url = `${window.location.origin}/i/${invoice?.publicId}`;
@@ -440,7 +384,7 @@ export default function InvoiceDetailPage() {
           <Button onClick={() => setSendDialogOpen(false)}>Cancel</Button>
           <Button
             variant="contained"
-            onClick={() => sendMutation.mutate()}
+            onClick={handleSendInvoice}
             disabled={sendMutation.isPending}
             startIcon={sendMutation.isPending ? <Spinner size={16} /> : <SendIcon />}
           >
@@ -467,7 +411,7 @@ export default function InvoiceDetailPage() {
           <Button onClick={() => setMarkPaidDialogOpen(false)}>Cancel</Button>
           <Button
             variant="contained"
-            onClick={() => markPaidMutation.mutate()}
+            onClick={handleMarkPaid}
             disabled={markPaidMutation.isPending}
             startIcon={markPaidMutation.isPending ? <Spinner size={16} /> : <CheckCircleIcon />}
           >

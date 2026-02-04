@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
   Button,
@@ -29,17 +28,7 @@ import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
 import { PageLoader, Spinner } from "@app/components/feedback/Loading";
 import { useToast } from "@app/components/feedback/Toast";
 import { senderProfileFormSchema, SenderProfileFormInput } from "@app/shared/schemas";
-
-interface SenderProfile {
-  id: string;
-  companyName: string | null;
-  displayName: string | null;
-  emailFrom: string | null;
-  address: string | null;
-  taxId: string | null;
-  defaultCurrency: string;
-  stripeAccountId: string | null;
-}
+import { useSenderProfile, useUpdateSenderProfile, ApiError } from "@app/lib/api";
 
 const currencies = [
   { value: "USD", label: "USD - US Dollar" },
@@ -69,18 +58,10 @@ function TabPanel(props: TabPanelProps) {
 export default function SettingsPage() {
   const theme = useTheme();
   const toast = useToast();
-  const queryClient = useQueryClient();
   const [tabValue, setTabValue] = React.useState(0);
   const [error, setError] = React.useState<string | null>(null);
 
-  const { data: profile, isLoading } = useQuery<SenderProfile>({
-    queryKey: ["sender-profile"],
-    queryFn: async () => {
-      const response = await fetch("/api/sender-profile");
-      if (!response.ok) throw new Error("Failed to fetch profile");
-      return response.json();
-    },
-  });
+  const { data: profile, isLoading } = useSenderProfile();
 
   const {
     register,
@@ -113,33 +94,21 @@ export default function SettingsPage() {
     }
   }, [profile, reset]);
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (data: SenderProfileFormInput) => {
-      const response = await fetch("/api/sender-profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error?.message || "Failed to update profile");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sender-profile"] });
-      toast.success("Settings saved successfully!");
-      setError(null);
-    },
-    onError: (err: Error) => {
-      setError(err.message);
-      toast.error(err.message);
-    },
-  });
+  const updateProfileMutation = useUpdateSenderProfile();
 
   const onSubmit = (data: SenderProfileFormInput) => {
     setError(null);
-    updateProfileMutation.mutate(data);
+    updateProfileMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success("Settings saved successfully!");
+        setError(null);
+      },
+      onError: (err) => {
+        const message = err instanceof ApiError ? err.message : "Failed to update profile";
+        setError(message);
+        toast.error(message);
+      },
+    });
   };
 
   const currency = useWatch({ control, name: "defaultCurrency" });

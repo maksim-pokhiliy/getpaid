@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { QueryProvider } from "./QueryProvider";
 import { SessionProvider } from "./SessionProvider";
 import { ThemeRegistry } from "@app/components/theme/ThemeRegistry";
@@ -11,7 +13,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <QueryProvider>
         <ThemeRegistry>
-          <ToastProvider>{children}</ToastProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <ToastProvider>{children}</ToastProvider>
+          </LocalizationProvider>
         </ThemeRegistry>
       </QueryProvider>
     </SessionProvider>

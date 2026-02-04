@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 import {
   Box,
   Button,
@@ -25,6 +26,7 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { AppLayout } from "@app/components/layout/AppLayout";
@@ -37,12 +39,7 @@ import {
   createClientSchema,
   CreateClientInput,
 } from "@app/shared/schemas";
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-}
+import { useClients, useCreateClient, useCreateInvoice, ApiError } from "@app/lib/api";
 
 const currencies = [
   { value: "USD", label: "USD - US Dollar" },
@@ -65,14 +62,7 @@ export default function NewInvoicePage() {
   const [clientDialogOpen, setClientDialogOpen] = React.useState(false);
   const [defaultDueDate] = React.useState(getDefaultDueDate);
 
-  const { data: clients, isLoading: clientsLoading } = useQuery<Client[]>({
-    queryKey: ["clients"],
-    queryFn: async () => {
-      const response = await fetch("/api/clients");
-      if (!response.ok) throw new Error("Failed to fetch clients");
-      return response.json();
-    },
-  });
+  const { data: clients, isLoading: clientsLoading } = useClients();
 
   const {
     register,
@@ -94,45 +84,30 @@ export default function NewInvoicePage() {
     name: "items",
   });
 
-  const createInvoiceMutation = useMutation({
-    mutationFn: async (
-      data: InvoiceFormInput & {
-        items: Array<{ description: string; quantity: number; unitPrice: number }>;
-      }
-    ) => {
-      const response = await fetch("/api/invoices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error?.message || "Failed to create invoice");
-      }
-      return response.json();
-    },
-    onSuccess: (invoice) => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      toast.success("Invoice created successfully!");
-      router.push(`/app/invoices/${invoice.id}`);
-    },
-    onError: (err: Error) => {
-      setError(err.message);
-      toast.error(err.message);
-    },
-  });
+  const createInvoiceMutation = useCreateInvoice();
 
   const onSubmit = (data: InvoiceFormInput) => {
     setError(null);
     const transformedData = {
-      ...data,
-      dueDate: data.dueDate,
+      clientId: data.clientId,
+      currency: data.currency,
+      dueDate: new Date(data.dueDate),
       items: data.items.map((item) => ({
         ...item,
         unitPrice: Math.round(item.unitPrice * 100),
       })),
     };
-    createInvoiceMutation.mutate(transformedData);
+    createInvoiceMutation.mutate(transformedData, {
+      onSuccess: (invoice) => {
+        toast.success("Invoice created successfully!");
+        router.push(`/app/invoices/${invoice.id}`);
+      },
+      onError: (err) => {
+        const message = err instanceof ApiError ? err.message : "Failed to create invoice";
+        setError(message);
+        toast.error(message);
+      },
+    });
   };
 
   const items = useWatch({ control, name: "items" });
@@ -222,13 +197,23 @@ export default function NewInvoicePage() {
               </Select>
             </FormControl>
 
-            <TextField
-              {...register("dueDate")}
-              label="Due Date"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-              error={!!errors.dueDate}
-              helperText={errors.dueDate?.message}
+            <Controller
+              name="dueDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  label="Due Date"
+                  value={field.value ? dayjs(field.value) : null}
+                  onChange={(date) => field.onChange(date?.format("YYYY-MM-DD") || "")}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!errors.dueDate,
+                      helperText: errors.dueDate?.message,
+                    },
+                  }}
+                />
+              )}
             />
           </Box>
 
@@ -403,31 +388,19 @@ function AddClientDialog({
     resolver: zodResolver(createClientSchema),
   });
 
-  const createClientMutation = useMutation({
-    mutationFn: async (data: CreateClientInput) => {
-      const response = await fetch("/api/clients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error?.message || "Failed to create client");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      reset();
-      onSuccess();
-    },
-    onError: (err: Error) => {
-      setError(err.message);
-    },
-  });
+  const createClientMutation = useCreateClient();
 
   const onSubmit = (data: CreateClientInput) => {
     setError(null);
-    createClientMutation.mutate(data);
+    createClientMutation.mutate(data, {
+      onSuccess: () => {
+        reset();
+        onSuccess();
+      },
+      onError: (err) => {
+        setError(err instanceof ApiError ? err.message : "Failed to create client");
+      },
+    });
   };
 
   return (
