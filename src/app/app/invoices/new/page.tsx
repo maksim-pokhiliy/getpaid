@@ -7,6 +7,22 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   Box,
   Button,
   FormControl,
@@ -29,6 +45,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { AppLayout } from "@app/components/layout/AppLayout";
 import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
 import { Spinner } from "@app/components/feedback/Loading";
@@ -49,6 +66,104 @@ const currencies = [
   { value: "CAD", label: "CAD - Canadian Dollar" },
   { value: "AUD", label: "AUD - Australian Dollar" },
 ];
+
+interface SortableItemProps {
+  id: string;
+  index: number;
+  currency: string;
+  canDelete: boolean;
+  register: ReturnType<typeof useForm<InvoiceFormInput>>["register"];
+  errors: ReturnType<typeof useForm<InvoiceFormInput>>["formState"]["errors"];
+  onRemove: () => void;
+}
+
+function SortableItem({
+  id,
+  index,
+  currency,
+  canDelete,
+  register,
+  errors,
+  onRemove,
+}: SortableItemProps) {
+  const theme = useTheme();
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <Box
+      ref={setNodeRef}
+      style={style}
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "24px 2fr 100px 120px 40px",
+        gap: 2,
+        mb: 2,
+        alignItems: "start",
+        p: 1,
+        borderRadius: 2,
+        bgcolor: isDragging
+          ? alpha(theme.palette.primary.main, 0.08)
+          : alpha(theme.palette.primary.main, 0.02),
+        cursor: isDragging ? "grabbing" : "default",
+      }}
+    >
+      <Box
+        {...attributes}
+        {...listeners}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: 40,
+          cursor: "grab",
+          color: "text.secondary",
+          "&:hover": { color: "primary.main" },
+        }}
+      >
+        <DragIndicatorIcon fontSize="small" />
+      </Box>
+      <TextField
+        {...register(`items.${index}.description`)}
+        placeholder="Item description"
+        size="small"
+        error={!!errors.items?.[index]?.description}
+        helperText={errors.items?.[index]?.description?.message}
+      />
+      <TextField
+        {...register(`items.${index}.quantity`, { valueAsNumber: true })}
+        type="number"
+        size="small"
+        inputProps={{ min: 1 }}
+        error={!!errors.items?.[index]?.quantity}
+      />
+      <TextField
+        {...register(`items.${index}.unitPrice`, { valueAsNumber: true })}
+        type="number"
+        size="small"
+        inputProps={{ min: 0, step: 0.01 }}
+        InputProps={{
+          startAdornment: (
+            <Typography variant="body2" color="text.secondary" sx={{ mr: 0.5 }}>
+              {currency}
+            </Typography>
+          ),
+        }}
+        error={!!errors.items?.[index]?.unitPrice}
+      />
+      <IconButton onClick={onRemove} disabled={!canDelete} color="error" size="small">
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+}
 
 function getDefaultDueDate(): string {
   return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
@@ -83,10 +198,26 @@ export default function NewInvoicePage() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, move } = useFieldArray({
     control,
     name: "items",
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = fields.findIndex((f) => f.id === active.id);
+      const newIndex = fields.findIndex((f) => f.id === over.id);
+      move(oldIndex, newIndex);
+    }
+  };
 
   const createInvoiceMutation = useCreateInvoice();
 
@@ -315,12 +446,13 @@ export default function NewInvoicePage() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: "2fr 100px 120px 40px",
+              gridTemplateColumns: "24px 2fr 100px 120px 40px",
               gap: 2,
               mb: 1,
               px: 1,
             }}
           >
+            <Box />
             <Typography variant="caption" color="text.secondary" fontWeight={600}>
               Description
             </Typography>
@@ -333,58 +465,26 @@ export default function NewInvoicePage() {
             <Box />
           </Box>
 
-          {fields.map((field, index) => (
-            <Box
-              key={field.id}
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "2fr 100px 120px 40px",
-                gap: 2,
-                mb: 2,
-                alignItems: "start",
-                p: 1,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.primary.main, 0.02),
-              }}
-            >
-              <TextField
-                {...register(`items.${index}.description`)}
-                placeholder="Item description"
-                size="small"
-                error={!!errors.items?.[index]?.description}
-                helperText={errors.items?.[index]?.description?.message}
-              />
-              <TextField
-                {...register(`items.${index}.quantity`, { valueAsNumber: true })}
-                type="number"
-                size="small"
-                inputProps={{ min: 1 }}
-                error={!!errors.items?.[index]?.quantity}
-              />
-              <TextField
-                {...register(`items.${index}.unitPrice`, { valueAsNumber: true })}
-                type="number"
-                size="small"
-                inputProps={{ min: 0, step: 0.01 }}
-                InputProps={{
-                  startAdornment: (
-                    <Typography variant="body2" color="text.secondary" sx={{ mr: 0.5 }}>
-                      {currency}
-                    </Typography>
-                  ),
-                }}
-                error={!!errors.items?.[index]?.unitPrice}
-              />
-              <IconButton
-                onClick={() => remove(index)}
-                disabled={fields.length === 1}
-                color="error"
-                size="small"
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          ))}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+              {fields.map((field, index) => (
+                <SortableItem
+                  key={field.id}
+                  id={field.id}
+                  index={index}
+                  currency={currency}
+                  canDelete={fields.length > 1}
+                  register={register}
+                  errors={errors}
+                  onRemove={() => remove(index)}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
 
           <Button
             startIcon={<AddIcon />}
