@@ -4,6 +4,51 @@ import { prisma } from "@app/server/db";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 const APP_URL = process.env.APP_URL || "http://localhost:3000";
+const STRIPE_CLIENT_ID = process.env.STRIPE_CLIENT_ID || "";
+
+// Stripe Connect OAuth URL
+export function getStripeConnectUrl(state: string): string {
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: STRIPE_CLIENT_ID,
+    scope: "read_write",
+    redirect_uri: `${APP_URL}/api/stripe/connect/callback`,
+    state,
+  });
+
+  return `https://connect.stripe.com/oauth/authorize?${params.toString()}`;
+}
+
+// Exchange authorization code for connected account ID
+export async function connectStripeAccount(code: string): Promise<string> {
+  const response = await stripe.oauth.token({
+    grant_type: "authorization_code",
+    code,
+  });
+
+  if (!response.stripe_user_id) {
+    throw new Error("Failed to connect Stripe account");
+  }
+
+  return response.stripe_user_id;
+}
+
+// Disconnect a Stripe account
+export async function disconnectStripeAccount(stripeAccountId: string): Promise<void> {
+  await stripe.oauth.deauthorize({
+    client_id: STRIPE_CLIENT_ID,
+    stripe_user_id: stripeAccountId,
+  });
+}
+
+// Get connected account details
+export async function getConnectedAccount(stripeAccountId: string): Promise<Stripe.Account | null> {
+  try {
+    return await stripe.accounts.retrieve(stripeAccountId);
+  } catch {
+    return null;
+  }
+}
 
 export async function createCheckoutSession(invoiceId: string) {
   const invoice = await prisma.invoice.findUnique({
@@ -32,7 +77,10 @@ export async function createCheckoutSession(invoiceId: string) {
     invoice.user.senderProfile?.displayName ||
     invoice.user.email;
 
-  const session = await stripe.checkout.sessions.create({
+  const stripeAccountId = invoice.user.senderProfile?.stripeAccountId;
+
+  // Build checkout session options
+  const sessionOptions: Stripe.Checkout.SessionCreateParams = {
     mode: "payment",
     customer_email: invoice.client.email,
     line_items: invoice.items.map((item) => ({
@@ -54,7 +102,19 @@ export async function createCheckoutSession(invoiceId: string) {
     payment_intent_data: {
       description: `Invoice ${invoice.publicId} from ${senderName}`,
     },
-  });
+  };
+
+  // If user has connected Stripe account, use destination charges
+  if (stripeAccountId) {
+    sessionOptions.payment_intent_data = {
+      ...sessionOptions.payment_intent_data,
+      transfer_data: {
+        destination: stripeAccountId,
+      },
+    };
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionOptions);
 
   await prisma.invoice.update({
     where: { id: invoiceId },

@@ -313,3 +313,11 @@ export const templatesApi = {
       method: "DELETE",
     }),
 };
+
+// Stripe Connect API
+export const stripeApi = {
+  disconnect: () =>
+    fetchApi<{ success: boolean }>("/api/stripe/disconnect", {
+      method: "POST",
+    }),
+};

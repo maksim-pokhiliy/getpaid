@@ -9,6 +9,7 @@ import {
   analyticsApi,
   templatesApi,
   remindersApi,
+  stripeApi,
   type RecordPaymentInput,
   type CreateTemplateInput,
   type UpdateTemplateInput,
@@ -477,6 +478,18 @@ export function useUpdateReminderSettings() {
     mutationFn: (data: ReminderSettings) => remindersApi.update(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.reminderSettings });
+    },
+  });
+}
+
+// Stripe hooks
+export function useDisconnectStripe() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => stripeApi.disconnect(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.senderProfile });
     },
   });
 }

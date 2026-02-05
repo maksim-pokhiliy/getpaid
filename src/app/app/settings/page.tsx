@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -32,16 +33,20 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import BrushIcon from "@mui/icons-material/Brush";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import LinkOffIcon from "@mui/icons-material/LinkOff";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { AppLayout } from "@app/components/layout/AppLayout";
 import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
 import { PageLoader, Spinner } from "@app/components/feedback/Loading";
 import { useToast } from "@app/components/feedback/Toast";
+import { ConfirmDialog } from "@app/components/feedback/ConfirmDialog";
 import { senderProfileFormSchema, SenderProfileFormInput } from "@app/shared/schemas";
 import {
   useSenderProfile,
   useUpdateSenderProfile,
   useReminderSettings,
   useUpdateReminderSettings,
+  useDisconnectStripe,
   ApiError,
 } from "@app/lib/api";
 
@@ -70,11 +75,47 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+const TAB_MAP: Record<string, number> = {
+  profile: 0,
+  payments: 1,
+  reminders: 2,
+  branding: 3,
+};
+
 export default function SettingsPage() {
   const theme = useTheme();
   const toast = useToast();
-  const [tabValue, setTabValue] = React.useState(0);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Get tab from URL or default to 0
+  const tabParam = searchParams.get("tab");
+  const initialTab = tabParam ? (TAB_MAP[tabParam] ?? 0) : 0;
+  const [tabValue, setTabValue] = React.useState(initialTab);
   const [error, setError] = React.useState<string | null>(null);
+  const [disconnectDialogOpen, setDisconnectDialogOpen] = React.useState(false);
+
+  // Handle URL params for success/error messages
+  React.useEffect(() => {
+    const success = searchParams.get("success");
+    const errorParam = searchParams.get("error");
+
+    if (success === "stripe_connected") {
+      toast.success("Stripe account connected successfully!");
+      router.replace("/app/settings?tab=payments");
+    } else if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        stripe_connect_failed: "Failed to connect Stripe account",
+        missing_params: "Missing required parameters",
+        state_expired: "Connection expired, please try again",
+        invalid_state: "Invalid connection state",
+        connection_failed: "Failed to connect Stripe account",
+        access_denied: "Access was denied by Stripe",
+      };
+      toast.error(errorMessages[errorParam] || "An error occurred");
+      router.replace("/app/settings?tab=payments");
+    }
+  }, [searchParams, toast, router]);
 
   // Reminder settings state
   const [reminderEnabled, setReminderEnabled] = React.useState(false);
@@ -92,6 +133,7 @@ export default function SettingsPage() {
   const { data: profile, isLoading } = useSenderProfile();
   const { data: reminderSettings, isLoading: reminderLoading } = useReminderSettings();
   const updateReminderMutation = useUpdateReminderSettings();
+  const disconnectStripeMutation = useDisconnectStripe();
 
   const {
     register,
@@ -221,6 +263,18 @@ export default function SettingsPage() {
         },
       }
     );
+  };
+
+  const handleDisconnectStripe = () => {
+    disconnectStripeMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success("Stripe account disconnected");
+        setDisconnectDialogOpen(false);
+      },
+      onError: (err) => {
+        toast.error(err instanceof ApiError ? err.message : "Failed to disconnect Stripe");
+      },
+    });
   };
 
   if (isLoading || reminderLoading) {
@@ -391,7 +445,9 @@ export default function SettingsPage() {
                   width: 80,
                   height: 80,
                   borderRadius: "50%",
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  bgcolor: profile?.stripeAccountId
+                    ? alpha(theme.palette.success.main, 0.1)
+                    : alpha(theme.palette.primary.main, 0.1),
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -399,7 +455,11 @@ export default function SettingsPage() {
                   mb: 3,
                 }}
               >
-                <PaymentIcon sx={{ fontSize: 40, color: "primary.main" }} />
+                {profile?.stripeAccountId ? (
+                  <CheckCircleIcon sx={{ fontSize: 40, color: "success.main" }} />
+                ) : (
+                  <PaymentIcon sx={{ fontSize: 40, color: "primary.main" }} />
+                )}
               </Box>
               <Typography variant="h6" fontWeight={600} gutterBottom>
                 {profile?.stripeAccountId ? "Stripe Connected" : "Connect Stripe"}
@@ -414,16 +474,48 @@ export default function SettingsPage() {
                   : "Connect your Stripe account to accept online payments directly from invoices."}
               </Typography>
               {profile?.stripeAccountId ? (
-                <Alert severity="success" sx={{ maxWidth: 400, mx: "auto", borderRadius: 2 }}>
-                  Stripe account connected successfully
-                </Alert>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}
+                >
+                  <Alert
+                    severity="success"
+                    icon={<CheckCircleIcon />}
+                    sx={{ maxWidth: 400, borderRadius: 2 }}
+                  >
+                    Stripe account connected successfully
+                  </Alert>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<LinkOffIcon />}
+                    onClick={() => setDisconnectDialogOpen(true)}
+                  >
+                    Disconnect Stripe
+                  </Button>
+                </Box>
               ) : (
-                <Button variant="contained" startIcon={<PaymentIcon />} size="large">
+                <Button
+                  variant="contained"
+                  startIcon={<PaymentIcon />}
+                  size="large"
+                  href="/api/stripe/connect"
+                >
                   Connect Stripe Account
                 </Button>
               )}
             </Box>
           </TabPanel>
+
+          <ConfirmDialog
+            open={disconnectDialogOpen}
+            title="Disconnect Stripe Account"
+            message="Are you sure you want to disconnect your Stripe account? You will no longer be able to accept online payments until you reconnect."
+            confirmText="Disconnect"
+            confirmColor="error"
+            onConfirm={handleDisconnectStripe}
+            onClose={() => setDisconnectDialogOpen(false)}
+            isLoading={disconnectStripeMutation.isPending}
+          />
 
           <TabPanel value={tabValue} index={2}>
             <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 3 }}>
