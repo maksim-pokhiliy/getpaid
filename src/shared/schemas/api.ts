@@ -32,6 +32,23 @@ export const invoiceItemResponseSchema = z.object({
   amount: z.number(),
 });
 
+// Invoice event (audit log) schema
+export const invoiceEventSchema = z.object({
+  id: z.string(),
+  type: z.enum([
+    "CREATED",
+    "SENT",
+    "VIEWED",
+    "REMINDER_SENT",
+    "PAID_STRIPE",
+    "PAID_MANUAL",
+    "STATUS_CHANGED",
+  ]),
+  createdAt: z.string(),
+});
+
+export type InvoiceEvent = z.infer<typeof invoiceEventSchema>;
+
 // Invoice response schema
 export const invoiceSchema = z.object({
   id: z.string(),
@@ -60,6 +77,7 @@ export const invoiceSchema = z.object({
     email: z.string(),
   }),
   items: z.array(invoiceItemResponseSchema),
+  events: z.array(invoiceEventSchema).optional(),
 });
 
 export const invoiceListItemSchema = z.object({
