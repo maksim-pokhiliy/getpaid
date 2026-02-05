@@ -272,6 +272,24 @@ export interface UpdateTemplateInput {
   }[];
 }
 
+// Reminder settings types
+export interface ReminderSettings {
+  enabled: boolean;
+  mode: "AFTER_SENT" | "AFTER_DUE";
+  delaysDays: number[];
+}
+
+// Reminders API
+export const remindersApi = {
+  get: () => fetchApi<ReminderSettings>("/api/reminders"),
+
+  update: (data: ReminderSettings) =>
+    fetchApi<ReminderSettings>("/api/reminders", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+};
+
 // Templates API
 export const templatesApi = {
   list: () => fetchApi<Template[]>("/api/templates"),

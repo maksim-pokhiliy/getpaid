@@ -8,10 +8,12 @@ import {
   publicApi,
   analyticsApi,
   templatesApi,
+  remindersApi,
   type RecordPaymentInput,
   type CreateTemplateInput,
   type UpdateTemplateInput,
   type Template,
+  type ReminderSettings,
 } from "./client";
 import type { CreateClientInput, UpdateClientInput } from "@app/shared/schemas/client";
 import type { CreateInvoiceInput, UpdateInvoiceInput } from "@app/shared/schemas/invoice";
@@ -28,6 +30,7 @@ export const queryKeys = {
   analytics: ["analytics"] as const,
   templates: ["templates"] as const,
   template: (id: string) => ["template", id] as const,
+  reminderSettings: ["reminder-settings"] as const,
 };
 
 // Stale time constants
@@ -454,6 +457,26 @@ export function useDeleteTemplate() {
     onSettled: (_, __, id) => {
       queryClient.removeQueries({ queryKey: queryKeys.template(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.templates });
+    },
+  });
+}
+
+// Reminder settings hooks
+export function useReminderSettings() {
+  return useQuery({
+    queryKey: queryKeys.reminderSettings,
+    queryFn: remindersApi.get,
+    staleTime: STALE_TIME.long,
+  });
+}
+
+export function useUpdateReminderSettings() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: ReminderSettings) => remindersApi.update(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.reminderSettings });
     },
   });
 }
