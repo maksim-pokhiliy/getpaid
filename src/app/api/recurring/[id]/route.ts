@@ -6,7 +6,7 @@ import {
   updateRecurringInvoice,
   deleteRecurringInvoice,
 } from "@app/server/recurring";
-import { VALIDATION } from "@app/lib/constants";
+import { VALIDATION } from "@app/shared/config/config";
 
 const updateRecurringSchema = z.object({
   name: z.string().min(1).optional(),

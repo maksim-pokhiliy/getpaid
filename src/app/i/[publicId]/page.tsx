@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getInvoiceByPublicId } from "@app/server/invoices";
-import PublicInvoiceView from "./PublicInvoiceView";
+import PublicInvoiceView from "@app/features/public-invoice/components/public-invoice-view";
 
 interface Props {
   params: Promise<{ publicId: string }>;

@@ -36,20 +36,20 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { TableSkeleton, Spinner } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
-import { ConfirmDialog, useConfirmDialog } from "@app/components/feedback/ConfirmDialog";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { TableSkeleton, Spinner } from "@app/shared/ui/loading";
+import { useToast } from "@app/shared/ui/toast";
+import { ConfirmDialog, useConfirmDialog } from "@app/shared/ui/confirm-dialog";
 import {
   useClients,
   useCreateClient,
   useUpdateClient,
   useDeleteClient,
-  ApiError,
-} from "@app/lib/api";
+} from "@app/features/clients";
+import { ApiError } from "@app/shared/api";
 import { createClientSchema, CreateClientInput } from "@app/shared/schemas";
-import { formatDateCompact } from "@app/lib/format";
+import { formatDateCompact } from "@app/shared/lib/format";
 
 export default function ClientsPage() {
   const toast = useToast();

@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { formatCurrency, formatDate } from "@app/lib/format";
+import { formatCurrency, formatDate } from "@app/shared/lib/format";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

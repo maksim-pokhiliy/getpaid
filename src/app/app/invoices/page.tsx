@@ -26,20 +26,20 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import EditIcon from "@mui/icons-material/Edit";
 import DownloadIcon from "@mui/icons-material/Download";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { useToast } from "@app/components/feedback/Toast";
-import { ConfirmDialog, useConfirmDialog } from "@app/components/feedback/ConfirmDialog";
-import { InvoicesContent } from "@app/components/pages/invoices";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { useToast } from "@app/shared/ui/toast";
+import { ConfirmDialog, useConfirmDialog } from "@app/shared/ui/confirm-dialog";
+import { InvoicesContent } from "@app/features/invoices/components";
 import {
   useInvoices,
   useDeleteInvoice,
   useDuplicateInvoice,
   usePrefetchInvoice,
-  ApiError,
-} from "@app/lib/api";
-import { exportInvoicesToCSV } from "@app/lib/export";
-import { useVirtualList } from "@app/hooks";
+} from "@app/features/invoices";
+import { ApiError } from "@app/shared/api";
+import { exportInvoicesToCSV } from "@app/shared/lib/export";
+import { useVirtualList } from "@app/shared/hooks";
 
 export default function InvoicesPage() {
   const router = useRouter();

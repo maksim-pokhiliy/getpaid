@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
 import { getRecurringInvoices, createRecurringInvoice } from "@app/server/recurring";
-import { VALIDATION } from "@app/lib/constants";
+import { VALIDATION } from "@app/shared/config/config";
 
 const createRecurringSchema = z.object({
   clientId: z.string().min(1),

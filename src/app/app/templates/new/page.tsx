@@ -24,11 +24,12 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { Spinner } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
-import { useCreateTemplate, ApiError } from "@app/lib/api";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { Spinner } from "@app/shared/ui/loading";
+import { useToast } from "@app/shared/ui/toast";
+import { useCreateTemplate } from "@app/features/templates";
+import { ApiError } from "@app/shared/api";
 
 const currencies = ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CHF", "CNY", "RUB"];
 

@@ -30,20 +30,21 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import RepeatIcon from "@mui/icons-material/Repeat";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { PageLoader } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
-import { ConfirmDialog } from "@app/components/feedback/ConfirmDialog";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { PageLoader } from "@app/shared/ui/loading";
+import { useToast } from "@app/shared/ui/toast";
+import { ConfirmDialog } from "@app/shared/ui/confirm-dialog";
 import {
   useRecurringInvoices,
   useDeleteRecurring,
   useUpdateRecurring,
   useGenerateFromRecurring,
-  ApiError,
-} from "@app/lib/api";
-import type { RecurringInvoice, RecurringStatus } from "@app/lib/api/client";
-import { formatCurrency, formatDateCompact } from "@app/lib/format";
+  type RecurringInvoice,
+  type RecurringStatus,
+} from "@app/features/recurring";
+import { ApiError } from "@app/shared/api";
+import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
 
 const frequencyLabels: Record<string, string> = {
   WEEKLY: "Weekly",

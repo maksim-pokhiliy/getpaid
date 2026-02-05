@@ -1,0 +1,44 @@
+"use client";
+
+import {
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
+
+type ReminderMode = "AFTER_SENT" | "AFTER_DUE";
+
+interface ReminderModeSelectorProps {
+  mode: ReminderMode;
+  onChange: (mode: ReminderMode) => void;
+}
+
+const MODE_DESCRIPTIONS: Record<ReminderMode, string> = {
+  AFTER_SENT: "Reminders will be sent X days after the invoice is sent",
+  AFTER_DUE: "Reminders will be sent X days after the due date",
+};
+
+export function ReminderModeSelector({ mode, onChange }: ReminderModeSelectorProps) {
+  return (
+    <>
+      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
+        When to send reminders
+      </Typography>
+      <FormControl sx={{ minWidth: 300, mb: 4 }}>
+        <InputLabel>Reminder timing</InputLabel>
+        <Select
+          value={mode}
+          label="Reminder timing"
+          onChange={(e) => onChange(e.target.value as ReminderMode)}
+        >
+          <MenuItem value="AFTER_SENT">After invoice is sent</MenuItem>
+          <MenuItem value="AFTER_DUE">After due date passes</MenuItem>
+        </Select>
+        <FormHelperText>{MODE_DESCRIPTIONS[mode]}</FormHelperText>
+      </FormControl>
+    </>
+  );
+}

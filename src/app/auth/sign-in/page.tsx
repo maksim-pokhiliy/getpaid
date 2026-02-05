@@ -22,8 +22,8 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { Logo } from "@app/components/brand/Logo";
-import { Spinner } from "@app/components/feedback/Loading";
+import { Logo } from "@app/shared/ui/logo";
+import { Spinner } from "@app/shared/ui/loading";
 import { signInSchema, SignInInput } from "@app/shared/schemas";
 
 export default function SignInPage() {

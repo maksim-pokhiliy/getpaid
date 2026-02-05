@@ -30,11 +30,11 @@ import EditIcon from "@mui/icons-material/Edit";
 import PreviewIcon from "@mui/icons-material/Preview";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import AddIcon from "@mui/icons-material/Add";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { PageLoader, Spinner } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
-import { ConfirmDialog, useConfirmDialog } from "@app/components/feedback/ConfirmDialog";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { PageLoader, Spinner } from "@app/shared/ui/loading";
+import { useToast } from "@app/shared/ui/toast";
+import { ConfirmDialog, useConfirmDialog } from "@app/shared/ui/confirm-dialog";
 import {
   useInvoice,
   useSendInvoice,
@@ -43,11 +43,11 @@ import {
   useDuplicateInvoice,
   useRecordPayment,
   useDeletePayment,
-  ApiError,
-} from "@app/lib/api";
-import { generateInvoicePdf } from "@app/lib/export";
-import { formatCurrency, formatDate } from "@app/lib/format";
-import { STATUS_CONFIG } from "@app/lib/constants";
+} from "@app/features/invoices";
+import { ApiError } from "@app/shared/api";
+import { generateInvoicePdf } from "@app/shared/lib/export";
+import { formatCurrency, formatDate } from "@app/shared/lib/format";
+import { STATUS_CONFIG } from "@app/features/invoices/constants/invoice";
 import {
   InvoiceTimeline,
   PaymentHistory,
@@ -56,7 +56,7 @@ import {
   MarkPaidDialog,
   RecordPaymentDialog,
   InvoicePreviewDialog,
-} from "./components";
+} from "@app/features/invoices/components";
 
 export default function InvoiceDetailPage() {
   const params = useParams();

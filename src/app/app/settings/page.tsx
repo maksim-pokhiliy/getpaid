@@ -7,11 +7,16 @@ import BusinessIcon from "@mui/icons-material/Business";
 import PaymentIcon from "@mui/icons-material/Payment";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import BrushIcon from "@mui/icons-material/Brush";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { PageLoader } from "@app/components/feedback/Loading";
-import { useSenderProfile, useReminderSettings } from "@app/lib/api";
-import { BusinessProfileTab, PaymentsTab, RemindersTab, BrandingTab } from "./components";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { PageLoader } from "@app/shared/ui/loading";
+import { useSenderProfile, useReminderSettings } from "@app/features/settings";
+import {
+  BusinessProfileTab,
+  PaymentsTab,
+  RemindersTab,
+  BrandingTab,
+} from "@app/features/settings/components";
 
 interface TabPanelProps {
   children?: React.ReactNode;

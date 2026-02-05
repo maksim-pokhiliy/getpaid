@@ -29,13 +29,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { TableSkeleton } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
-import { ConfirmDialog, useConfirmDialog } from "@app/components/feedback/ConfirmDialog";
-import { useTemplates, useDeleteTemplate, type Template } from "@app/lib/api";
-import { formatCurrency, formatDateCompact } from "@app/lib/format";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { TableSkeleton } from "@app/shared/ui/loading";
+import { useToast } from "@app/shared/ui/toast";
+import { ConfirmDialog, useConfirmDialog } from "@app/shared/ui/confirm-dialog";
+import { useTemplates, useDeleteTemplate, type Template } from "@app/features/templates";
+import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
 
 export default function TemplatesPage() {
   const router = useRouter();

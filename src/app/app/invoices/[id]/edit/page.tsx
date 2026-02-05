@@ -46,17 +46,19 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
-import { PageLoader, Spinner } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import { PageLoader, Spinner } from "@app/shared/ui/loading";
+import { useToast } from "@app/shared/ui/toast";
 import {
   invoiceFormSchema,
   InvoiceFormInput,
   createClientSchema,
   CreateClientInput,
 } from "@app/shared/schemas";
-import { useClients, useCreateClient, useInvoice, useUpdateInvoice, ApiError } from "@app/lib/api";
+import { useClients, useCreateClient } from "@app/features/clients";
+import { useInvoice, useUpdateInvoice } from "@app/features/invoices";
+import { ApiError } from "@app/shared/api";
 
 const currencies = [
   { value: "USD", label: "USD - US Dollar" },

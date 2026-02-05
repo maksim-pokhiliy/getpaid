@@ -7,3 +7,8 @@ ignoredBuiltDependencies:
   - prisma
   - sharp
   - unrs-resolver
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - core-js
+  - lefthook

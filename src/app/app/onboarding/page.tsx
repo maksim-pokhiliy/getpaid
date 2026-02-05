@@ -21,9 +21,9 @@ import {
   Step,
   StepLabel,
 } from "@mui/material";
-import { Logo } from "@app/components/brand/Logo";
-import { Spinner } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
+import { Logo } from "@app/shared/ui/logo";
+import { Spinner } from "@app/shared/ui/loading";
+import { useToast } from "@app/shared/ui/toast";
 import { senderProfileFormSchema, SenderProfileFormInput } from "@app/shared/schemas";
 
 const currencies = [

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
 import { getFollowUpRule, createOrUpdateFollowUpRule } from "@app/server/followups";
-import { REMINDER } from "@app/lib/constants";
+import { REMINDER } from "@app/shared/config/config";
 
 const updateReminderSettingsSchema = z.object({
   enabled: z.boolean(),

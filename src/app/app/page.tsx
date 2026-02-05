@@ -23,11 +23,11 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import WarningIcon from "@mui/icons-material/Warning";
 import PeopleIcon from "@mui/icons-material/People";
 import AddIcon from "@mui/icons-material/Add";
-import { AppLayout } from "@app/components/layout/AppLayout";
-import { MetricCard } from "@app/components/data-display";
-import { useAnalytics } from "@app/lib/api";
-import { formatCurrency, formatCurrencyCompact, formatDateShort } from "@app/lib/format";
-import { STATUS_COLORS } from "@app/lib/constants";
+import { AppLayout } from "@app/shared/layout/app-layout";
+import { MetricCard } from "@app/shared/ui/metric-card";
+import { useAnalytics } from "@app/features/dashboard";
+import { formatCurrency, formatCurrencyCompact, formatDateShort } from "@app/shared/lib/format";
+import { STATUS_COLORS } from "@app/features/invoices/constants/invoice";
 
 export default function DashboardPage() {
   const router = useRouter();

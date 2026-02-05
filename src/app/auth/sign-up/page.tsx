@@ -24,8 +24,8 @@ import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { Logo } from "@app/components/brand/Logo";
-import { Spinner } from "@app/components/feedback/Loading";
+import { Logo } from "@app/shared/ui/logo";
+import { Spinner } from "@app/shared/ui/loading";
 import { signUpSchema, SignUpInput } from "@app/shared/schemas";
 
 const features = [
