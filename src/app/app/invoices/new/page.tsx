@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import {
   DndContext,
@@ -56,7 +56,7 @@ import {
   createClientSchema,
   CreateClientInput,
 } from "@app/shared/schemas";
-import { useClients, useCreateClient, useCreateInvoice, ApiError } from "@app/lib/api";
+import { useClients, useCreateClient, useCreateInvoice, useTemplate, ApiError } from "@app/lib/api";
 import { useAutosave } from "@app/hooks";
 
 const currencies = [
@@ -169,16 +169,24 @@ function getDefaultDueDate(): string {
   return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 }
 
+function getTemplateDueDate(dueDays: number): string {
+  return new Date(Date.now() + dueDays * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+}
+
 export default function NewInvoicePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const templateId = searchParams.get("templateId");
   const queryClient = useQueryClient();
   const theme = useTheme();
   const toast = useToast();
   const [error, setError] = React.useState<string | null>(null);
   const [clientDialogOpen, setClientDialogOpen] = React.useState(false);
   const [defaultDueDate] = React.useState(getDefaultDueDate);
+  const [templateApplied, setTemplateApplied] = React.useState(false);
 
   const { data: clients, isLoading: clientsLoading } = useClients();
+  const { data: template, isLoading: templateLoading } = useTemplate(templateId || "");
 
   const {
     register,
@@ -236,6 +244,26 @@ export default function NewInvoicePage() {
   });
 
   const [showDraftBanner, setShowDraftBanner] = React.useState(false);
+
+  // Apply template when loaded
+  React.useEffect(() => {
+    if (template && !templateApplied && !templateLoading) {
+      const templateDueDate = getTemplateDueDate(template.dueDays);
+      reset({
+        clientId: "",
+        currency: template.currency,
+        dueDate: templateDueDate,
+        items: template.items.map((item) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice / 100, // Convert from cents
+        })),
+        notes: template.notes || "",
+      });
+      setTemplateApplied(true);
+      toast.success(`Template "${template.name}" applied`);
+    }
+  }, [template, templateApplied, templateLoading, reset, toast]);
 
   // Check for existing draft on mount
   React.useEffect(() => {

@@ -19,12 +19,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  senderProfile SenderProfile?
-  clients       Client[]
-  invoices      Invoice[]
-  followUpRules FollowUpRule[]
+  accounts          Account[]
+  sessions          Session[]
+  senderProfile     SenderProfile?
+  clients           Client[]
+  invoices          Invoice[]
+  invoiceTemplates  InvoiceTemplate[]
+  followUpRules     FollowUpRule[]
 }
 
 model Account {
@@ -205,6 +206,38 @@ model Payment {
   invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId])
+}
+
+model InvoiceTemplate {
+  id           String                @id @default(cuid())
+  userId       String
+  name         String
+  description  String?
+  currency     String                @default("USD")
+  discountType DiscountType?
+  discountValue Int                  @default(0)
+  taxRate      Int                   @default(0)
+  notes        String?               @db.Text
+  dueDays      Int                   @default(30) // Days until due from invoice creation
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  user  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items InvoiceTemplateItem[]
+
+  @@index([userId])
+}
+
+model InvoiceTemplateItem {
+  id          String @id @default(cuid())
+  templateId  String
+  description String
+  quantity    Int
+  unitPrice   Int
+
+  template InvoiceTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
 }
 
 enum FollowUpMode {
