@@ -1,7 +1,14 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { clientsApi, invoicesApi, senderProfileApi, publicApi, analyticsApi } from "./client";
+import {
+  clientsApi,
+  invoicesApi,
+  senderProfileApi,
+  publicApi,
+  analyticsApi,
+  type RecordPaymentInput,
+} from "./client";
 import type { CreateClientInput, UpdateClientInput } from "@app/shared/schemas/client";
 import type { CreateInvoiceInput, UpdateInvoiceInput } from "@app/shared/schemas/invoice";
 import type { SenderProfileInput } from "@app/shared/schemas/sender-profile";
@@ -235,6 +242,35 @@ export function useDuplicateInvoice() {
     mutationFn: (id: string) => invoicesApi.duplicate(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.invoices });
+    },
+  });
+}
+
+// Payment hooks
+export function useRecordPayment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ invoiceId, data }: { invoiceId: string; data: RecordPaymentInput }) =>
+      invoicesApi.recordPayment(invoiceId, data),
+    onSuccess: (_, { invoiceId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.invoice(invoiceId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.invoices });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
+    },
+  });
+}
+
+export function useDeletePayment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ invoiceId, paymentId }: { invoiceId: string; paymentId: string }) =>
+      invoicesApi.deletePayment(invoiceId, paymentId),
+    onSuccess: (_, { invoiceId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.invoice(invoiceId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.invoices });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics });
     },
   });
 }

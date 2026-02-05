@@ -37,9 +37,20 @@ function computeOverdueStatus(invoice: {
   status: InvoiceStatus;
   dueDate: Date;
   paidAt: Date | null;
+  paidAmount?: number;
+  total?: number;
 }) {
   if (invoice.status === "PAID" || invoice.paidAt) {
     return "PAID";
+  }
+  // Check for partial payment
+  if (
+    invoice.paidAmount &&
+    invoice.total &&
+    invoice.paidAmount > 0 &&
+    invoice.paidAmount < invoice.total
+  ) {
+    return "PARTIALLY_PAID";
   }
   if (invoice.status !== "DRAFT" && invoice.dueDate < new Date() && invoice.status !== "OVERDUE") {
     return "OVERDUE";
@@ -71,6 +82,9 @@ export async function getInvoice(id: string, userId: string) {
       items: true,
       events: {
         orderBy: { createdAt: "desc" },
+      },
+      payments: {
+        orderBy: { paidAt: "desc" },
       },
     },
   });
@@ -450,4 +464,146 @@ export async function logInvoiceEvent(
       payload,
     },
   });
+}
+
+export interface RecordPaymentInput {
+  amount: number;
+  method: PaymentMethod;
+  note?: string;
+  paidAt?: Date;
+}
+
+export async function recordPayment(id: string, userId: string, data: RecordPaymentInput) {
+  const invoice = await prisma.invoice.findFirst({
+    where: { id, userId },
+  });
+
+  if (!invoice) {
+    return null;
+  }
+
+  // Don't allow payments on drafts
+  if (invoice.status === "DRAFT") {
+    return null;
+  }
+
+  // Don't allow payments that exceed the remaining balance
+  const remainingBalance = invoice.total - invoice.paidAmount;
+  if (data.amount > remainingBalance) {
+    return null;
+  }
+
+  const newPaidAmount = invoice.paidAmount + data.amount;
+  const isFullyPaid = newPaidAmount >= invoice.total;
+
+  // Create payment record
+  const payment = await prisma.payment.create({
+    data: {
+      invoiceId: id,
+      amount: data.amount,
+      method: data.method,
+      note: data.note,
+      paidAt: data.paidAt || new Date(),
+    },
+  });
+
+  // Update invoice
+  const updatedInvoice = await prisma.invoice.update({
+    where: { id },
+    data: {
+      paidAmount: newPaidAmount,
+      status: isFullyPaid ? "PAID" : "PARTIALLY_PAID",
+      paidAt: isFullyPaid ? new Date() : null,
+      paymentMethod: isFullyPaid ? data.method : null,
+    },
+    include: {
+      client: true,
+      items: true,
+      payments: {
+        orderBy: { paidAt: "desc" },
+      },
+    },
+  });
+
+  // Log the payment event
+  await prisma.invoiceEvent.create({
+    data: {
+      invoiceId: id,
+      type: "PAYMENT_RECORDED",
+      payload: {
+        amount: data.amount,
+        method: data.method,
+        note: data.note,
+        paymentId: payment.id,
+      },
+    },
+  });
+
+  // Cancel follow-up jobs if fully paid
+  if (isFullyPaid) {
+    await prisma.followUpJob.updateMany({
+      where: { invoiceId: id, status: "PENDING" },
+      data: { status: "CANCELED" },
+    });
+  }
+
+  return updatedInvoice;
+}
+
+export async function getPayments(invoiceId: string, userId: string) {
+  const invoice = await prisma.invoice.findFirst({
+    where: { id: invoiceId, userId },
+  });
+
+  if (!invoice) {
+    return null;
+  }
+
+  return prisma.payment.findMany({
+    where: { invoiceId },
+    orderBy: { paidAt: "desc" },
+  });
+}
+
+export async function deletePayment(paymentId: string, userId: string) {
+  const payment = await prisma.payment.findFirst({
+    where: { id: paymentId },
+    include: {
+      invoice: true,
+    },
+  });
+
+  if (!payment || payment.invoice.userId !== userId) {
+    return null;
+  }
+
+  // Don't allow deleting payments from paid invoices
+  if (payment.invoice.status === "PAID") {
+    return null;
+  }
+
+  const newPaidAmount = payment.invoice.paidAmount - payment.amount;
+
+  // Delete the payment
+  await prisma.payment.delete({
+    where: { id: paymentId },
+  });
+
+  // Update invoice
+  const updatedInvoice = await prisma.invoice.update({
+    where: { id: payment.invoiceId },
+    data: {
+      paidAmount: newPaidAmount,
+      status: newPaidAmount > 0 ? "PARTIALLY_PAID" : payment.invoice.viewedAt ? "VIEWED" : "SENT",
+    },
+    include: {
+      client: true,
+      items: true,
+      payments: {
+        orderBy: { paidAt: "desc" },
+      },
+    },
+  });
+
+  return updatedInvoice;
 }

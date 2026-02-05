@@ -42,18 +42,33 @@ export const invoiceEventSchema = z.object({
     "REMINDER_SENT",
     "PAID_STRIPE",
     "PAID_MANUAL",
+    "PAYMENT_RECORDED",
     "STATUS_CHANGED",
   ]),
+  payload: z.unknown().optional(),
   createdAt: z.string(),
 });
 
 export type InvoiceEvent = z.infer<typeof invoiceEventSchema>;
 
+// Payment schema
+export const paymentSchema = z.object({
+  id: z.string(),
+  invoiceId: z.string(),
+  amount: z.number(),
+  method: z.enum(["STRIPE", "MANUAL"]),
+  note: z.string().nullable(),
+  paidAt: z.string(),
+  createdAt: z.string(),
+});
+
+export type Payment = z.infer<typeof paymentSchema>;
+
 // Invoice response schema
 export const invoiceSchema = z.object({
   id: z.string(),
   publicId: z.string(),
-  status: z.enum(["DRAFT", "SENT", "VIEWED", "PAID", "OVERDUE"]),
+  status: z.enum(["DRAFT", "SENT", "VIEWED", "PAID", "OVERDUE", "PARTIALLY_PAID"]),
   currency: z.string(),
   subtotal: z.number(),
   discountType: z.enum(["PERCENTAGE", "FIXED"]).nullable(),
@@ -62,6 +77,7 @@ export const invoiceSchema = z.object({
   taxRate: z.number(),
   taxAmount: z.number(),
   total: z.number(),
+  paidAmount: z.number(),
   dueDate: z.string(),
   notes: z.string().nullable(),
   tags: z.array(z.string()),
@@ -78,14 +94,16 @@ export const invoiceSchema = z.object({
   }),
   items: z.array(invoiceItemResponseSchema),
   events: z.array(invoiceEventSchema).optional(),
+  payments: z.array(paymentSchema).optional(),
 });
 
 export const invoiceListItemSchema = z.object({
   id: z.string(),
   publicId: z.string(),
-  status: z.enum(["DRAFT", "SENT", "VIEWED", "PAID", "OVERDUE"]),
+  status: z.enum(["DRAFT", "SENT", "VIEWED", "PAID", "OVERDUE", "PARTIALLY_PAID"]),
   currency: z.string(),
   total: z.number(),
+  paidAmount: z.number(),
   dueDate: z.string(),
   tags: z.array(z.string()),
   createdAt: z.string(),
@@ -118,10 +136,11 @@ export type SenderProfile = z.infer<typeof senderProfileResponseSchema>;
 export const publicInvoiceSchema = z.object({
   id: z.string(),
   publicId: z.string(),
-  status: z.enum(["DRAFT", "SENT", "VIEWED", "PAID", "OVERDUE"]),
+  status: z.enum(["DRAFT", "SENT", "VIEWED", "PAID", "OVERDUE", "PARTIALLY_PAID"]),
   currency: z.string(),
   subtotal: z.number(),
   total: z.number(),
+  paidAmount: z.number(),
   dueDate: z.string(),
   paidAt: z.string().nullable(),
   items: z.array(invoiceItemResponseSchema),

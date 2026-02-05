@@ -76,6 +76,7 @@ const statusConfig: Record<
   { color: "success" | "error" | "info" | "warning" | "default"; label: string }
 > = {
   PAID: { color: "success", label: "Paid" },
+  PARTIALLY_PAID: { color: "warning", label: "Partially Paid" },
   OVERDUE: { color: "error", label: "Overdue" },
   SENT: { color: "info", label: "Sent" },
   VIEWED: { color: "info", label: "Viewed" },
@@ -357,6 +358,7 @@ export default function InvoicesPage() {
               <MenuItem value="DRAFT">Draft</MenuItem>
               <MenuItem value="SENT">Sent</MenuItem>
               <MenuItem value="VIEWED">Viewed</MenuItem>
+              <MenuItem value="PARTIALLY_PAID">Partially Paid</MenuItem>
               <MenuItem value="PAID">Paid</MenuItem>
               <MenuItem value="OVERDUE">Overdue</MenuItem>
             </Select>

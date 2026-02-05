@@ -105,6 +105,7 @@ enum InvoiceStatus {
   SENT
   VIEWED
   OVERDUE
+  PARTIALLY_PAID
   PAID
 }
 
@@ -132,6 +133,7 @@ model Invoice {
   taxRate                 Int            @default(0) // Tax rate as percentage (e.g., 20 for 20%)
   taxAmount               Int            @default(0) // Calculated tax amount in cents
   total                   Int            @default(0)
+  paidAmount              Int            @default(0) // Total amount paid so far (in cents)
   dueDate                 DateTime
   notes                   String?        @db.Text
   tags                    Json           @default("[]") // Array of tag strings
@@ -147,6 +149,7 @@ model Invoice {
   client       Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
   items        InvoiceItem[]
   events       InvoiceEvent[]
+  payments     Payment[]
   followUpJobs FollowUpJob[]
 
   @@index([userId])
@@ -174,6 +177,7 @@ enum InvoiceEventType {
   REMINDER_SENT
   PAID_STRIPE
   PAID_MANUAL
+  PAYMENT_RECORDED
   STATUS_CHANGED
 }
 
@@ -183,6 +187,20 @@ model InvoiceEvent {
   type      InvoiceEventType
   payload   Json?
   createdAt DateTime         @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  invoiceId String
+  amount    Int           // Amount in cents
+  method    PaymentMethod
+  note      String?
+  paidAt    DateTime      @default(now())
+  createdAt DateTime      @default(now())
 
   invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 

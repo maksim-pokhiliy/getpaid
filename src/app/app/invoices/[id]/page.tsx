@@ -25,6 +25,10 @@ import {
   useTheme,
   Grid,
   Collapse,
+  TextField,
+  IconButton,
+  Tooltip,
+  LinearProgress,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -45,6 +49,7 @@ import CreateIcon from "@mui/icons-material/Create";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import AddIcon from "@mui/icons-material/Add";
 import { AppLayout } from "@app/components/layout/AppLayout";
 import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
 import { PageLoader, Spinner } from "@app/components/feedback/Loading";
@@ -56,6 +61,8 @@ import {
   useMarkInvoicePaid,
   useDeleteInvoice,
   useDuplicateInvoice,
+  useRecordPayment,
+  useDeletePayment,
   ApiError,
 } from "@app/lib/api";
 import { generateInvoicePdf } from "@app/lib/export";
@@ -90,6 +97,7 @@ const statusConfig: Record<
   { color: "success" | "error" | "info" | "warning" | "default"; label: string }
 > = {
   PAID: { color: "success", label: "Paid" },
+  PARTIALLY_PAID: { color: "warning", label: "Partially Paid" },
   OVERDUE: { color: "error", label: "Overdue" },
   SENT: { color: "info", label: "Sent" },
   VIEWED: { color: "info", label: "Viewed" },
@@ -127,6 +135,11 @@ const eventConfig: Record<string, { icon: React.ReactNode; label: string; color:
     label: "Marked as paid manually",
     color: "success.main",
   },
+  PAYMENT_RECORDED: {
+    icon: <PaymentIcon fontSize="small" />,
+    label: "Payment recorded",
+    color: "success.main",
+  },
   STATUS_CHANGED: {
     icon: <HistoryIcon fontSize="small" />,
     label: "Status changed",
@@ -145,6 +158,10 @@ export default function InvoiceDetailPage() {
   const [markPaidDialogOpen, setMarkPaidDialogOpen] = React.useState(false);
   const [previewDialogOpen, setPreviewDialogOpen] = React.useState(false);
   const [auditLogExpanded, setAuditLogExpanded] = React.useState(false);
+  const [paymentDialogOpen, setPaymentDialogOpen] = React.useState(false);
+  const [paymentsExpanded, setPaymentsExpanded] = React.useState(true);
+  const [paymentAmount, setPaymentAmount] = React.useState("");
+  const [paymentNote, setPaymentNote] = React.useState("");
 
   const { data: invoice, isLoading, error } = useInvoice(invoiceId);
 
@@ -152,6 +169,8 @@ export default function InvoiceDetailPage() {
   const markPaidMutation = useMarkInvoicePaid();
   const deleteMutation = useDeleteInvoice();
   const duplicateMutation = useDuplicateInvoice();
+  const recordPaymentMutation = useRecordPayment();
+  const deletePaymentMutation = useDeletePayment();
 
   const handleSendInvoice = () => {
     sendMutation.mutate(invoiceId, {
@@ -209,6 +228,49 @@ export default function InvoiceDetailPage() {
     });
   };
 
+  const handleRecordPayment = () => {
+    const amountInCents = Math.round(parseFloat(paymentAmount) * 100);
+    if (isNaN(amountInCents) || amountInCents <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    recordPaymentMutation.mutate(
+      {
+        invoiceId,
+        data: {
+          amount: amountInCents,
+          method: "MANUAL",
+          note: paymentNote || undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          setPaymentDialogOpen(false);
+          setPaymentAmount("");
+          setPaymentNote("");
+          toast.success("Payment recorded successfully!");
+        },
+        onError: (err) => {
+          toast.error(err instanceof ApiError ? err.message : "Failed to record payment");
+        },
+      }
+    );
+  };
+
+  const handleDeletePayment = (paymentId: string) => {
+    confirm({
+      title: "Delete Payment",
+      message: "Are you sure you want to delete this payment? This action cannot be undone.",
+      confirmText: "Delete",
+      confirmColor: "error",
+      onConfirm: async () => {
+        await deletePaymentMutation.mutateAsync({ invoiceId, paymentId });
+        toast.success("Payment deleted");
+      },
+    });
+  };
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -229,8 +291,11 @@ export default function InvoiceDetailPage() {
 
   const isDraft = invoice.status === "DRAFT";
   const isPaid = invoice.status === "PAID";
+  const isPartiallyPaid = invoice.status === "PARTIALLY_PAID";
   const isOverdue = invoice.status === "OVERDUE";
   const status = statusConfig[invoice.status] || statusConfig.DRAFT;
+  const remainingBalance = invoice.total - (invoice.paidAmount || 0);
+  const paidPercentage = invoice.total > 0 ? ((invoice.paidAmount || 0) / invoice.total) * 100 : 0;
 
   return (
     <AppLayout>
@@ -292,7 +357,17 @@ export default function InvoiceDetailPage() {
               Copy Link
             </Button>
           )}
-          {!isPaid && (
+          {!isPaid && !isDraft && (
+            <Button
+              variant="outlined"
+              color="success"
+              startIcon={<AddIcon />}
+              onClick={() => setPaymentDialogOpen(true)}
+            >
+              Record Payment
+            </Button>
+          )}
+          {!isPaid && !isPartiallyPaid && (
             <Button
               variant="outlined"
               startIcon={<CheckCircleIcon />}
@@ -478,7 +553,14 @@ export default function InvoiceDetailPage() {
               <Typography>{formatCurrency(invoice.subtotal, invoice.currency)}</Typography>
             </Box>
             <Divider sx={{ my: 1.5 }} />
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1.5,
+              }}
+            >
               <Typography variant="h6" fontWeight={600}>
                 Total
               </Typography>
@@ -486,9 +568,139 @@ export default function InvoiceDetailPage() {
                 {formatCurrency(invoice.total, invoice.currency)}
               </Typography>
             </Box>
+            {(invoice.paidAmount || 0) > 0 && (
+              <>
+                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                  <Typography color="success.main" fontWeight={500}>
+                    Paid
+                  </Typography>
+                  <Typography color="success.main" fontWeight={500}>
+                    -{formatCurrency(invoice.paidAmount || 0, invoice.currency)}
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={paidPercentage}
+                  sx={{
+                    height: 6,
+                    borderRadius: 1,
+                    mb: 1.5,
+                    bgcolor: alpha(theme.palette.success.main, 0.1),
+                    "& .MuiLinearProgress-bar": {
+                      bgcolor: "success.main",
+                    },
+                  }}
+                />
+                <Box
+                  sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                >
+                  <Typography
+                    fontWeight={600}
+                    color={remainingBalance > 0 ? "error.main" : "success.main"}
+                  >
+                    {remainingBalance > 0 ? "Balance Due" : "Fully Paid"}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    fontWeight={700}
+                    color={remainingBalance > 0 ? "error.main" : "success.main"}
+                  >
+                    {formatCurrency(remainingBalance, invoice.currency)}
+                  </Typography>
+                </Box>
+              </>
+            )}
           </Box>
         </Box>
       </Paper>
+
+      {/* Payments Section */}
+      {invoice.payments && invoice.payments.length > 0 && (
+        <Paper sx={{ borderRadius: 3, overflow: "hidden", mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              p: 2,
+              cursor: "pointer",
+              "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+            }}
+            onClick={() => setPaymentsExpanded(!paymentsExpanded)}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <PaymentIcon color="success" />
+              <Typography variant="subtitle1" fontWeight={600}>
+                Payment History
+              </Typography>
+              <Chip label={invoice.payments.length} size="small" color="success" />
+            </Box>
+            {paymentsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </Box>
+          <Collapse in={paymentsExpanded}>
+            <Divider />
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Method</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Note</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600 }}>
+                      Amount
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, width: 60 }}>
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {invoice.payments.map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell>{formatDateTime(payment.paidAt)}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={payment.method === "STRIPE" ? "Stripe" : "Manual"}
+                          size="small"
+                          color={payment.method === "STRIPE" ? "primary" : "default"}
+                          icon={
+                            payment.method === "STRIPE" ? (
+                              <CreditCardIcon fontSize="small" />
+                            ) : undefined
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {payment.note || "—"}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography fontWeight={600} color="success.main">
+                          {formatCurrency(payment.amount, invoice.currency)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        {!isPaid && (
+                          <Tooltip title="Delete payment">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDeletePayment(payment.id)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Collapse>
+        </Paper>
+      )}
 
       {/* View Public Page */}
       {!isDraft && (
@@ -644,6 +856,59 @@ export default function InvoiceDetailPage() {
             startIcon={markPaidMutation.isPending ? <Spinner size={16} /> : <CheckCircleIcon />}
           >
             Mark as Paid
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Record Payment Dialog */}
+      <Dialog
+        open={paymentDialogOpen}
+        onClose={() => setPaymentDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle sx={{ fontWeight: 600 }}>Record Payment</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Record a partial or full payment for this invoice. Remaining balance:{" "}
+            <strong>{formatCurrency(remainingBalance, invoice.currency)}</strong>
+          </DialogContentText>
+          <TextField
+            autoFocus
+            label="Amount"
+            type="number"
+            fullWidth
+            value={paymentAmount}
+            onChange={(e) => setPaymentAmount(e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <Typography color="text.secondary" sx={{ mr: 0.5 }}>
+                    {invoice.currency === "USD" ? "$" : invoice.currency}
+                  </Typography>
+                ),
+              },
+            }}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Note (optional)"
+            fullWidth
+            value={paymentNote}
+            onChange={(e) => setPaymentNote(e.target.value)}
+            placeholder="e.g., Bank transfer, Check #123"
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleRecordPayment}
+            disabled={recordPaymentMutation.isPending || !paymentAmount}
+            startIcon={recordPaymentMutation.isPending ? <Spinner size={16} /> : <AddIcon />}
+          >
+            Record Payment
           </Button>
         </DialogActions>
       </Dialog>

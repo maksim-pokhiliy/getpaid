@@ -79,6 +79,24 @@ export const clientsApi = {
     }),
 };
 
+// Payment types
+export interface Payment {
+  id: string;
+  invoiceId: string;
+  amount: number;
+  method: "STRIPE" | "MANUAL";
+  note: string | null;
+  paidAt: string;
+  createdAt: string;
+}
+
+export interface RecordPaymentInput {
+  amount: number;
+  method: "STRIPE" | "MANUAL";
+  note?: string;
+  paidAt?: string;
+}
+
 // Invoices API
 export const invoicesApi = {
   list: () => fetchApi<InvoiceListItem[]>("/api/invoices"),
@@ -115,6 +133,20 @@ export const invoicesApi = {
   duplicate: (id: string) =>
     fetchApi<Invoice>(`/api/invoices/${id}/duplicate`, {
       method: "POST",
+    }),
+
+  // Payment methods
+  getPayments: (invoiceId: string) => fetchApi<Payment[]>(`/api/invoices/${invoiceId}/payments`),
+
+  recordPayment: (invoiceId: string, data: RecordPaymentInput) =>
+    fetchApi<Invoice>(`/api/invoices/${invoiceId}/payments`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  deletePayment: (invoiceId: string, paymentId: string) =>
+    fetchApi<Invoice>(`/api/invoices/${invoiceId}/payments?paymentId=${paymentId}`, {
+      method: "DELETE",
     }),
 };
 
