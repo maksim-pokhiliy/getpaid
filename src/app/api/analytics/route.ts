@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import { requireUser } from "@app/server/auth/require-user";
 import { prisma } from "@app/server/db";
 
+interface CurrencyMetrics {
+  totalRevenue: number;
+  revenueThisMonth: number;
+  revenueLastMonth: number;
+  outstandingBalance: number;
+  overdueAmount: number;
+  monthlyRevenue: { month: string; revenue: number }[];
+}
+
 export async function GET() {
   const user = await requireUser();
 
@@ -24,16 +33,77 @@ export async function GET() {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-  // Total revenue (paid invoices)
+  // Get unique currencies
+  const currencies = [...new Set(invoices.map((inv) => inv.currency))];
+
+  // Calculate metrics per currency
+  const byCurrency: Record<string, CurrencyMetrics> = {};
+
+  for (const currency of currencies) {
+    const currencyInvoices = invoices.filter((inv) => inv.currency === currency);
+    const paidInvoices = currencyInvoices.filter((inv) => inv.status === "PAID" || inv.paidAt);
+
+    const totalRevenue = paidInvoices.reduce((sum, inv) => sum + inv.total, 0);
+
+    const revenueThisMonth = paidInvoices
+      .filter((inv) => inv.paidAt && new Date(inv.paidAt) >= thirtyDaysAgo)
+      .reduce((sum, inv) => sum + inv.total, 0);
+
+    const revenueLastMonth = paidInvoices
+      .filter(
+        (inv) =>
+          inv.paidAt && new Date(inv.paidAt) >= sixtyDaysAgo && new Date(inv.paidAt) < thirtyDaysAgo
+      )
+      .reduce((sum, inv) => sum + inv.total, 0);
+
+    const outstandingInvoices = currencyInvoices.filter(
+      (inv) =>
+        !inv.paidAt &&
+        (inv.status === "SENT" || inv.status === "VIEWED" || inv.status === "OVERDUE")
+    );
+    const outstandingBalance = outstandingInvoices.reduce((sum, inv) => sum + inv.total, 0);
+
+    const overdueInvoices = currencyInvoices.filter(
+      (inv) => !inv.paidAt && new Date(inv.dueDate) < now && inv.status !== "DRAFT"
+    );
+    const overdueAmount = overdueInvoices.reduce((sum, inv) => sum + inv.total, 0);
+
+    // Monthly revenue for last 6 months
+    const monthlyRevenue: { month: string; revenue: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+      const monthName = monthStart.toLocaleDateString("en-US", { month: "short" });
+
+      const revenue = paidInvoices
+        .filter((inv) => {
+          if (!inv.paidAt) return false;
+          const paidDate = new Date(inv.paidAt);
+          return paidDate >= monthStart && paidDate <= monthEnd;
+        })
+        .reduce((sum, inv) => sum + inv.total, 0);
+
+      monthlyRevenue.push({ month: monthName, revenue });
+    }
+
+    byCurrency[currency] = {
+      totalRevenue,
+      revenueThisMonth,
+      revenueLastMonth,
+      outstandingBalance,
+      overdueAmount,
+      monthlyRevenue,
+    };
+  }
+
+  // Calculate totals (for backwards compatibility, using primary currency or first available)
   const paidInvoices = invoices.filter((inv) => inv.status === "PAID" || inv.paidAt);
   const totalRevenue = paidInvoices.reduce((sum, inv) => sum + inv.total, 0);
 
-  // Revenue this month
   const revenueThisMonth = paidInvoices
     .filter((inv) => inv.paidAt && new Date(inv.paidAt) >= thirtyDaysAgo)
     .reduce((sum, inv) => sum + inv.total, 0);
 
-  // Revenue last month (for comparison)
   const revenueLastMonth = paidInvoices
     .filter(
       (inv) =>
@@ -41,14 +111,12 @@ export async function GET() {
     )
     .reduce((sum, inv) => sum + inv.total, 0);
 
-  // Outstanding balance (unpaid invoices that are sent/viewed/overdue)
   const outstandingInvoices = invoices.filter(
     (inv) =>
       !inv.paidAt && (inv.status === "SENT" || inv.status === "VIEWED" || inv.status === "OVERDUE")
   );
   const outstandingBalance = outstandingInvoices.reduce((sum, inv) => sum + inv.total, 0);
 
-  // Overdue amount
   const overdueInvoices = invoices.filter(
     (inv) => !inv.paidAt && new Date(inv.dueDate) < now && inv.status !== "DRAFT"
   );
@@ -57,7 +125,6 @@ export async function GET() {
   // Invoices by status
   const statusCounts = invoices.reduce(
     (acc, inv) => {
-      // Compute actual status (considering overdue)
       let status = inv.status;
       if (!inv.paidAt && inv.status !== "DRAFT" && new Date(inv.dueDate) < now) {
         status = "OVERDUE";
@@ -68,7 +135,7 @@ export async function GET() {
     {} as Record<string, number>
   );
 
-  // Monthly revenue for the last 6 months
+  // Monthly revenue for the last 6 months (combined)
   const monthlyRevenue: { month: string; revenue: number }[] = [];
   for (let i = 5; i >= 0; i--) {
     const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -104,6 +171,10 @@ export async function GET() {
   });
 
   return NextResponse.json({
+    // Currency-specific data
+    currencies,
+    byCurrency,
+    // Backwards-compatible totals
     totalRevenue,
     revenueThisMonth,
     revenueLastMonth,

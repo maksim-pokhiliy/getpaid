@@ -13,6 +13,8 @@ import {
   Button,
   alpha,
   useTheme,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -116,6 +118,14 @@ export default function DashboardPage() {
   const router = useRouter();
   const theme = useTheme();
   const { data: analytics, isLoading, error } = useAnalytics();
+  const [selectedCurrency, setSelectedCurrency] = React.useState<string | null>(null);
+
+  // Set default currency when data loads
+  React.useEffect(() => {
+    if (analytics?.currencies && analytics.currencies.length > 0 && !selectedCurrency) {
+      setSelectedCurrency(analytics.currencies[0]);
+    }
+  }, [analytics, selectedCurrency]);
 
   if (error) {
     return (
@@ -127,11 +137,23 @@ export default function DashboardPage() {
     );
   }
 
+  // Get currency-specific metrics or fallback to totals
+  const currencyMetrics =
+    selectedCurrency && analytics?.byCurrency ? analytics.byCurrency[selectedCurrency] : undefined;
+  const displayCurrency = selectedCurrency || "USD";
+
+  const totalRevenue = currencyMetrics?.totalRevenue ?? analytics?.totalRevenue ?? 0;
+  const revenueThisMonth = currencyMetrics?.revenueThisMonth ?? analytics?.revenueThisMonth ?? 0;
+  const revenueLastMonth = currencyMetrics?.revenueLastMonth ?? analytics?.revenueLastMonth ?? 0;
+  const outstandingBalance =
+    currencyMetrics?.outstandingBalance ?? analytics?.outstandingBalance ?? 0;
+  const overdueAmount = currencyMetrics?.overdueAmount ?? analytics?.overdueAmount ?? 0;
+  const monthlyRevenue = currencyMetrics?.monthlyRevenue ?? analytics?.monthlyRevenue ?? [];
+
   const revenueChange =
-    analytics && analytics.revenueLastMonth > 0
-      ? ((analytics.revenueThisMonth - analytics.revenueLastMonth) / analytics.revenueLastMonth) *
-        100
-      : 0;
+    revenueLastMonth > 0 ? ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100 : 0;
+
+  const hasMultipleCurrencies = (analytics?.currencies?.length ?? 0) > 1;
 
   return (
     <AppLayout>
@@ -141,6 +163,8 @@ export default function DashboardPage() {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 4,
+          flexWrap: "wrap",
+          gap: 2,
         }}
       >
         <Box>
@@ -151,13 +175,30 @@ export default function DashboardPage() {
             Overview of your invoicing activity
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => router.push("/app/invoices/new")}
-        >
-          New Invoice
-        </Button>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          {hasMultipleCurrencies && analytics?.currencies && (
+            <ToggleButtonGroup
+              value={selectedCurrency}
+              exclusive
+              onChange={(_, value) => value && setSelectedCurrency(value)}
+              size="small"
+              aria-label="Currency selection"
+            >
+              {analytics.currencies.map((currency) => (
+                <ToggleButton key={currency} value={currency} sx={{ px: 2, fontWeight: 600 }}>
+                  {currency}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          )}
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => router.push("/app/invoices/new")}
+          >
+            New Invoice
+          </Button>
+        </Box>
       </Box>
 
       {/* Metrics Grid */}
@@ -168,7 +209,7 @@ export default function DashboardPage() {
           ) : (
             <MetricCard
               title="Total Revenue"
-              value={formatCurrency(analytics?.totalRevenue || 0)}
+              value={formatCurrency(totalRevenue, displayCurrency)}
               icon={<AccountBalanceWalletIcon />}
               color={theme.palette.success.main}
             />
@@ -180,7 +221,7 @@ export default function DashboardPage() {
           ) : (
             <MetricCard
               title="This Month"
-              value={formatCurrency(analytics?.revenueThisMonth || 0)}
+              value={formatCurrency(revenueThisMonth, displayCurrency)}
               icon={<TrendingUpIcon />}
               change={revenueChange}
               changeLabel="vs last month"
@@ -194,7 +235,7 @@ export default function DashboardPage() {
           ) : (
             <MetricCard
               title="Outstanding"
-              value={formatCurrency(analytics?.outstandingBalance || 0)}
+              value={formatCurrency(outstandingBalance, displayCurrency)}
               icon={<ReceiptLongIcon />}
               color={theme.palette.warning.main}
             />
@@ -206,7 +247,7 @@ export default function DashboardPage() {
           ) : (
             <MetricCard
               title="Overdue"
-              value={formatCurrency(analytics?.overdueAmount || 0)}
+              value={formatCurrency(overdueAmount, displayCurrency)}
               icon={<WarningIcon />}
               color={theme.palette.error.main}
             />
@@ -220,22 +261,32 @@ export default function DashboardPage() {
         <Grid size={{ xs: 12, md: 8 }}>
           <Paper sx={{ p: 3, borderRadius: 3, height: 400 }}>
             <Typography variant="h6" fontWeight={600} gutterBottom>
-              Revenue (Last 6 Months)
+              Revenue (Last 6 Months){hasMultipleCurrencies && ` - ${displayCurrency}`}
             </Typography>
             {isLoading ? (
               <Skeleton variant="rounded" height={320} />
             ) : (
               <ResponsiveContainer width="100%" height={320}>
-                <BarChart data={analytics?.monthlyRevenue || []}>
+                <BarChart data={monthlyRevenue}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" axisLine={false} tickLine={false} />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(value) => `$${(value / 100).toLocaleString()}`}
+                    tickFormatter={(value) =>
+                      new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: displayCurrency,
+                        notation: "compact",
+                        maximumFractionDigits: 0,
+                      }).format(value / 100)
+                    }
                   />
                   <Tooltip
-                    formatter={(value) => [formatCurrency(value as number), "Revenue"]}
+                    formatter={(value) => [
+                      formatCurrency(value as number, displayCurrency),
+                      "Revenue",
+                    ]}
                     contentStyle={{
                       borderRadius: 8,
                       border: "none",

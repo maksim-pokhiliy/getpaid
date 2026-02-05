@@ -184,7 +184,20 @@ export const publicApi = {
 };
 
 // Analytics types
+export interface CurrencyMetrics {
+  totalRevenue: number;
+  revenueThisMonth: number;
+  revenueLastMonth: number;
+  outstandingBalance: number;
+  overdueAmount: number;
+  monthlyRevenue: { month: string; revenue: number }[];
+}
+
 export interface AnalyticsData {
+  // Currency-specific data
+  currencies: string[];
+  byCurrency: Record<string, CurrencyMetrics>;
+  // Totals (for backwards compatibility)
   totalRevenue: number;
   revenueThisMonth: number;
   revenueLastMonth: number;
