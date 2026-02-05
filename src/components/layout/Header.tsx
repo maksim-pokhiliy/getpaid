@@ -32,6 +32,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+import DescriptionIcon from "@mui/icons-material/Description";
 import { Logo } from "@app/components/brand/Logo";
 import { useThemeMode } from "@app/components/theme/ThemeRegistry";
 import { usePrefetchInvoices, usePrefetchClients } from "@app/lib/api";
@@ -39,6 +40,7 @@ import { usePrefetchInvoices, usePrefetchClients } from "@app/lib/api";
 const navItems = [
   { label: "Invoices", href: "/app/invoices", icon: <ReceiptLongIcon fontSize="small" /> },
   { label: "Clients", href: "/app/clients", icon: <PeopleIcon fontSize="small" /> },
+  { label: "Templates", href: "/app/templates", icon: <DescriptionIcon fontSize="small" /> },
 ];
 
 export function Header() {
