@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const paymentMethodSchema = z.enum(["STRIPE", "MANUAL"]);
+export const paymentMethodSchema = z.enum(["MANUAL", "BANK_TRANSFER", "CASH", "OTHER"]);
 
 export const recordPaymentSchema = z.object({
   amount: z.number().positive(),

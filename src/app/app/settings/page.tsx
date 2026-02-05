@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Box, Paper, Typography, Tabs, Tab, alpha, useTheme } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 import PaymentIcon from "@mui/icons-material/Payment";
@@ -10,7 +10,6 @@ import BrushIcon from "@mui/icons-material/Brush";
 import { AppLayout } from "@app/components/layout/AppLayout";
 import { Breadcrumbs } from "@app/components/navigation/Breadcrumbs";
 import { PageLoader } from "@app/components/feedback/Loading";
-import { useToast } from "@app/components/feedback/Toast";
 import { useSenderProfile, useReminderSettings } from "@app/lib/api";
 import { BusinessProfileTab, PaymentsTab, RemindersTab, BrandingTab } from "./components";
 
@@ -38,34 +37,11 @@ const TAB_MAP: Record<string, number> = {
 
 export default function SettingsPage() {
   const theme = useTheme();
-  const toast = useToast();
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const tabParam = searchParams.get("tab");
   const initialTab = tabParam ? (TAB_MAP[tabParam] ?? 0) : 0;
   const [tabValue, setTabValue] = React.useState(initialTab);
-
-  React.useEffect(() => {
-    const success = searchParams.get("success");
-    const errorParam = searchParams.get("error");
-
-    if (success === "stripe_connected") {
-      toast.success("Stripe account connected successfully!");
-      router.replace("/app/settings?tab=payments");
-    } else if (errorParam) {
-      const errorMessages: Record<string, string> = {
-        stripe_connect_failed: "Failed to connect Stripe account",
-        missing_params: "Missing required parameters",
-        state_expired: "Connection expired, please try again",
-        invalid_state: "Invalid connection state",
-        connection_failed: "Failed to connect Stripe account",
-        access_denied: "Access was denied by Stripe",
-      };
-      toast.error(errorMessages[errorParam] || "An error occurred");
-      router.replace("/app/settings?tab=payments");
-    }
-  }, [searchParams, toast, router]);
 
   const { data: profile, isLoading } = useSenderProfile();
   const { data: reminderSettings, isLoading: reminderLoading } = useReminderSettings();
@@ -128,7 +104,7 @@ export default function SettingsPage() {
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
-            <PaymentsTab isConnected={!!profile?.stripeAccountId} />
+            <PaymentsTab />
           </TabPanel>
 
           <TabPanel value={tabValue} index={2}>

@@ -407,42 +407,8 @@ export async function markInvoicePaid(
   await prisma.invoiceEvent.create({
     data: {
       invoiceId: invoice.id,
-      type: method === "STRIPE" ? "PAID_STRIPE" : "PAID_MANUAL",
+      type: "PAID_MANUAL",
       payload: {},
-    },
-  });
-
-  await prisma.followUpJob.updateMany({
-    where: { invoiceId: invoice.id, status: "PENDING" },
-    data: { status: "CANCELED" },
-  });
-
-  return updated;
-}
-
-export async function markInvoicePaidByCheckoutSession(checkoutSessionId: string) {
-  const invoice = await prisma.invoice.findFirst({
-    where: { stripeCheckoutSessionId: checkoutSessionId, paidAt: null },
-  });
-
-  if (!invoice) {
-    return null;
-  }
-
-  const updated = await prisma.invoice.update({
-    where: { id: invoice.id },
-    data: {
-      status: "PAID",
-      paidAt: new Date(),
-      paymentMethod: "STRIPE",
-    },
-  });
-
-  await prisma.invoiceEvent.create({
-    data: {
-      invoiceId: invoice.id,
-      type: "PAID_STRIPE",
-      payload: { checkoutSessionId },
     },
   });
 

@@ -12,8 +12,8 @@ A SaaS MVP for invoice management: create, send, track, and get paid.
 - Public invoice viewing
 - View tracking (when client opens invoice)
 - Automated follow-up reminders
-- Stripe Checkout integration for payments
-- Manual payment marking
+- Manual payment recording (bank transfer, cash, etc.)
+- Partial payment support
 - Light/dark theme
 
 ## Tech Stack
@@ -25,7 +25,6 @@ A SaaS MVP for invoice management: create, send, track, and get paid.
 - **Forms:** React Hook Form + Zod validation
 - **Data Fetching:** React Query
 - **Email:** Resend
-- **Payments:** Stripe Checkout
 
 ## Prerequisites
 
@@ -33,7 +32,6 @@ A SaaS MVP for invoice management: create, send, track, and get paid.
 - pnpm 9+
 - PostgreSQL database
 - Resend account (for email)
-- Stripe account (for payments)
 
 ## Setup
 
@@ -59,8 +57,6 @@ NEXTAUTH_SECRET="your-secret-key"
 NEXTAUTH_URL="http://localhost:3000"
 RESEND_API_KEY="re_your_api_key"
 EMAIL_FROM="invoices@yourdomain.com"
-STRIPE_SECRET_KEY="sk_test_your_key"
-STRIPE_WEBHOOK_SECRET="whsec_your_secret"
 APP_URL="http://localhost:3000"
 ```
 
@@ -113,32 +109,6 @@ pnpm followups:run
 0 * * * * cd /path/to/invox && pnpm followups:run
 ```
 
-## Stripe Webhook Setup
-
-### Local Development
-
-Use Stripe CLI to forward webhooks:
-
-```bash
-# Install Stripe CLI
-brew install stripe/stripe-cli/stripe
-
-# Login
-stripe login
-
-# Forward webhooks to local server
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-
-# Copy the webhook signing secret to .env
-```
-
-### Production
-
-1. Go to Stripe Dashboard > Developers > Webhooks
-2. Add endpoint: `https://yourdomain.com/api/stripe/webhook`
-3. Select events: `checkout.session.completed`
-4. Copy signing secret to `STRIPE_WEBHOOK_SECRET`
-
 ## Project Structure
 
 ```
@@ -159,8 +129,7 @@ src/
 │   ├── email/            # Email service
 │   ├── followups/        # Follow-up service
 │   ├── invoices/         # Invoice service
-│   ├── sender-profile/   # Sender profile service
-│   └── stripe/           # Stripe service
+│   └── sender-profile/   # Sender profile service
 └── shared/               # Shared code
     └── schemas/          # Zod validation schemas
 ```

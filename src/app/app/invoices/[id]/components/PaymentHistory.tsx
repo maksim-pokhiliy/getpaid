@@ -19,7 +19,6 @@ import {
   useTheme,
 } from "@mui/material";
 import PaymentIcon from "@mui/icons-material/Payment";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -28,10 +27,17 @@ import { formatCurrency, formatDateTime } from "@app/lib/format";
 interface Payment {
   id: string;
   amount: number;
-  method: "STRIPE" | "MANUAL";
+  method: "MANUAL" | "BANK_TRANSFER" | "CASH" | "OTHER";
   note: string | null;
   paidAt: string;
 }
+
+const METHOD_LABELS: Record<Payment["method"], string> = {
+  MANUAL: "Manual",
+  BANK_TRANSFER: "Bank Transfer",
+  CASH: "Cash",
+  OTHER: "Other",
+};
 
 interface PaymentHistoryProps {
   payments: Payment[];
@@ -100,16 +106,7 @@ export function PaymentHistory({
                 <TableRow key={payment.id}>
                   <TableCell>{formatDateTime(payment.paidAt)}</TableCell>
                   <TableCell>
-                    <Chip
-                      label={payment.method === "STRIPE" ? "Stripe" : "Manual"}
-                      size="small"
-                      color={payment.method === "STRIPE" ? "primary" : "default"}
-                      icon={
-                        payment.method === "STRIPE" ? (
-                          <CreditCardIcon fontSize="small" />
-                        ) : undefined
-                      }
-                    />
+                    <Chip label={METHOD_LABELS[payment.method]} size="small" color="default" />
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">

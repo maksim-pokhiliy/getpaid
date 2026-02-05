@@ -36,7 +36,6 @@ export const invoiceEventSchema = z.object({
     "SENT",
     "VIEWED",
     "REMINDER_SENT",
-    "PAID_STRIPE",
     "PAID_MANUAL",
     "PAYMENT_RECORDED",
     "STATUS_CHANGED",
@@ -51,7 +50,7 @@ export const paymentSchema = z.object({
   id: z.string(),
   invoiceId: z.string(),
   amount: z.number(),
-  method: z.enum(["STRIPE", "MANUAL"]),
+  method: z.enum(["MANUAL", "BANK_TRANSFER", "CASH", "OTHER"]),
   note: z.string().nullable(),
   paidAt: z.string(),
   createdAt: z.string(),
@@ -120,7 +119,6 @@ export const senderProfileResponseSchema = z.object({
   address: z.string().nullable(),
   taxId: z.string().nullable(),
   defaultCurrency: z.string(),
-  stripeAccountId: z.string().nullable(),
   logoUrl: z.string().nullable(),
   primaryColor: z.string().nullable(),
   accentColor: z.string().nullable(),
@@ -149,13 +147,6 @@ export const publicInvoiceSchema = z.object({
     name: z.string(),
     email: z.string(),
   }),
-  stripeEnabled: z.boolean(),
 });
 
 export type PublicInvoice = z.infer<typeof publicInvoiceSchema>;
-
-export const checkoutSessionSchema = z.object({
-  url: z.string(),
-});
-
-export type CheckoutSession = z.infer<typeof checkoutSessionSchema>;

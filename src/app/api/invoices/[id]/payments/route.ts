@@ -5,7 +5,7 @@ import { recordPayment, getPayments, deletePayment } from "@app/server/invoices"
 
 const recordPaymentSchema = z.object({
   amount: z.number().positive(),
-  method: z.enum(["STRIPE", "MANUAL"]),
+  method: z.enum(["MANUAL", "BANK_TRANSFER", "CASH", "OTHER"]),
   note: z.string().optional(),
   paidAt: z.coerce.date().optional(),
 });

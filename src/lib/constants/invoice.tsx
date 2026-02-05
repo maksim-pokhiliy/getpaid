@@ -3,7 +3,6 @@ import CreateIcon from "@mui/icons-material/Create";
 import MailIcon from "@mui/icons-material/Mail";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PaymentIcon from "@mui/icons-material/Payment";
 import HistoryIcon from "@mui/icons-material/History";
@@ -51,14 +50,9 @@ export const EVENT_CONFIG: Record<string, { icon: React.ReactNode; label: string
       label: "Payment reminder sent",
       color: "warning.main",
     },
-    PAID_STRIPE: {
-      icon: <CreditCardIcon fontSize="small" />,
-      label: "Paid via Stripe",
-      color: "success.main",
-    },
     PAID_MANUAL: {
       icon: <CheckCircleIcon fontSize="small" />,
-      label: "Marked as paid manually",
+      label: "Marked as paid",
       color: "success.main",
     },
     PAYMENT_RECORDED: {

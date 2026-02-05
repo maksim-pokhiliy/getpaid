@@ -4,7 +4,6 @@ import type {
   InvoiceListItem,
   SenderProfile,
   PublicInvoice,
-  CheckoutSession,
 } from "@app/shared/schemas/api";
 import type { CreateClientInput, UpdateClientInput } from "@app/shared/schemas/client";
 import type { CreateInvoiceInput, UpdateInvoiceInput } from "@app/shared/schemas/invoice";
@@ -79,7 +78,7 @@ export interface Payment {
   id: string;
   invoiceId: string;
   amount: number;
-  method: "STRIPE" | "MANUAL";
+  method: "MANUAL" | "BANK_TRANSFER" | "CASH" | "OTHER";
   note: string | null;
   paidAt: string;
   createdAt: string;
@@ -87,7 +86,7 @@ export interface Payment {
 
 export interface RecordPaymentInput {
   amount: number;
-  method: "STRIPE" | "MANUAL";
+  method: "MANUAL" | "BANK_TRANSFER" | "CASH" | "OTHER";
   note?: string;
   paidAt?: string;
 }
@@ -165,12 +164,6 @@ export const publicApi = {
   markViewed: (publicId: string) =>
     fetchApi<void>(`/api/public/invoices/${publicId}/viewed`, {
       method: "POST",
-    }),
-
-  createCheckoutSession: (invoiceId: string) =>
-    fetchApi<CheckoutSession>("/api/stripe/create-checkout-session", {
-      method: "POST",
-      body: JSON.stringify({ invoiceId }),
     }),
 };
 
@@ -307,13 +300,6 @@ export const templatesApi = {
   delete: (id: string) =>
     fetchApi<{ success: boolean }>(`/api/templates/${id}`, {
       method: "DELETE",
-    }),
-};
-
-export const stripeApi = {
-  disconnect: () =>
-    fetchApi<{ success: boolean }>("/api/stripe/disconnect", {
-      method: "POST",
     }),
 };
 

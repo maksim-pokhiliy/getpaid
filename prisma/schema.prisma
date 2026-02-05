@@ -81,7 +81,6 @@ model SenderProfile {
   address         String?
   taxId           String?
   defaultCurrency String   @default("USD")
-  stripeAccountId String?
   // Branding customization
   logoUrl         String?
   primaryColor    String?  @default("#1976d2") // MUI default primary
@@ -117,8 +116,10 @@ enum InvoiceStatus {
 }
 
 enum PaymentMethod {
-  STRIPE
   MANUAL
+  BANK_TRANSFER
+  CASH
+  OTHER
 }
 
 enum DiscountType {
@@ -148,7 +149,6 @@ model Invoice {
   viewedAt                DateTime?
   paidAt                  DateTime?
   paymentMethod           PaymentMethod?
-  stripeCheckoutSessionId String?
   createdAt               DateTime       @default(now())
   updatedAt               DateTime       @updatedAt
 
@@ -182,7 +182,6 @@ enum InvoiceEventType {
   SENT
   VIEWED
   REMINDER_SENT
-  PAID_STRIPE
   PAID_MANUAL
   PAYMENT_RECORDED
   STATUS_CHANGED

@@ -31,7 +31,7 @@ import { signUpSchema, SignUpInput } from "@app/shared/schemas";
 const features = [
   "Create professional invoices in minutes",
   "Track payments and send reminders",
-  "Accept online payments via Stripe",
+  "Record payments with multiple methods",
   "Manage all your clients in one place",
 ];
 

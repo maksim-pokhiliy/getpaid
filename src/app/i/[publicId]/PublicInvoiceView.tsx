@@ -19,10 +19,8 @@ import {
   alpha,
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import PaymentIcon from "@mui/icons-material/Payment";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import { Spinner } from "@app/components/feedback/Loading";
 
 interface InvoiceItem {
   id: string;
@@ -66,9 +64,7 @@ interface Props {
   publicId: string;
   invoice: Invoice;
   branding: Branding;
-  hasStripe: boolean;
   justPaid: boolean;
-  wasCanceled: boolean;
 }
 
 const statusConfig: Record<
@@ -82,18 +78,10 @@ const statusConfig: Record<
   DRAFT: { color: "default", label: "Draft" },
 };
 
-export default function PublicInvoiceView({
-  publicId,
-  invoice,
-  branding,
-  hasStripe,
-  justPaid,
-  wasCanceled,
-}: Props) {
+export default function PublicInvoiceView({ publicId, invoice, branding, justPaid }: Props) {
   const brandPrimary = branding.primaryColor;
   const brandAccent = branding.accentColor;
   const [viewTracked, setViewTracked] = React.useState(false);
-  const [isPayLoading, setIsPayLoading] = React.useState(false);
 
   React.useEffect(() => {
     if (!viewTracked) {
@@ -108,31 +96,7 @@ export default function PublicInvoiceView({
     window.print();
   };
 
-  const handlePay = async () => {
-    setIsPayLoading(true);
-    try {
-      const response = await fetch("/api/stripe/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ invoiceId: invoice.id }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create checkout session");
-      }
-
-      const { url } = await response.json();
-      window.location.href = url;
-    } catch (error) {
-      console.error("Payment error:", error);
-      alert("Failed to initiate payment. Please try again.");
-    } finally {
-      setIsPayLoading(false);
-    }
-  };
-
   const isPaid = invoice.status === "PAID";
-  const isPayable = !isPaid && hasStripe;
   const isOverdue = invoice.status === "OVERDUE";
   const status = statusConfig[invoice.status] || statusConfig.DRAFT;
 
@@ -191,13 +155,7 @@ export default function PublicInvoiceView({
 
         {justPaid && (
           <Alert severity="success" icon={<CheckCircleIcon />} sx={{ mb: 3, borderRadius: 2 }}>
-            Payment successful! Thank you for your payment.
-          </Alert>
-        )}
-
-        {wasCanceled && (
-          <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
-            Payment was canceled. You can try again when ready.
+            Payment received! Thank you for your payment.
           </Alert>
         )}
 
@@ -405,22 +363,6 @@ export default function PublicInvoiceView({
             >
               Print / Save PDF
             </Button>
-
-            {isPayable && (
-              <Button
-                variant="contained"
-                startIcon={isPayLoading ? <Spinner size={20} /> : <PaymentIcon />}
-                onClick={handlePay}
-                disabled={isPayLoading}
-                size="large"
-                sx={{
-                  bgcolor: brandPrimary,
-                  "&:hover": { bgcolor: brandPrimary, filter: "brightness(0.9)" },
-                }}
-              >
-                Pay Now
-              </Button>
-            )}
 
             {isPaid && (
               <Button

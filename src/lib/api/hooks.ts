@@ -9,7 +9,6 @@ import {
   analyticsApi,
   templatesApi,
   remindersApi,
-  stripeApi,
   recurringApi,
   type RecordPaymentInput,
   type CreateTemplateInput,
@@ -330,12 +329,6 @@ export function useMarkInvoiceViewed() {
   });
 }
 
-export function useCreateCheckoutSession() {
-  return useMutation({
-    mutationFn: (invoiceId: string) => publicApi.createCheckoutSession(invoiceId),
-  });
-}
-
 export function usePrefetchInvoice() {
   const queryClient = useQueryClient();
 
@@ -473,17 +466,6 @@ export function useUpdateReminderSettings() {
     mutationFn: (data: ReminderSettings) => remindersApi.update(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.reminderSettings });
-    },
-  });
-}
-
-export function useDisconnectStripe() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: () => stripeApi.disconnect(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.senderProfile });
     },
   });
 }

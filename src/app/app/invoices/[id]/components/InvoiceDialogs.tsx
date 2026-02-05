@@ -63,8 +63,8 @@ export function MarkPaidDialog({ open, onClose, onConfirm, isLoading }: MarkPaid
       <DialogTitle sx={{ fontWeight: 600 }}>Mark as Paid</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          This will mark the invoice as paid manually. Use this if you received payment outside of
-          the Stripe integration.
+          This will mark the invoice as fully paid. Use this if you received the full payment
+          amount.
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>

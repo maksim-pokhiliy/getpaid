@@ -116,7 +116,8 @@ npx prisma migrate dev --name <name>
 DRAFT -> SENT (on send)
 SENT -> VIEWED (on first view)
 VIEWED/SENT -> OVERDUE (computed if dueDate < now)
-Any -> PAID (via Stripe webhook or manual)
+Any -> PAID (manual payment recording)
+Any -> PARTIALLY_PAID (partial payment recorded)
 ```
 
 ## Error Handling

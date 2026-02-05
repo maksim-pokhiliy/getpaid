@@ -8,7 +8,10 @@ const eslintConfig = defineConfig([
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
   {
     rules: {
-      "no-warning-comments": ["error", { terms: ["todo", "fixme", "hack", "xxx"], location: "anywhere" }],
+      "no-warning-comments": [
+        "error",
+        { terms: ["todo", "fixme", "hack", "xxx"], location: "anywhere" },
+      ],
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/explicit-function-return-type": "off",
@@ -17,66 +20,67 @@ const eslintConfig = defineConfig([
       "no-console": ["error", { allow: ["warn", "error"] }],
       "prefer-const": "error",
       "no-var": "error",
-      "eqeqeq": ["error", "always"],
-      "curly": ["error", "all"],
-      "no-nested-ternary": "warn",
-      "max-lines-per-function": ["warn", { max: 100, skipBlankLines: true, skipComments: true }],
+      eqeqeq: ["error", "always"],
+      curly: ["error", "all"],
+      "no-nested-ternary": "error",
+      "max-lines-per-function": ["error", { max: 100, skipBlankLines: true, skipComments: true }],
       "max-depth": ["error", 4],
-      "complexity": ["warn", 15],
+      complexity: ["error", 15],
     },
   },
   {
     files: ["src/app/api/**/*.ts"],
     rules: {
-      "no-restricted-imports": ["error", {
-        patterns: [{
-          group: ["@app/server/db"],
-          message: "API routes should not import prisma directly. Use service layer instead."
-        }]
-      }]
-    }
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@app/server/db"],
+              message: "API routes should not import prisma directly. Use service layer instead.",
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     files: ["src/lib/constants/**/*.ts", "src/lib/constants/**/*.tsx"],
     rules: {
-      "no-magic-numbers": "off"
-    }
+      "no-magic-numbers": "off",
+    },
   },
   {
     files: ["src/components/theme/**/*.ts"],
     rules: {
-      "no-magic-numbers": "off"
-    }
+      "no-magic-numbers": "off",
+    },
   },
   {
     files: [
       "src/app/app/invoices/new/page.tsx",
       "src/app/app/recurring/new/page.tsx",
       "src/app/app/templates/new/page.tsx",
-      "src/hooks/useVirtualList.ts"
+      "src/hooks/useVirtualList.ts",
     ],
     rules: {
-      "react-hooks/incompatible-library": "off"
-    }
+      "react-hooks/incompatible-library": "off",
+    },
   },
   {
-    files: [
-      "src/app/**/page.tsx",
-      "src/app/**/*.tsx",
-      "src/components/**/*.tsx"
-    ],
+    files: ["src/app/**/page.tsx", "src/app/**/*.tsx", "src/components/**/*.tsx"],
     rules: {
-      "max-lines-per-function": ["warn", { max: 450, skipBlankLines: true, skipComments: true }],
-      "complexity": ["warn", 50]
-    }
+      "max-lines-per-function": ["error", { max: 450, skipBlankLines: true, skipComments: true }],
+      complexity: ["error", 50],
+    },
   },
   {
     files: ["src/lib/export/pdf.ts"],
     rules: {
-      "max-lines-per-function": ["warn", { max: 200, skipBlankLines: true, skipComments: true }],
-      "complexity": ["warn", 20]
-    }
-  }
+      "max-lines-per-function": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
+      complexity: ["error", 20],
+    },
+  },
 ]);
 
 export default eslintConfig;

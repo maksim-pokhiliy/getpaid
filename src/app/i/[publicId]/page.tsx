@@ -4,12 +4,12 @@ import PublicInvoiceView from "./PublicInvoiceView";
 
 interface Props {
   params: Promise<{ publicId: string }>;
-  searchParams: Promise<{ paid?: string; canceled?: string }>;
+  searchParams: Promise<{ paid?: string }>;
 }
 
 export default async function PublicInvoicePage({ params, searchParams }: Props) {
   const { publicId } = await params;
-  const { paid, canceled } = await searchParams;
+  const { paid } = await searchParams;
 
   const invoice = await getInvoiceByPublicId(publicId);
 
@@ -22,7 +22,6 @@ export default async function PublicInvoicePage({ params, searchParams }: Props)
 
   const senderAddress = senderProfile?.address || "";
   const senderTaxId = senderProfile?.taxId || "";
-  const hasStripe = !!senderProfile?.stripeAccountId;
 
   const branding = {
     logoUrl: senderProfile?.logoUrl || null,
@@ -61,9 +60,7 @@ export default async function PublicInvoicePage({ params, searchParams }: Props)
         },
       }}
       branding={branding}
-      hasStripe={hasStripe}
       justPaid={paid === "1"}
-      wasCanceled={canceled === "1"}
     />
   );
 }
