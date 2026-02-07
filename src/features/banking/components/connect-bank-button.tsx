@@ -5,17 +5,20 @@ import { Button } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import AddIcon from "@mui/icons-material/Add";
 import { queryKeys } from "@app/shared/config/query";
+import { BANKING } from "@app/shared/config/config";
 import { useToast } from "@app/shared/ui/toast";
 import { useCreateConnection } from "../hooks";
-
-const POPUP_WIDTH = 600;
-const POPUP_HEIGHT = 700;
 
 export function ConnectBankButton() {
   const createConnection = useCreateConnection();
   const queryClient = useQueryClient();
   const toast = useToast();
   const popupRef = React.useRef<Window | null>(null);
+
+  const invalidateBankingQueries = React.useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.bankConnections });
+    queryClient.invalidateQueries({ queryKey: queryKeys.bankTransactions });
+  }, [queryClient]);
 
   React.useEffect(() => {
     function handleMessage(event: MessageEvent) {
@@ -42,23 +45,17 @@ export function ConnectBankButton() {
       window.removeEventListener("message", handleMessage);
       window.removeEventListener("focus", handleFocus);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryClient, toast]);
-
-  function invalidateBankingQueries() {
-    queryClient.invalidateQueries({ queryKey: queryKeys.bankConnections });
-    queryClient.invalidateQueries({ queryKey: queryKeys.bankTransactions });
-  }
+  }, [invalidateBankingQueries, toast]);
 
   const handleConnect = async () => {
     const result = await createConnection.mutateAsync(undefined);
-    const left = window.screenX + (window.innerWidth - POPUP_WIDTH) / 2;
-    const top = window.screenY + (window.innerHeight - POPUP_HEIGHT) / 2;
+    const left = window.screenX + (window.innerWidth - BANKING.POPUP_WIDTH) / 2;
+    const top = window.screenY + (window.innerHeight - BANKING.POPUP_HEIGHT) / 2;
 
     popupRef.current = window.open(
       result.connectUrl,
       "salt_edge_connect",
-      `width=${POPUP_WIDTH},height=${POPUP_HEIGHT},left=${left},top=${top},toolbar=no,menubar=no`
+      `width=${BANKING.POPUP_WIDTH},height=${BANKING.POPUP_HEIGHT},left=${left},top=${top},toolbar=no,menubar=no`
     );
   };
 

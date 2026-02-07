@@ -23,7 +23,7 @@ export function Logo({ size = "medium", showText = true }: LogoProps) {
         sx={{
           width: iconSize,
           height: iconSize,
-          borderRadius: 1.5,
+          borderRadius: 2,
           bgcolor: "primary.main",
           display: "flex",
           alignItems: "center",

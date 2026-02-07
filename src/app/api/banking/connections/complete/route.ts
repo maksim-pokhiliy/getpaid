@@ -6,8 +6,13 @@ import { syncTransactions } from "@app/server/banking/sync";
 export async function POST(request: Request) {
   try {
     const user = await requireUser();
-    const body = await request.json().catch(() => ({}));
-    const { connectionId } = body as { connectionId?: string };
+    let body: Record<string, unknown> = {};
+    try {
+      body = await request.json();
+    } catch {
+      /* empty body is valid for discovery flow */
+    }
+    const connectionId = typeof body.connectionId === "string" ? body.connectionId : undefined;
 
     if (connectionId) {
       const connection = await handleConnectionSuccess(connectionId, user.id);

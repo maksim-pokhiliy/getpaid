@@ -1,49 +1,12 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
 import {
   getRecurringInvoice,
   updateRecurringInvoice,
   deleteRecurringInvoice,
+  RecurringInvoiceNotFoundError,
 } from "@app/server/recurring";
-import { VALIDATION } from "@app/shared/config/config";
-
-const updateRecurringSchema = z.object({
-  name: z.string().min(1).optional(),
-  frequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY", "QUARTERLY", "YEARLY"]).optional(),
-  status: z.enum(["ACTIVE", "PAUSED", "CANCELED"]).optional(),
-  currency: z.string().optional(),
-  discount: z
-    .object({
-      type: z.enum(["PERCENTAGE", "FIXED"]),
-      value: z.number().min(0),
-    })
-    .nullable()
-    .optional(),
-  taxRate: z.number().min(0).max(100).optional(),
-  notes: z.string().optional(),
-  dueDays: z.number().min(1).max(VALIDATION.MAX_DUE_DAYS).optional(),
-  autoSend: z.boolean().optional(),
-  nextRunAt: z
-    .string()
-    .transform((s) => new Date(s))
-    .optional(),
-  endDate: z
-    .string()
-    .transform((s) => new Date(s))
-    .nullable()
-    .optional(),
-  items: z
-    .array(
-      z.object({
-        description: z.string().min(1),
-        quantity: z.number().min(1),
-        unitPrice: z.number().min(0),
-      })
-    )
-    .min(1)
-    .optional(),
-});
+import { updateRecurringApiSchema } from "@app/shared/schemas";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -83,7 +46,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     const user = await requireUser();
     const { id } = await params;
     const body = await request.json();
-    const parsed = updateRecurringSchema.safeParse(body);
+    const parsed = updateRecurringApiSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -106,7 +69,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         { status: 401 }
       );
     }
-    if (error instanceof Error && error.message === "Recurring invoice not found") {
+    if (error instanceof RecurringInvoiceNotFoundError) {
       return NextResponse.json(
         { error: { code: "NOT_FOUND", message: "Recurring invoice not found" } },
         { status: 404 }
@@ -133,7 +96,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
         { status: 401 }
       );
     }
-    if (error instanceof Error && error.message === "Recurring invoice not found") {
+    if (error instanceof RecurringInvoiceNotFoundError) {
       return NextResponse.json(
         { error: { code: "NOT_FOUND", message: "Recurring invoice not found" } },
         { status: 404 }

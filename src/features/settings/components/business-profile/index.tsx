@@ -79,7 +79,7 @@ export function BusinessProfileTab({ profile }: BusinessProfileTabProps) {
         </Alert>
       )}
 
-      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <CompanyInfoFields register={register} errors={errors} />
         <ContactFields register={register} errors={errors} />
         <CurrencySelector register={register} errors={errors} currentValue={currency} />

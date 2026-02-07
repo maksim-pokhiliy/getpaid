@@ -5,4 +5,11 @@ export { SendDialog, MarkPaidDialog, RecordPaymentDialog } from "./invoice-dialo
 export { InvoicePreviewDialog } from "./preview";
 export { InvoicesContent } from "./invoices-content";
 export { InvoiceRow } from "./invoice-row";
+export { SelectionToolbar } from "./selection-toolbar";
 export { EmptyInvoicesState } from "./empty-states";
+export { InvoiceOverflowMenu } from "./invoice-overflow-menu";
+export { SortableItem } from "./sortable-item";
+export { InlineClientDialog } from "./inline-client-dialog";
+export { InvoicesPageContent } from "./invoices-page-content";
+export { InvoiceForm } from "./invoice-form";
+export { InvoiceDetailContent } from "./invoice-detail-content";

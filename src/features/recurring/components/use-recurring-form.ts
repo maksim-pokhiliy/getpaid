@@ -1,0 +1,112 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@app/shared/ui/toast";
+import { useClients } from "@app/features/clients";
+import { useCreateRecurring } from "@app/features/recurring";
+import { ApiError } from "@app/shared/api";
+import { useUnsavedChanges } from "@app/shared/hooks";
+import { recurringFormSchema, type RecurringFormData } from "@app/shared/schemas";
+
+export function useRecurringForm() {
+  const router = useRouter();
+  const toast = useToast();
+  const { data: clients, isLoading: clientsLoading } = useClients();
+  const createMutation = useCreateRecurring();
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isDirty },
+  } = useForm<RecurringFormData>({
+    resolver: zodResolver(recurringFormSchema),
+    defaultValues: {
+      clientId: "",
+      name: "",
+      frequency: "MONTHLY",
+      currency: "USD",
+      discountType: "NONE",
+      discountValue: 0,
+      taxRate: 0,
+      notes: "",
+      dueDays: 30,
+      autoSend: false,
+      startDate: new Date().toISOString().split("T")[0],
+      endDate: "",
+      items: [{ description: "", quantity: 1, unitPrice: 0 }],
+    },
+  });
+
+  useUnsavedChanges(isDirty);
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  });
+
+  const currency = useWatch({ control, name: "currency" });
+  const discountType = useWatch({ control, name: "discountType" });
+  const items = useWatch({ control, name: "items" });
+
+  const subtotal = items.reduce(
+    (sum, item) => sum + (item.quantity || 0) * (item.unitPrice || 0),
+    0
+  );
+
+  const onSubmit = (data: RecurringFormData) => {
+    const submitData = {
+      clientId: data.clientId,
+      name: data.name,
+      frequency: data.frequency,
+      currency: data.currency,
+      discount:
+        data.discountType !== "NONE"
+          ? { type: data.discountType as "PERCENTAGE" | "FIXED", value: data.discountValue }
+          : undefined,
+      taxRate: data.taxRate,
+      notes: data.notes || undefined,
+      dueDays: data.dueDays,
+      autoSend: data.autoSend,
+      startDate: data.startDate,
+      endDate: data.endDate || undefined,
+      items: data.items.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: Math.round(item.unitPrice * 100),
+      })),
+    };
+
+    createMutation.mutate(submitData, {
+      onSuccess: () => {
+        toast.success("Recurring invoice created");
+        router.push("/app/recurring");
+      },
+      onError: (err) => {
+        toast.error(err instanceof ApiError ? err.message : "Failed to create recurring invoice");
+      },
+    });
+  };
+
+  return {
+    register,
+    handleSubmit,
+    control,
+    errors,
+    isDirty,
+    fields,
+    append,
+    remove,
+    currency,
+    discountType,
+    items,
+    subtotal,
+    isPending: createMutation.isPending,
+    clients,
+    clientsLoading,
+    onSubmit,
+    router,
+  };
+}

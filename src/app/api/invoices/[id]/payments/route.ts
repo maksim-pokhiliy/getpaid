@@ -1,14 +1,7 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
 import { recordPayment, getPayments, deletePayment } from "@app/server/invoices";
-
-const recordPaymentSchema = z.object({
-  amount: z.number().positive(),
-  method: z.enum(["MANUAL", "BANK_TRANSFER", "CASH", "OTHER"]),
-  note: z.string().optional(),
-  paidAt: z.coerce.date().optional(),
-});
+import { recordPaymentApiSchema } from "@app/shared/schemas";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -44,7 +37,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const user = await requireUser();
     const { id } = await params;
     const body = await request.json();
-    const parsed = recordPaymentSchema.safeParse(body);
+    const parsed = recordPaymentApiSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(

@@ -1,0 +1,78 @@
+"use client";
+
+import { Box, Button, Typography, alpha, useTheme } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SendIcon from "@mui/icons-material/Send";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DownloadIcon from "@mui/icons-material/Download";
+import CloseIcon from "@mui/icons-material/Close";
+import { Spinner } from "@app/shared/ui/loading";
+
+interface SelectionToolbarProps {
+  count: number;
+  isProcessing: boolean;
+  onDelete: () => void;
+  onExport: () => void;
+  onMarkPaid: () => void;
+  onSend: () => void;
+  onClear: () => void;
+}
+
+export function SelectionToolbar({
+  count,
+  isProcessing,
+  onDelete,
+  onExport,
+  onMarkPaid,
+  onSend,
+  onClear,
+}: SelectionToolbarProps) {
+  const theme = useTheme();
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+        px: 2,
+        py: 1,
+        mb: 2,
+        borderRadius: 2.5,
+        bgcolor: alpha(theme.palette.primary.main, 0.08),
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+      }}
+    >
+      <Typography variant="body2" fontWeight={600} sx={{ mr: 1 }}>
+        {count} selected
+      </Typography>
+      {isProcessing ? (
+        <Spinner size={20} />
+      ) : (
+        <>
+          <Button size="small" startIcon={<SendIcon />} onClick={onSend}>
+            Send
+          </Button>
+          <Button size="small" startIcon={<CheckCircleIcon />} onClick={onMarkPaid}>
+            Mark Paid
+          </Button>
+          <Button size="small" startIcon={<DownloadIcon />} onClick={onExport}>
+            Export
+          </Button>
+          <Button size="small" startIcon={<DeleteIcon />} color="error" onClick={onDelete}>
+            Delete
+          </Button>
+        </>
+      )}
+      <Box sx={{ flexGrow: 1 }} />
+      <Button
+        size="small"
+        startIcon={<CloseIcon />}
+        onClick={onClear}
+        sx={{ color: "text.secondary" }}
+      >
+        Clear
+      </Button>
+    </Box>
+  );
+}

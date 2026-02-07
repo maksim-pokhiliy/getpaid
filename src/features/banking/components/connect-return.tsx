@@ -4,6 +4,7 @@ import * as React from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import { BANKING } from "@app/shared/config/config";
 import { useCompleteConnection } from "../hooks";
 
 type ConnectionStatus = "loading" | "success" | "error";
@@ -11,21 +12,26 @@ type ConnectionStatus = "loading" | "success" | "error";
 export function ConnectReturn() {
   const completeConnection = useCompleteConnection();
   const [status, setStatus] = React.useState<ConnectionStatus>("loading");
+  const didRun = React.useRef(false);
 
   React.useEffect(() => {
+    if (didRun.current) {
+      return;
+    }
+    didRun.current = true;
+
     completeConnection
       .mutateAsync()
       .then(() => {
         setStatus("success");
         window.opener?.postMessage({ type: "bank-connected" }, window.location.origin);
-        setTimeout(() => window.close(), 1500);
+        setTimeout(() => window.close(), BANKING.CONNECT_SUCCESS_DELAY);
       })
       .catch(() => {
         setStatus("error");
-        setTimeout(() => window.close(), 3000);
+        setTimeout(() => window.close(), BANKING.CONNECT_ERROR_DELAY);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [completeConnection]);
 
   return (
     <Box

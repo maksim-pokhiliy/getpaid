@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import type { SenderProfileFormInput } from "@app/shared/schemas";
-import { CURRENCIES } from "@app/features/invoices/constants/invoice";
+import { CURRENCIES } from "@app/shared/config/currencies";
 
 interface CurrencySelectorProps {
   register: UseFormRegister<SenderProfileFormInput>;

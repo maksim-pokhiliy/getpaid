@@ -1,6 +1,7 @@
 import { prisma } from "@app/server/db";
 import * as saltEdge from "./salt-edge-client";
 import { matchTransaction } from "./matching";
+import { BANKING, CURRENCY, TIME } from "@app/shared/config/config";
 
 export async function syncTransactions(connectionId: string) {
   const connection = await prisma.bankConnection.findUniqueOrThrow({
@@ -10,7 +11,9 @@ export async function syncTransactions(connectionId: string) {
 
   const fromDate = connection.lastSyncAt
     ? connection.lastSyncAt.toISOString().split("T")[0]
-    : new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    : new Date(Date.now() - BANKING.TRANSACTION_HISTORY_DAYS * TIME.DAY)
+        .toISOString()
+        .split("T")[0];
 
   for (const account of connection.accounts) {
     const transactions = await saltEdge.getTransactions(
@@ -32,7 +35,7 @@ export async function syncTransactions(connectionId: string) {
         data: {
           accountId: account.id,
           saltEdgeId: tx.id,
-          amount: Math.round(tx.amount * 100),
+          amount: Math.round(tx.amount * CURRENCY.CENTS_MULTIPLIER),
           currencyCode: tx.currency_code,
           description: tx.description,
           madeOn: new Date(tx.made_on),

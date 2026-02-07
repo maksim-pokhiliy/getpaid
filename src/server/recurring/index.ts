@@ -1,6 +1,22 @@
 import { prisma } from "@app/server/db";
 import { nanoid } from "nanoid";
 import type { RecurringFrequency, RecurringStatus } from "@prisma/client";
+import { NANOID } from "@app/shared/config/config";
+import { calculateTotals } from "@app/shared/lib/calculations";
+
+export class ClientNotFoundError extends Error {
+  constructor() {
+    super("Client not found");
+    this.name = "ClientNotFoundError";
+  }
+}
+
+export class RecurringInvoiceNotFoundError extends Error {
+  constructor() {
+    super("Recurring invoice not found");
+    this.name = "RecurringInvoiceNotFoundError";
+  }
+}
 
 export interface CreateRecurringInvoiceInput {
   clientId: string;
@@ -77,7 +93,7 @@ export async function createRecurringInvoice(userId: string, data: CreateRecurri
   });
 
   if (!client) {
-    throw new Error("Client not found");
+    throw new ClientNotFoundError();
   }
 
   return prisma.recurringInvoice.create({
@@ -122,7 +138,7 @@ export async function updateRecurringInvoice(
   });
 
   if (!existing) {
-    throw new Error("Recurring invoice not found");
+    throw new RecurringInvoiceNotFoundError();
   }
 
   if (data.items) {
@@ -171,7 +187,7 @@ export async function deleteRecurringInvoice(userId: string, id: string) {
   });
 
   if (!existing) {
-    throw new Error("Recurring invoice not found");
+    throw new RecurringInvoiceNotFoundError();
   }
 
   await prisma.recurringInvoice.delete({
@@ -219,21 +235,19 @@ export async function generateInvoiceFromRecurring(recurringInvoice: {
   frequency: RecurringFrequency;
   items: { description: string; quantity: number; unitPrice: number }[];
 }) {
-  const subtotal = recurringInvoice.items.reduce(
-    (sum, item) => sum + item.quantity * item.unitPrice,
-    0
+  const discount =
+    recurringInvoice.discountType && recurringInvoice.discountValue > 0
+      ? {
+          type: recurringInvoice.discountType as "PERCENTAGE" | "FIXED",
+          value: recurringInvoice.discountValue,
+        }
+      : null;
+
+  const { subtotal, discountAmount, taxAmount, total } = calculateTotals(
+    recurringInvoice.items,
+    discount,
+    recurringInvoice.taxRate
   );
-
-  let discountAmount = 0;
-  if (recurringInvoice.discountType === "PERCENTAGE") {
-    discountAmount = Math.round((subtotal * recurringInvoice.discountValue) / 100);
-  } else if (recurringInvoice.discountType === "FIXED") {
-    discountAmount = recurringInvoice.discountValue;
-  }
-
-  const afterDiscount = subtotal - discountAmount;
-  const taxAmount = Math.round((afterDiscount * recurringInvoice.taxRate) / 100);
-  const total = afterDiscount + taxAmount;
 
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + recurringInvoice.dueDays);
@@ -242,7 +256,7 @@ export async function generateInvoiceFromRecurring(recurringInvoice: {
     data: {
       userId: recurringInvoice.userId,
       clientId: recurringInvoice.clientId,
-      publicId: nanoid(10),
+      publicId: nanoid(NANOID.PUBLIC_ID_LENGTH),
       currency: recurringInvoice.currency,
       status: recurringInvoice.autoSend ? "SENT" : "DRAFT",
       subtotal,

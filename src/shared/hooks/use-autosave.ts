@@ -30,7 +30,9 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
           setHasDraft(true);
         }
       }
-    } catch {}
+    } catch (error) {
+      console.warn("[autosave] localStorage operation failed:", error);
+    }
   }, [key, enabled]);
 
   React.useEffect(() => {
@@ -51,7 +53,9 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
         localStorage.setItem(key, JSON.stringify(payload));
         setLastSaved(new Date());
         setHasDraft(true);
-      } catch {}
+      } catch (error) {
+        console.warn("[autosave] localStorage operation failed:", error);
+      }
     }, AUTOSAVE.DELAY_MS);
 
     return () => {
@@ -71,7 +75,9 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
           return true;
         }
       }
-    } catch {}
+    } catch (error) {
+      console.warn("[autosave] localStorage operation failed:", error);
+    }
     return false;
   }, [key, onRestore]);
 
@@ -80,7 +86,9 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
       localStorage.removeItem(key);
       setHasDraft(false);
       setLastSaved(null);
-    } catch {}
+    } catch (error) {
+      console.warn("[autosave] localStorage operation failed:", error);
+    }
   }, [key]);
 
   const getDraftTimestamp = React.useCallback((): Date | null => {
@@ -92,7 +100,9 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
           return new Date(parsed.timestamp);
         }
       }
-    } catch {}
+    } catch (error) {
+      console.warn("[autosave] localStorage operation failed:", error);
+    }
     return null;
   }, [key]);
 

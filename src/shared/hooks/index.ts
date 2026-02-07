@@ -1,3 +1,10 @@
-export { useAutosave } from "./useAutosave";
-export { useKeyboardShortcuts } from "./useKeyboardShortcuts";
-export { useVirtualList } from "./useVirtualList";
+export { useAutosave } from "./use-autosave";
+export { useKeyboardShortcuts } from "./use-keyboard-shortcuts";
+export { useOptimisticDelete } from "./use-optimistic-delete";
+export { useUnsavedChanges } from "./use-unsaved-changes";
+export { useVirtualList } from "./use-virtual-list";
+export { useDebouncedValue } from "./use-debounced-value";
+export { useCountUp } from "./use-count-up";
+export { useRecentItems } from "./use-recent-items";
+export type { RecentItem } from "./use-recent-items";
+export { useTableKeyboardNav } from "./use-table-keyboard-nav";

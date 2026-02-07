@@ -1,0 +1,132 @@
+"use client";
+
+import {
+  Box,
+  Paper,
+  TextField,
+  Typography,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
+import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
+import type { Client } from "@app/shared/schemas/api";
+import { CURRENCIES } from "@app/shared/config/currencies";
+import { FREQUENCIES } from "@app/shared/config/frequencies";
+import { VALIDATION } from "@app/shared/config/config";
+import type { RecurringFormData } from "@app/shared/schemas";
+
+interface RecurringFormScheduleProps {
+  register: UseFormRegister<RecurringFormData>;
+  errors: FieldErrors<RecurringFormData>;
+  clients: Client[] | undefined;
+  control: Control<RecurringFormData>;
+}
+
+export function RecurringFormSchedule({ register, errors, clients }: RecurringFormScheduleProps) {
+  return (
+    <Paper sx={{ p: 4, borderRadius: 3, mb: 3 }}>
+      <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 3 }}>
+        Schedule Details
+      </Typography>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+          gap: 3,
+          mb: 3,
+        }}
+      >
+        <TextField
+          {...register("name")}
+          label="Schedule Name"
+          placeholder="e.g., Monthly Retainer - Acme Corp"
+          fullWidth
+          error={!!errors.name}
+          helperText={errors.name?.message}
+        />
+
+        <FormControl fullWidth error={!!errors.clientId}>
+          <InputLabel>Client</InputLabel>
+          <Select {...register("clientId")} label="Client" defaultValue="">
+            {clients?.map((client) => (
+              <MenuItem key={client.id} value={client.id}>
+                {client.name}
+              </MenuItem>
+            ))}
+          </Select>
+          {errors.clientId && <FormHelperText>{errors.clientId.message}</FormHelperText>}
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel>Frequency</InputLabel>
+          <Select {...register("frequency")} label="Frequency" defaultValue="MONTHLY">
+            {FREQUENCIES.map((f) => (
+              <MenuItem key={f.value} value={f.value}>
+                {f.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel>Currency</InputLabel>
+          <Select {...register("currency")} label="Currency" defaultValue="USD">
+            {CURRENCIES.map((c) => (
+              <MenuItem key={c.value} value={c.value}>
+                {c.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <TextField
+          {...register("startDate")}
+          label="Start Date"
+          type="date"
+          fullWidth
+          error={!!errors.startDate}
+          helperText={errors.startDate?.message}
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
+
+        <TextField
+          {...register("endDate")}
+          label="End Date (Optional)"
+          type="date"
+          fullWidth
+          slotProps={{ inputLabel: { shrink: true } }}
+          helperText="Leave empty for indefinite"
+        />
+
+        <TextField
+          {...register("dueDays", { valueAsNumber: true })}
+          label="Days Until Due"
+          type="number"
+          fullWidth
+          error={!!errors.dueDays}
+          helperText={errors.dueDays?.message || "Number of days from invoice date"}
+          slotProps={{ htmlInput: { min: 1, max: VALIDATION.MAX_DUE_DAYS } }}
+        />
+
+        <FormControlLabel
+          control={<Switch {...register("autoSend")} />}
+          label={
+            <Box>
+              <Typography variant="body2">Auto-send invoices</Typography>
+              <Typography variant="caption" color="text.secondary">
+                Automatically send invoices when generated
+              </Typography>
+            </Box>
+          }
+          sx={{ alignItems: "flex-start", ml: 0 }}
+        />
+      </Box>
+    </Paper>
+  );
+}

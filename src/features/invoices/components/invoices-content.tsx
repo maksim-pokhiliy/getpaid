@@ -36,6 +36,9 @@ interface InvoicesContentProps {
   onPrefetch: (id: string) => void;
   onClearFilters: () => void;
   onCreateInvoice: () => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  onToggleSelectAll?: () => void;
 }
 
 export function InvoicesContent({
@@ -60,6 +63,9 @@ export function InvoicesContent({
   onPrefetch,
   onClearFilters,
   onCreateInvoice,
+  selectedIds,
+  onToggleSelect,
+  onToggleSelectAll,
 }: InvoicesContentProps) {
   if (isLoading) {
     return (
@@ -89,6 +95,9 @@ export function InvoicesContent({
         onRowClick={onRowClick}
         onMenuOpen={onMenuOpen}
         onPrefetch={onPrefetch}
+        selectedIds={selectedIds}
+        onToggleSelect={onToggleSelect}
+        onToggleSelectAll={onToggleSelectAll}
       />
     );
   }

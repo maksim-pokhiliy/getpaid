@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VALIDATION } from "@app/shared/config/config";
 
 export const templateItemSchema = z.object({
   description: z.string().min(1),
@@ -18,7 +19,7 @@ export const createTemplateSchema = z.object({
     .optional(),
   taxRate: z.number().min(0).max(100).optional(),
   notes: z.string().optional(),
-  dueDays: z.number().min(1).max(365).optional(),
+  dueDays: z.number().min(1).max(VALIDATION.MAX_DUE_DAYS).optional(),
   items: z.array(templateItemSchema).min(1),
 });
 
@@ -33,6 +34,19 @@ export const updateTemplateSchema = createTemplateSchema.partial().extend({
 });
 
 export type TemplateItem = z.infer<typeof templateItemSchema>;
+export const templateFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+  currency: z.string().min(1, "Currency is required"),
+  discountType: z.enum(["PERCENTAGE", "FIXED", ""]).optional(),
+  discountValue: z.number().min(0).optional(),
+  taxRate: z.number().min(0).max(100).optional(),
+  notes: z.string().optional(),
+  dueDays: z.number().min(1, "Due days must be at least 1").max(VALIDATION.MAX_DUE_DAYS),
+  items: z.array(templateItemSchema).min(1, "At least one item is required"),
+});
+
+export type TemplateFormData = z.infer<typeof templateFormSchema>;
 export type CreateTemplateInput = z.infer<typeof createTemplateSchema>;
 export type UpdateTemplateInput = z.infer<typeof updateTemplateSchema>;
 

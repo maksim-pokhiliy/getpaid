@@ -1,31 +1,7 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
 import { getTemplates, createTemplate } from "@app/server/templates";
-
-const createTemplateSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  currency: z.string().optional(),
-  discount: z
-    .object({
-      type: z.enum(["PERCENTAGE", "FIXED"]),
-      value: z.number().min(0),
-    })
-    .optional(),
-  taxRate: z.number().min(0).max(100).optional(),
-  notes: z.string().optional(),
-  dueDays: z.number().min(1).optional(),
-  items: z
-    .array(
-      z.object({
-        description: z.string().min(1),
-        quantity: z.number().min(1),
-        unitPrice: z.number().min(0),
-      })
-    )
-    .min(1, "At least one item is required"),
-});
+import { createTemplateSchema } from "@app/shared/schemas";
 
 export async function GET() {
   try {

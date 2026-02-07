@@ -8,6 +8,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("Banking callback error:", error);
-    return NextResponse.json({ received: true });
+    return NextResponse.json(
+      { error: { code: "CALLBACK_ERROR", message: "Failed to process callback" } },
+      { status: 500 }
+    );
   }
 }

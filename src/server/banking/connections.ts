@@ -1,6 +1,7 @@
 import { prisma } from "@app/server/db";
 import * as saltEdge from "./salt-edge-client";
 import { syncTransactions } from "./sync";
+import { CURRENCY } from "@app/shared/config/config";
 
 export async function ensureCustomer(userId: string): Promise<string> {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
@@ -50,7 +51,7 @@ export async function handleConnectionSuccess(saltEdgeConnectionId: string, user
           saltEdgeAccountId: account.id,
           name: account.name,
           nature: account.nature,
-          balance: Math.round(account.balance * 100),
+          balance: Math.round(account.balance * CURRENCY.CENTS_MULTIPLIER),
           currencyCode: account.currency_code,
         })),
       },

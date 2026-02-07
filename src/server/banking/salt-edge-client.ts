@@ -1,12 +1,8 @@
-import { BANKING } from "@app/shared/config/config";
+import { BANKING, TIME } from "@app/shared/config/config";
 
 const APP_ID = process.env.SALT_EDGE_APP_ID ?? "";
 const SECRET = process.env.SALT_EDGE_SECRET ?? "";
 const BASE_URL = process.env.SALT_EDGE_BASE_URL || BANKING.SALT_EDGE_BASE_URL;
-
-interface SaltEdgeResponse<T> {
-  data: T;
-}
 
 interface SaltEdgeCustomer {
   customer_id: string;
@@ -63,54 +59,52 @@ async function saltEdgeFetch<T>(path: string, options: RequestInit = {}): Promis
     throw new Error(`Salt Edge API error ${response.status}: ${errorBody}`);
   }
 
-  return response.json() as Promise<T>;
+  const json: unknown = await response.json();
+
+  if (json !== null && typeof json === "object" && "data" in json) {
+    return (json as { data: T }).data;
+  }
+
+  return json as T;
 }
 
 export async function createCustomer(identifier: string): Promise<string> {
-  const result = await saltEdgeFetch<SaltEdgeResponse<SaltEdgeCustomer>>("/customers", {
+  const result = await saltEdgeFetch<SaltEdgeCustomer>("/customers", {
     method: "POST",
     body: JSON.stringify({ data: { identifier } }),
   });
-  return result.data.customer_id;
+  return result.customer_id;
 }
 
 export async function createConnectSession(
   customerId: string,
   returnUrl: string
 ): Promise<SaltEdgeConnectSession> {
-  const result = await saltEdgeFetch<SaltEdgeResponse<SaltEdgeConnectSession>>(
-    "/connections/connect",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        data: {
-          customer_id: customerId,
-          consent: {
-            scopes: ["accounts", "transactions"],
-            from_date: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-          },
-          attempt: {
-            return_to: returnUrl,
-          },
+  return saltEdgeFetch<SaltEdgeConnectSession>("/connections/connect", {
+    method: "POST",
+    body: JSON.stringify({
+      data: {
+        customer_id: customerId,
+        consent: {
+          scopes: ["accounts", "transactions"],
+          from_date: new Date(Date.now() - BANKING.TRANSACTION_HISTORY_DAYS * TIME.DAY)
+            .toISOString()
+            .split("T")[0],
         },
-      }),
-    }
-  );
-  return result.data;
+        attempt: {
+          return_to: returnUrl,
+        },
+      },
+    }),
+  });
 }
 
 export async function getConnection(connectionId: string): Promise<SaltEdgeConnection> {
-  const result = await saltEdgeFetch<SaltEdgeResponse<SaltEdgeConnection>>(
-    `/connections/${connectionId}`
-  );
-  return result.data;
+  return saltEdgeFetch<SaltEdgeConnection>(`/connections/${connectionId}`);
 }
 
 export async function getAccounts(connectionId: string): Promise<SaltEdgeAccount[]> {
-  const result = await saltEdgeFetch<SaltEdgeResponse<SaltEdgeAccount[]>>(
-    `/accounts?connection_id=${connectionId}`
-  );
-  return result.data;
+  return saltEdgeFetch<SaltEdgeAccount[]>(`/accounts?connection_id=${connectionId}`);
 }
 
 export async function getTransactions(
@@ -126,17 +120,11 @@ export async function getTransactions(
     params.set("from_date", fromDate);
   }
 
-  const result = await saltEdgeFetch<SaltEdgeResponse<SaltEdgeTransaction[]>>(
-    `/transactions?${params.toString()}`
-  );
-  return result.data;
+  return saltEdgeFetch<SaltEdgeTransaction[]>(`/transactions?${params.toString()}`);
 }
 
 export async function listConnections(customerId: string): Promise<SaltEdgeConnection[]> {
-  const result = await saltEdgeFetch<SaltEdgeResponse<SaltEdgeConnection[]>>(
-    `/connections?customer_id=${customerId}`
-  );
-  return result.data;
+  return saltEdgeFetch<SaltEdgeConnection[]>(`/connections?customer_id=${customerId}`);
 }
 
 export async function deleteConnection(connectionId: string): Promise<void> {

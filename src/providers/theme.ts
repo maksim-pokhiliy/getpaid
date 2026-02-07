@@ -1,7 +1,7 @@
 import { createTheme, alpha } from "@mui/material/styles";
 
 const brand = {
-  primary: "#4f46e5",
+  primary: "#4338ca",
   primaryLight: "#818cf8",
   primaryDark: "#3730a3",
   secondary: "#047857",
@@ -15,28 +15,31 @@ const brand = {
 };
 
 const typography = {
-  fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontFamily:
+    '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   h1: {
-    fontWeight: 700,
+    fontWeight: 800,
     fontSize: "2.5rem",
     lineHeight: 1.2,
-    letterSpacing: "-0.02em",
+    letterSpacing: "-0.025em",
   },
   h2: {
     fontWeight: 700,
     fontSize: "2rem",
     lineHeight: 1.3,
-    letterSpacing: "-0.01em",
+    letterSpacing: "-0.02em",
   },
   h3: {
-    fontWeight: 600,
+    fontWeight: 700,
     fontSize: "1.5rem",
     lineHeight: 1.4,
+    letterSpacing: "-0.015em",
   },
   h4: {
-    fontWeight: 600,
+    fontWeight: 700,
     fontSize: "1.25rem",
     lineHeight: 1.4,
+    letterSpacing: "-0.01em",
   },
   h5: {
     fontWeight: 600,
@@ -59,11 +62,11 @@ const typography = {
     lineHeight: 1.5,
   },
   body1: {
-    fontSize: "1rem",
+    fontSize: "0.9375rem",
     lineHeight: 1.6,
   },
   body2: {
-    fontSize: "0.875rem",
+    fontSize: "0.8125rem",
     lineHeight: 1.6,
   },
   button: {
@@ -100,7 +103,7 @@ const sharedComponents = {
   MuiButton: {
     styleOverrides: {
       root: {
-        borderRadius: 8,
+        borderRadius: 10,
         padding: "10px 20px",
         fontSize: "0.9375rem",
         boxShadow: "none",
@@ -136,7 +139,7 @@ const sharedComponents = {
   MuiPaper: {
     styleOverrides: {
       root: {
-        borderRadius: 12,
+        borderRadius: 14,
       },
       elevation1: {
         boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
@@ -149,7 +152,7 @@ const sharedComponents = {
   MuiCard: {
     styleOverrides: {
       root: {
-        borderRadius: 12,
+        borderRadius: 14,
         boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
       },
     },
@@ -158,7 +161,7 @@ const sharedComponents = {
     styleOverrides: {
       root: {
         "& .MuiOutlinedInput-root": {
-          borderRadius: 8,
+          borderRadius: 10,
         },
       },
     },
@@ -166,14 +169,14 @@ const sharedComponents = {
   MuiOutlinedInput: {
     styleOverrides: {
       root: {
-        borderRadius: 8,
+        borderRadius: 10,
       },
     },
   },
   MuiChip: {
     styleOverrides: {
       root: {
-        borderRadius: 6,
+        borderRadius: 8,
         fontWeight: 500,
       },
     },
@@ -182,23 +185,24 @@ const sharedComponents = {
     styleOverrides: {
       head: {
         fontWeight: 600,
-        fontSize: "0.8125rem",
+        fontSize: "0.75rem",
         textTransform: "uppercase" as const,
-        letterSpacing: "0.05em",
+        letterSpacing: "0.06em",
+        color: "inherit",
       },
     },
   },
   MuiDialog: {
     styleOverrides: {
       paper: {
-        borderRadius: 16,
+        borderRadius: 18,
       },
     },
   },
   MuiAlert: {
     styleOverrides: {
       root: {
-        borderRadius: 8,
+        borderRadius: 10,
       },
     },
   },
@@ -209,13 +213,28 @@ const sharedComponents = {
       },
     },
   },
+  MuiMenu: {
+    styleOverrides: {
+      paper: {
+        borderRadius: 12,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05)",
+      },
+    },
+  },
+  MuiTooltip: {
+    styleOverrides: {
+      tooltip: {
+        borderRadius: 8,
+      },
+    },
+  },
 };
 
 export const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#4f46e5",
+      main: "#4338ca",
       light: brand.primaryLight,
       dark: "#3730a3",
       contrastText: "#fff",
@@ -236,16 +255,50 @@ export const lightTheme = createTheme({
     },
     text: {
       primary: "#0f172a",
-      secondary: "#475569",
+      secondary: "#64748b",
     },
-    divider: "#cbd5e1",
+    divider: "rgba(148,163,184,0.2)",
   },
   typography,
   shape: {
-    borderRadius: 8,
+    borderRadius: 10,
   },
   components: {
     ...sharedComponents,
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+        },
+        elevation1: {
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
+          border: "1px solid rgba(148,163,184,0.2)",
+        },
+        elevation2: {
+          boxShadow: "0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06)",
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+          border: "1px solid rgba(148,163,184,0.2)",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          fontWeight: 600,
+          fontSize: "0.75rem",
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.06em",
+          color: "#64748b",
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
@@ -262,7 +315,7 @@ export const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#a5b4fc",
+      main: "#818cf8",
       light: "#c7d2fe",
       dark: brand.primaryLight,
       contrastText: "#0f172a",
@@ -273,46 +326,75 @@ export const darkTheme = createTheme({
       dark: brand.secondaryLight,
       contrastText: "#0f172a",
     },
-    error: { main: "#fca5a5", contrastText: "#0f172a" },
-    warning: { main: "#fcd34d", contrastText: "#0f172a" },
-    info: { main: "#93c5fd", contrastText: "#0f172a" },
-    success: { main: "#6ee7b7", contrastText: "#0f172a" },
+    error: { main: "#f87171", contrastText: "#0f172a" },
+    warning: { main: "#fbbf24", contrastText: "#0f172a" },
+    info: { main: "#60a5fa", contrastText: "#0f172a" },
+    success: { main: "#4ade80", contrastText: "#0f172a" },
     background: {
-      default: "#0f172a",
-      paper: "#1e293b",
+      default: "#0c1222",
+      paper: "#162032",
     },
     text: {
       primary: "#f8fafc",
-      secondary: "#cbd5e1",
+      secondary: "#94a3b8",
     },
-    divider: "#475569",
+    divider: "rgba(148,163,184,0.12)",
   },
   typography,
   shape: {
-    borderRadius: 8,
+    borderRadius: 10,
   },
   components: {
     ...sharedComponents,
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+          backgroundImage: "none",
+        },
+        elevation1: {
+          boxShadow: "0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+          border: "1px solid rgba(148,163,184,0.12)",
+        },
+        elevation2: {
+          boxShadow: "0 4px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 14,
+          border: "1px solid rgba(148,163,184,0.12)",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          fontWeight: 600,
+          fontSize: "0.75rem",
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.06em",
+          color: "#94a3b8",
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#1e293b",
+          backgroundColor: "#162032",
           color: "#f1f5f9",
           boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
         },
       },
     },
-    MuiPaper: {
+    MuiMenu: {
       styleOverrides: {
-        root: {
+        paper: {
           borderRadius: 12,
-          backgroundImage: "none",
-        },
-        elevation1: {
-          boxShadow: "0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
-        },
-        elevation2: {
-          boxShadow: "0 4px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2)",
         },
       },
     },

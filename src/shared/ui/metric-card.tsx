@@ -1,38 +1,69 @@
 "use client";
 
+import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Box, Paper, Typography, Chip, alpha, useTheme } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import { useCountUp } from "@app/shared/hooks";
+import { ANIMATION } from "@app/shared/config/config";
 
 interface MetricCardProps {
   title: string;
   value: string;
+  numericValue?: number;
+  formatValue?: (n: number) => string;
   icon: React.ReactNode;
   change?: number;
   changeLabel?: string;
   color?: string;
+  href?: string;
 }
 
-export function MetricCard({ title, value, icon, change, changeLabel, color }: MetricCardProps) {
+export function MetricCard({
+  title,
+  value,
+  numericValue,
+  formatValue,
+  icon,
+  change,
+  changeLabel,
+  color,
+  href,
+}: MetricCardProps) {
   const theme = useTheme();
+  const router = useRouter();
   const isPositive = change !== undefined && change >= 0;
+  const animatedValue = useCountUp(numericValue ?? 0, ANIMATION.SLOW);
+  const displayValue =
+    numericValue !== undefined && formatValue ? formatValue(animatedValue) : value;
 
   return (
     <Paper
       sx={{
-        p: 3,
+        p: 2.5,
         borderRadius: 3,
+        width: "100%",
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        ...(href && {
+          cursor: "pointer",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            boxShadow: 6,
+            transform: "translateY(-1px)",
+          },
+        }),
       }}
+      onClick={href ? () => router.push(href) : undefined}
     >
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
         <Box
           sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
+            width: 44,
+            height: 44,
+            borderRadius: 2.5,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -56,7 +87,7 @@ export function MetricCard({ title, value, icon, change, changeLabel, color }: M
         {title}
       </Typography>
       <Typography variant="h4" fontWeight={700}>
-        {value}
+        {displayValue}
       </Typography>
       {changeLabel && (
         <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>

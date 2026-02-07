@@ -14,27 +14,33 @@ interface VirtualizedRowsProps {
   filteredInvoices: InvoiceData[];
   virtualItems: VirtualItem[];
   totalSize: number;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
   onRowClick: (id: string) => void;
   onMenuOpen: (event: React.MouseEvent<HTMLElement>, id: string) => void;
   onPrefetch: (id: string) => void;
 }
 
-const TABLE_COLUMNS = 7;
+const TABLE_COLUMNS_BASE = 7;
 const ROW_HEIGHT = 65;
 
 export function VirtualizedRows({
   filteredInvoices,
   virtualItems,
   totalSize,
+  selectedIds,
+  onToggleSelect,
   onRowClick,
   onMenuOpen,
   onPrefetch,
 }: VirtualizedRowsProps) {
+  const colSpan = onToggleSelect ? TABLE_COLUMNS_BASE + 1 : TABLE_COLUMNS_BASE;
+
   return (
     <>
       {virtualItems.length > 0 && (
         <TableRow style={{ height: virtualItems[0].start }}>
-          <TableCell colSpan={TABLE_COLUMNS} sx={{ p: 0, border: 0 }} />
+          <TableCell colSpan={colSpan} sx={{ p: 0, border: 0 }} />
         </TableRow>
       )}
       {virtualItems.map((virtualRow) => {
@@ -45,6 +51,8 @@ export function VirtualizedRows({
             invoice={invoice}
             height={ROW_HEIGHT}
             dataIndex={virtualRow.index}
+            selected={selectedIds?.has(invoice.id)}
+            onToggleSelect={onToggleSelect}
             onRowClick={onRowClick}
             onMenuOpen={onMenuOpen}
             onPrefetch={onPrefetch}
@@ -53,7 +61,7 @@ export function VirtualizedRows({
       })}
       {virtualItems.length > 0 && (
         <TableRow style={{ height: totalSize - (virtualItems[virtualItems.length - 1].end || 0) }}>
-          <TableCell colSpan={TABLE_COLUMNS} sx={{ p: 0, border: 0 }} />
+          <TableCell colSpan={colSpan} sx={{ p: 0, border: 0 }} />
         </TableRow>
       )}
     </>
@@ -62,6 +70,8 @@ export function VirtualizedRows({
 
 interface PaginatedRowsProps {
   invoices: InvoiceData[];
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
   onRowClick: (id: string) => void;
   onMenuOpen: (event: React.MouseEvent<HTMLElement>, id: string) => void;
   onPrefetch: (id: string) => void;
@@ -69,6 +79,8 @@ interface PaginatedRowsProps {
 
 export function PaginatedRows({
   invoices,
+  selectedIds,
+  onToggleSelect,
   onRowClick,
   onMenuOpen,
   onPrefetch,
@@ -79,6 +91,8 @@ export function PaginatedRows({
         <InvoiceTableRow
           key={invoice.id}
           invoice={invoice}
+          selected={selectedIds?.has(invoice.id)}
+          onToggleSelect={onToggleSelect}
           onRowClick={onRowClick}
           onMenuOpen={onMenuOpen}
           onPrefetch={onPrefetch}

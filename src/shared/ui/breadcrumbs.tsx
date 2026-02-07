@@ -24,8 +24,8 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
 
   return (
     <MuiBreadcrumbs
-      separator={<NavigateNextIcon sx={{ fontSize: 18, color: "text.secondary" }} />}
-      sx={{ mb: 2 }}
+      separator={<NavigateNextIcon sx={{ fontSize: 16, color: "text.secondary" }} />}
+      sx={{ mb: 1.5 }}
     >
       {allItems.map((item, index) => {
         const isLast = index === allItems.length - 1;
@@ -53,6 +53,8 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
               gap: 0.5,
               color: "text.secondary",
               textDecoration: "none",
+              transition: "color 0.2s ease",
+              maxWidth: 200,
               "&:hover": {
                 color: "primary.main",
                 textDecoration: "none",
@@ -60,7 +62,17 @@ export function Breadcrumbs({ items, showHome = true }: BreadcrumbsProps) {
             }}
           >
             {item.icon}
-            {item.label}
+            <Box
+              component="span"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: 160,
+              }}
+            >
+              {item.label}
+            </Box>
           </MuiLink>
         );
       })}

@@ -2,35 +2,8 @@ import { nanoid } from "nanoid";
 import { prisma } from "@app/server/db";
 import { CreateInvoiceInput, UpdateInvoiceInput, InvoiceItemInput } from "@app/shared/schemas";
 import { InvoiceStatus, InvoiceEventType, PaymentMethod, Prisma } from "@prisma/client";
-
-interface DiscountInput {
-  type: "PERCENTAGE" | "FIXED";
-  value: number;
-}
-
-function calculateTotals(
-  items: InvoiceItemInput[],
-  discount?: DiscountInput | null,
-  taxRate?: number
-) {
-  const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-
-  let discountAmount = 0;
-  if (discount && discount.value > 0) {
-    if (discount.type === "PERCENTAGE") {
-      discountAmount = Math.round((subtotal * discount.value) / 100);
-    } else {
-      discountAmount = discount.value;
-    }
-  }
-
-  const afterDiscount = Math.max(0, subtotal - discountAmount);
-
-  const taxAmount = taxRate ? Math.round((afterDiscount * taxRate) / 100) : 0;
-
-  const total = afterDiscount + taxAmount;
-  return { subtotal, discountAmount, taxAmount, total };
-}
+import { NANOID, INVOICE, TIME } from "@app/shared/config/config";
+import { calculateTotals, type DiscountInput } from "@app/shared/lib/calculations";
 
 function computeOverdueStatus(invoice: {
   status: InvoiceStatus;
@@ -56,8 +29,8 @@ function computeOverdueStatus(invoice: {
   return invoice.status;
 }
 
-function buildBasicUpdateFields(data: UpdateInvoiceInput): Record<string, unknown> {
-  const updateData: Record<string, unknown> = {};
+function buildBasicUpdateFields(data: UpdateInvoiceInput): Prisma.InvoiceUncheckedUpdateInput {
+  const updateData: Prisma.InvoiceUncheckedUpdateInput = {};
   if (data.clientId) {
     updateData.clientId = data.clientId;
   }
@@ -79,7 +52,7 @@ function buildBasicUpdateFields(data: UpdateInvoiceInput): Record<string, unknow
   return updateData;
 }
 
-function buildDiscountFields(data: UpdateInvoiceInput): Record<string, unknown> {
+function buildDiscountFields(data: UpdateInvoiceInput): Prisma.InvoiceUncheckedUpdateInput {
   if (data.discount === undefined) {
     return {};
   }
@@ -183,7 +156,7 @@ export async function createInvoice(userId: string, data: CreateInvoiceInput) {
     data.discount,
     data.taxRate
   );
-  const publicId = nanoid(10);
+  const publicId = nanoid(NANOID.PUBLIC_ID_LENGTH);
 
   const invoice = await prisma.invoice.create({
     data: {
@@ -262,7 +235,7 @@ export async function updateInvoice(id: string, userId: string, data: UpdateInvo
     return null;
   }
 
-  const updateData: Record<string, unknown> = {
+  const updateData: Prisma.InvoiceUncheckedUpdateInput = {
     ...buildBasicUpdateFields(data),
     ...buildDiscountFields(data),
   };
@@ -320,7 +293,7 @@ export async function duplicateInvoice(id: string, userId: string) {
     return null;
   }
 
-  const publicId = nanoid(10);
+  const publicId = nanoid(NANOID.PUBLIC_ID_LENGTH);
   const newInvoice = await prisma.invoice.create({
     data: {
       userId,
@@ -328,7 +301,7 @@ export async function duplicateInvoice(id: string, userId: string) {
       publicId,
       currency: invoice.currency,
       status: "DRAFT",
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      dueDate: new Date(Date.now() + INVOICE.DEFAULT_DUE_DAYS * TIME.DAY),
       subtotal: invoice.subtotal,
       total: invoice.total,
       tags: invoice.tags as string[],
@@ -476,54 +449,56 @@ export async function recordPayment(id: string, userId: string, data: RecordPaym
   const newPaidAmount = invoice.paidAmount + data.amount;
   const isFullyPaid = newPaidAmount >= invoice.total;
 
-  const payment = await prisma.payment.create({
-    data: {
-      invoiceId: id,
-      amount: data.amount,
-      method: data.method,
-      note: data.note,
-      paidAt: data.paidAt || new Date(),
-    },
-  });
-
-  const updatedInvoice = await prisma.invoice.update({
-    where: { id },
-    data: {
-      paidAmount: newPaidAmount,
-      status: isFullyPaid ? "PAID" : "PARTIALLY_PAID",
-      paidAt: isFullyPaid ? new Date() : null,
-      paymentMethod: isFullyPaid ? data.method : null,
-    },
-    include: {
-      client: true,
-      items: true,
-      payments: {
-        orderBy: { paidAt: "desc" },
-      },
-    },
-  });
-
-  await prisma.invoiceEvent.create({
-    data: {
-      invoiceId: id,
-      type: "PAYMENT_RECORDED",
-      payload: {
+  return prisma.$transaction(async (tx) => {
+    const payment = await tx.payment.create({
+      data: {
+        invoiceId: id,
         amount: data.amount,
         method: data.method,
         note: data.note,
-        paymentId: payment.id,
+        paidAt: data.paidAt || new Date(),
       },
-    },
-  });
-
-  if (isFullyPaid) {
-    await prisma.followUpJob.updateMany({
-      where: { invoiceId: id, status: "PENDING" },
-      data: { status: "CANCELED" },
     });
-  }
 
-  return updatedInvoice;
+    const updatedInvoice = await tx.invoice.update({
+      where: { id },
+      data: {
+        paidAmount: newPaidAmount,
+        status: isFullyPaid ? "PAID" : "PARTIALLY_PAID",
+        paidAt: isFullyPaid ? new Date() : null,
+        paymentMethod: isFullyPaid ? data.method : null,
+      },
+      include: {
+        client: true,
+        items: true,
+        payments: {
+          orderBy: { paidAt: "desc" },
+        },
+      },
+    });
+
+    await tx.invoiceEvent.create({
+      data: {
+        invoiceId: id,
+        type: "PAYMENT_RECORDED",
+        payload: {
+          amount: data.amount,
+          method: data.method,
+          note: data.note,
+          paymentId: payment.id,
+        },
+      },
+    });
+
+    if (isFullyPaid) {
+      await tx.followUpJob.updateMany({
+        where: { invoiceId: id, status: "PENDING" },
+        data: { status: "CANCELED" },
+      });
+    }
+
+    return updatedInvoice;
+  });
 }
 
 export async function getPayments(invoiceId: string, userId: string) {
@@ -559,10 +534,6 @@ export async function deletePayment(paymentId: string, userId: string) {
 
   const newPaidAmount = payment.invoice.paidAmount - payment.amount;
 
-  await prisma.payment.delete({
-    where: { id: paymentId },
-  });
-
   let newStatus: "PARTIALLY_PAID" | "VIEWED" | "SENT";
   if (newPaidAmount > 0) {
     newStatus = "PARTIALLY_PAID";
@@ -572,20 +543,24 @@ export async function deletePayment(paymentId: string, userId: string) {
     newStatus = "SENT";
   }
 
-  const updatedInvoice = await prisma.invoice.update({
-    where: { id: payment.invoiceId },
-    data: {
-      paidAmount: newPaidAmount,
-      status: newStatus,
-    },
-    include: {
-      client: true,
-      items: true,
-      payments: {
-        orderBy: { paidAt: "desc" },
-      },
-    },
-  });
+  return prisma.$transaction(async (tx) => {
+    await tx.payment.delete({
+      where: { id: paymentId },
+    });
 
-  return updatedInvoice;
+    return tx.invoice.update({
+      where: { id: payment.invoiceId },
+      data: {
+        paidAmount: newPaidAmount,
+        status: newStatus,
+      },
+      include: {
+        client: true,
+        items: true,
+        payments: {
+          orderBy: { paidAt: "desc" },
+        },
+      },
+    });
+  });
 }

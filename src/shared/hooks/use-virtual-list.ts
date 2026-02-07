@@ -14,6 +14,7 @@ export function useVirtualList<T>({
 }: UseVirtualListOptions<T>) {
   const parentRef = React.useRef<HTMLDivElement>(null);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Virtual API is stable, safe to use here
   const virtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => parentRef.current,

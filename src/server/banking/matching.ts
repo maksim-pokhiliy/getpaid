@@ -24,27 +24,27 @@ function calculateMatchScore(
 
   let score = 0;
 
-  score += 0.1;
+  score += BANKING.MATCH_SCORE_CURRENCY;
 
   if (
     invoice.paymentReference &&
     transaction.description.toUpperCase().includes(invoice.paymentReference.toUpperCase())
   ) {
-    score += 0.5;
+    score += BANKING.MATCH_SCORE_REFERENCE;
   }
 
   const remainingBalance = invoice.total - invoice.paidAmount;
-  const tolerance = remainingBalance * 0.01;
+  const tolerance = remainingBalance * BANKING.MATCH_AMOUNT_TOLERANCE;
 
   if (
     Math.abs(transaction.amount - invoice.total) <= tolerance ||
     Math.abs(transaction.amount - remainingBalance) <= tolerance
   ) {
-    score += 0.3;
+    score += BANKING.MATCH_SCORE_AMOUNT;
   }
 
   if (invoice.sentAt && transaction.madeOn >= invoice.sentAt) {
-    score += 0.05;
+    score += BANKING.MATCH_SCORE_DATE;
   }
 
   return { invoiceId: invoice.id, score };
@@ -96,12 +96,24 @@ export async function matchTransaction(transactionId: string, userId: string) {
       },
     });
 
-    await recordPayment(bestMatch.invoiceId, userId, {
-      amount: transaction.amount,
-      method: "BANK_TRANSFER",
-      note: `Auto-matched bank transaction: ${transaction.description}`,
-      paidAt: transaction.madeOn,
-    });
+    try {
+      await recordPayment(bestMatch.invoiceId, userId, {
+        amount: transaction.amount,
+        method: "BANK_TRANSFER",
+        note: `Auto-matched bank transaction: ${transaction.description}`,
+        paidAt: transaction.madeOn,
+      });
+    } catch (error) {
+      await prisma.bankTransaction.update({
+        where: { id: transactionId },
+        data: {
+          status: "PENDING",
+          matchedInvoiceId: null,
+          matchConfidence: null,
+        },
+      });
+      throw error;
+    }
   } else {
     await prisma.bankTransaction.update({
       where: { id: transactionId },
@@ -136,12 +148,24 @@ export async function confirmMatch(transactionId: string, invoiceId: string, use
     },
   });
 
-  await recordPayment(invoiceId, userId, {
-    amount: transaction.amount,
-    method: "BANK_TRANSFER",
-    note: `Confirmed bank transaction: ${transaction.description}`,
-    paidAt: transaction.madeOn,
-  });
+  try {
+    await recordPayment(invoiceId, userId, {
+      amount: transaction.amount,
+      method: "BANK_TRANSFER",
+      note: `Confirmed bank transaction: ${transaction.description}`,
+      paidAt: transaction.madeOn,
+    });
+  } catch (error) {
+    await prisma.bankTransaction.update({
+      where: { id: transactionId },
+      data: {
+        status: "PENDING",
+        matchedInvoiceId: null,
+        matchConfidence: null,
+      },
+    });
+    throw error;
+  }
 
   return { success: true };
 }

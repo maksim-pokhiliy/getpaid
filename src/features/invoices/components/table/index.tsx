@@ -5,6 +5,7 @@ import { Paper, Table, TableBody, TableContainer, alpha, useTheme } from "@mui/m
 import { InvoicesTableHeader } from "./table-header";
 import { InvoicesTableFooter } from "./table-footer";
 import { VirtualizedRows, PaginatedRows } from "./table-rows";
+import { useTableKeyboardNav } from "@app/shared/hooks";
 import type { InvoiceData } from "../invoice-row";
 
 interface VirtualItem {
@@ -33,6 +34,9 @@ interface InvoicesTableProps {
   onRowClick: (id: string) => void;
   onMenuOpen: (event: React.MouseEvent<HTMLElement>, id: string) => void;
   onPrefetch: (id: string) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+  onToggleSelectAll?: () => void;
 }
 
 export function InvoicesTable({
@@ -53,11 +57,31 @@ export function InvoicesTable({
   onRowClick,
   onMenuOpen,
   onPrefetch,
+  selectedIds,
+  onToggleSelect,
+  onToggleSelectAll,
 }: InvoicesTableProps) {
   const theme = useTheme();
+  const displayedInvoices = showAll ? filteredInvoices : paginatedInvoices;
+  const { onKeyDown: tableKeyDown } = useTableKeyboardNav(displayedInvoices.length, {
+    onActivate: (index) => {
+      const invoice = displayedInvoices[index];
+      if (invoice) {
+        onRowClick(invoice.id);
+      }
+    },
+    onToggleSelect: onToggleSelect
+      ? (index) => {
+          const invoice = displayedInvoices[index];
+          if (invoice) {
+            onToggleSelect(invoice.id);
+          }
+        }
+      : undefined,
+  });
 
   return (
-    <Paper sx={{ borderRadius: 3, overflow: "hidden" }}>
+    <Paper sx={{ borderRadius: 3, overflow: "hidden" }} onKeyDown={tableKeyDown}>
       <TableContainer
         ref={showAll ? parentRef : undefined}
         sx={{
@@ -70,6 +94,9 @@ export function InvoicesTable({
             sortColumn={sortColumn}
             sortDirection={sortDirection}
             onSort={onSort}
+            selectionCount={selectedIds?.size}
+            totalCount={filteredInvoices.length}
+            onToggleSelectAll={onToggleSelectAll}
           />
           <TableBody>
             {showAll ? (
@@ -77,6 +104,8 @@ export function InvoicesTable({
                 filteredInvoices={filteredInvoices}
                 virtualItems={virtualItems}
                 totalSize={totalSize}
+                selectedIds={selectedIds}
+                onToggleSelect={onToggleSelect}
                 onRowClick={onRowClick}
                 onMenuOpen={onMenuOpen}
                 onPrefetch={onPrefetch}
@@ -84,6 +113,8 @@ export function InvoicesTable({
             ) : (
               <PaginatedRows
                 invoices={paginatedInvoices}
+                selectedIds={selectedIds}
+                onToggleSelect={onToggleSelect}
                 onRowClick={onRowClick}
                 onMenuOpen={onMenuOpen}
                 onPrefetch={onPrefetch}

@@ -9,7 +9,7 @@ import {
   alpha,
   useTheme,
 } from "@mui/material";
-import { NAV_ITEMS } from "./desktop-nav";
+import { NAV_ITEMS, isNavActive } from "./desktop-nav";
 
 interface DrawerNavListProps {
   pathname: string;
@@ -22,7 +22,7 @@ export function DrawerNavList({ pathname, onNavigate }: DrawerNavListProps) {
   return (
     <List sx={{ px: 1 }}>
       {NAV_ITEMS.map((item) => {
-        const isActive = pathname.startsWith(item.href);
+        const isActive = isNavActive(pathname, item);
         return (
           <ListItem key={item.href} disablePadding>
             <ListItemButton

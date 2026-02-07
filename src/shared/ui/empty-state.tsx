@@ -1,53 +1,73 @@
 "use client";
 
-import { Box, Button, Paper, Typography, alpha, useTheme } from "@mui/material";
+import * as React from "react";
+import { Box, Button, Fade, Grow, Paper, Typography, alpha, useTheme } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { ANIMATION } from "@app/shared/config/config";
 
 interface EmptyStateProps {
   icon: React.ReactNode;
+  illustration?: React.ReactNode;
   title: string;
   description: string;
   action?: React.ReactNode;
 }
 
-export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+export function EmptyState({ icon, illustration, title, description, action }: EmptyStateProps) {
   const theme = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <Paper
       sx={{
-        p: 8,
+        p: illustration ? 6 : 8,
         textAlign: "center",
         borderRadius: 3,
         bgcolor: alpha(theme.palette.primary.main, 0.02),
       }}
+      elevation={0}
     >
-      <Box
-        sx={{
-          width: 80,
-          height: 80,
-          borderRadius: "50%",
-          bgcolor: alpha(theme.palette.primary.main, 0.1),
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          mx: "auto",
-          mb: 3,
-        }}
-      >
-        {icon}
-      </Box>
-      <Typography variant="h6" fontWeight={600} gutterBottom>
-        {title}
-      </Typography>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ mb: action ? 3 : 0, maxWidth: 400, mx: "auto" }}
-      >
-        {description}
-      </Typography>
-      {action}
+      <Grow in={mounted} timeout={ANIMATION.NORMAL}>
+        <Box sx={{ mb: 3 }}>
+          {illustration ? (
+            <Box sx={{ mx: "auto", mb: 1, maxWidth: 200 }}>{illustration}</Box>
+          ) : (
+            <Box
+              sx={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mx: "auto",
+              }}
+            >
+              {icon}
+            </Box>
+          )}
+        </Box>
+      </Grow>
+      <Fade in={mounted} timeout={ANIMATION.SLOW} style={{ transitionDelay: "100ms" }}>
+        <Box>
+          <Typography variant="h6" fontWeight={600} gutterBottom>
+            {title}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: action ? 3 : 0, maxWidth: 400, mx: "auto" }}
+          >
+            {description}
+          </Typography>
+          {action}
+        </Box>
+      </Fade>
     </Paper>
   );
 }
@@ -68,11 +88,12 @@ export function NoResults({ entity, onClear }: NoResultsProps) {
         borderRadius: 3,
         bgcolor: alpha(theme.palette.primary.main, 0.02),
       }}
+      elevation={0}
     >
       <Box
         sx={{
-          width: 80,
-          height: 80,
+          width: 64,
+          height: 64,
           borderRadius: "50%",
           bgcolor: alpha(theme.palette.action.active, 0.08),
           display: "flex",

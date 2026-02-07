@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@app/server/auth";
-import { prisma } from "@app/server/db";
+import { getSenderProfile } from "@app/server/sender-profile";
 
 export default async function MainAppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -9,9 +9,7 @@ export default async function MainAppLayout({ children }: { children: React.Reac
     redirect("/auth/sign-in");
   }
 
-  const senderProfile = await prisma.senderProfile.findUnique({
-    where: { userId: session.user.id },
-  });
+  const senderProfile = await getSenderProfile(session.user.id);
 
   if (!senderProfile) {
     redirect("/app/onboarding");

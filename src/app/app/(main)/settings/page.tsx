@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import { Box, Paper, Typography, Tabs, Tab, alpha, useTheme } from "@mui/material";
+import { Box, Paper, Typography, Tabs, Tab, Divider, Stack, alpha, useTheme } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 import PaymentIcon from "@mui/icons-material/Payment";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -17,6 +17,11 @@ import {
   RemindersTab,
   BrandingTab,
 } from "@app/features/settings/components";
+import {
+  ConnectionList,
+  ConnectBankButton,
+  PendingMatches,
+} from "@app/features/banking/components";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -107,7 +112,19 @@ export default function SettingsPage() {
               </TabPanel>
 
               <TabPanel value={tabValue} index={1}>
-                <PaymentsTab />
+                <PaymentsTab>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="flex-end"
+                    sx={{ mb: 2 }}
+                  >
+                    <ConnectBankButton />
+                  </Stack>
+                  <ConnectionList />
+                  <Divider sx={{ my: 4 }} />
+                  <PendingMatches />
+                </PaymentsTab>
               </TabPanel>
 
               <TabPanel value={tabValue} index={2}>
