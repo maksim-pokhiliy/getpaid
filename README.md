@@ -1,147 +1,155 @@
-# Invox - Invoice Management MVP
+# Invox
 
-A SaaS MVP for invoice management: create, send, track, and get paid.
+Simple, self-hosted invoice management for freelancers. No bloat, no hidden fees, no vendor lock-in.
 
 ## Features
 
-- User authentication (sign up, sign in)
-- Sender profile onboarding
-- Client management
-- Invoice creation with line items
-- Send invoices via email
-- Public invoice viewing
-- View tracking (when client opens invoice)
-- Automated follow-up reminders
-- Manual payment recording (bank transfer, cash, etc.)
-- Partial payment support
-- Light/dark theme
+- **Invoices** — create, edit, and send professional invoices with line items, taxes, and discounts
+- **Recurring** — set up recurring invoices that generate and send automatically
+- **View Tracking** — know exactly when your client opens an invoice
+- **Follow-ups** — automated payment reminders so you never chase clients manually
+- **PDF Export** — generate clean PDF invoices for download and print
+- **Dashboard** — revenue, outstanding amounts, and payment trends at a glance
+- **Templates** — reusable invoice templates for repeat work
+- **Client Management** — client directory with contact details and invoice history
+- **Banking** _(optional)_ — connect bank accounts via Salt Edge for automatic payment matching
+- **Light & Dark themes** — full theme support out of the box
 
-## Tech Stack
-
-- **Framework:** Next.js 16 (App Router)
-- **UI:** MUI (Material UI)
-- **Database:** PostgreSQL with Prisma ORM
-- **Authentication:** NextAuth (Auth.js)
-- **Forms:** React Hook Form + Zod validation
-- **Data Fetching:** React Query
-- **Email:** Resend
-
-## Prerequisites
-
-- Node.js 20+
-- pnpm 9+
-- PostgreSQL database
-- Resend account (for email)
-
-## Setup
-
-### 1. Clone and install dependencies
+## Quick Start (Docker)
 
 ```bash
+git clone https://github.com/maksim-pokhiliy/invox.git
+cd invox
+```
+
+Generate a secret and start:
+
+```bash
+# Generate NEXTAUTH_SECRET
+echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)" > .env
+
+# Start the app
+docker compose up -d
+```
+
+Open [http://localhost:3000](http://localhost:3000) and create an account.
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js 22+
+- pnpm 10+
+- PostgreSQL 16+
+
+### Install
+
+```bash
+git clone https://github.com/maksim-pokhiliy/invox.git
+cd invox
 pnpm install
 ```
 
-### 2. Configure environment
-
-Copy the example env file and fill in your values:
+### Configure
 
 ```bash
 cp .env.example .env
 ```
 
-Required environment variables:
-
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/invox"
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-RESEND_API_KEY="re_your_api_key"
-EMAIL_FROM="invoices@yourdomain.com"
-APP_URL="http://localhost:3000"
-```
-
-### 3. Setup database
+Edit `.env` with your PostgreSQL connection string and a generated secret:
 
 ```bash
-# Generate Prisma client
-pnpm db:generate
-
-# Run migrations
-pnpm db:migrate
-
-# Or push schema directly (dev)
-pnpm db:push
+openssl rand -base64 32  # use this for NEXTAUTH_SECRET
 ```
 
-### 4. Start development server
+### Database
+
+```bash
+pnpm db:migrate    # run migrations
+pnpm db:seed       # optional: load demo data
+```
+
+### Run
 
 ```bash
 pnpm dev
 ```
 
-Visit http://localhost:3000
+Open [http://localhost:3000](http://localhost:3000).
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Yes | Auth session secret (`openssl rand -base64 32`) |
+| `APP_URL` | No | App base URL (default: `http://localhost:3000`) |
+| `RESEND_API_KEY` | No | [Resend](https://resend.com) API key for sending emails |
+| `EMAIL_FROM` | No | Sender email address (default: `invoices@example.com`) |
+| `SALT_EDGE_APP_ID` | No | [Salt Edge](https://www.saltedge.com) app ID for banking |
+| `SALT_EDGE_SECRET` | No | Salt Edge secret |
+| `CRON_SECRET` | No | Secret for cron sync endpoint authentication |
+
+## Tech Stack
+
+- **Framework** — Next.js 16 (App Router, standalone output)
+- **UI** — MUI 7 (Material UI)
+- **Language** — TypeScript (strict mode)
+- **Database** — PostgreSQL 16 + Prisma ORM
+- **Auth** — NextAuth (Auth.js)
+- **Validation** — Zod 4
+- **Data Fetching** — React Query
+- **Forms** — React Hook Form
+- **Email** — Resend
+- **Charts** — Recharts
+- **Deployment** — Docker (multi-stage build)
+
+## Architecture
+
+The project follows [Feature-Sliced Design](https://feature-sliced.design/) (FSD):
+
+```
+src/
+├── app/           # Next.js routing only (pages, layouts, API routes)
+├── features/      # Domain slices (invoices, clients, settings, banking, ...)
+│   └── {name}/
+│       ├── api/         # API client functions
+│       ├── hooks/       # React Query hooks
+│       ├── components/  # UI components
+│       ├── schemas/     # Zod validation schemas
+│       └── constants/
+├── shared/        # Cross-feature code
+│   ├── config/    # App config, env validation, constants
+│   ├── ui/        # Reusable UI components
+│   ├── lib/       # Utilities (formatting, PDF export, calculations)
+│   ├── hooks/     # Shared hooks
+│   └── layout/    # Layout components
+├── server/        # Server-side services (sole Prisma consumer)
+│   ├── invoices/  # Invoice CRUD, sending, payments
+│   ├── banking/   # Salt Edge integration, matching
+│   ├── email/     # Transactional email
+│   ├── auth/      # Auth config
+│   └── db/        # Prisma client
+└── providers/     # React context providers, theme
+```
 
 ## Scripts
 
 | Script | Description |
 |--------|-------------|
 | `pnpm dev` | Start development server |
-| `pnpm build` | Build for production |
-| `pnpm start` | Start production server |
+| `pnpm build` | Production build |
 | `pnpm lint` | Run ESLint |
-| `pnpm typecheck` | Run TypeScript type checking |
+| `pnpm typecheck` | TypeScript type checking |
 | `pnpm format` | Format code with Prettier |
-| `pnpm format:check` | Check code formatting |
 | `pnpm db:migrate` | Run database migrations |
-| `pnpm db:push` | Push schema to database |
+| `pnpm db:seed` | Seed demo data |
 | `pnpm db:studio` | Open Prisma Studio |
-| `pnpm followups:run` | Process pending follow-up jobs |
 
-## Running Follow-ups
+## Contributing
 
-The follow-up system sends reminder emails for unpaid invoices. Run the script manually or set up a cron job:
-
-```bash
-# Run once
-pnpm followups:run
-
-# Cron example (every hour)
-0 * * * * cd /path/to/invox && pnpm followups:run
-```
-
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js routes and pages
-│   ├── api/               # API route handlers
-│   ├── app/               # Authenticated app pages
-│   ├── auth/              # Auth pages (sign-in, sign-up)
-│   └── i/[publicId]/      # Public invoice page
-├── components/            # React components
-│   ├── layout/           # Layout components
-│   ├── providers/        # Context providers
-│   └── theme/            # Theme configuration
-├── server/               # Server-side code
-│   ├── auth/             # Auth configuration
-│   ├── clients/          # Client service
-│   ├── db/               # Prisma client
-│   ├── email/            # Email service
-│   ├── followups/        # Follow-up service
-│   ├── invoices/         # Invoice service
-│   └── sender-profile/   # Sender profile service
-└── shared/               # Shared code
-    └── schemas/          # Zod validation schemas
-```
-
-## Architecture Rules
-
-- UI components never import Prisma directly
-- Route handlers call server services only
-- React Query hooks call API endpoints
-- All inputs validated with Zod schemas
-- Public pages use `publicId`, never internal `id`
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and project conventions.
 
 ## License
 
-Private - All rights reserved
+[MIT](./LICENSE)
