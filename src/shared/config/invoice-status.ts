@@ -1,3 +1,5 @@
+import type { Theme } from "@mui/material";
+
 export const STATUS_CONFIG: Record<
   string,
   { color: "success" | "error" | "info" | "warning" | "default"; label: string }
@@ -10,11 +12,10 @@ export const STATUS_CONFIG: Record<
   DRAFT: { color: "default", label: "Draft" },
 };
 
-export const STATUS_COLORS: Record<string, string> = {
-  PAID: "#10b981",
-  OVERDUE: "#ef4444",
-  SENT: "#3b82f6",
-  VIEWED: "#3b82f6",
-  DRAFT: "#94a3b8",
-  PARTIALLY_PAID: "#f59e0b",
-};
+export function getStatusColor(theme: Theme, status: string): string {
+  const config = STATUS_CONFIG[status];
+  if (!config || config.color === "default") {
+    return theme.palette.text.secondary;
+  }
+  return theme.palette[config.color].main;
+}

@@ -20,6 +20,7 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
 import { calculateTotals } from "@app/shared/lib/calculations";
+import { UI } from "@app/shared/config/config";
 import type { Template } from "@app/features/templates";
 
 const TEMPLATE_COLUMNS: { id: string; label: string; sortable?: boolean; hideOnMobile: boolean }[] =
@@ -116,7 +117,7 @@ export function TemplatesTable({
     <Paper sx={{ borderRadius: 3, overflow: "hidden" }}>
       <TableContainer>
         <Table>
-          <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+          <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, UI.ALPHA_HOVER) }}>
             <TableRow>
               {TEMPLATE_COLUMNS.map((col) => (
                 <TableCell

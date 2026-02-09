@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { Box, Button } from "@mui/material";
 import { PageHeader } from "@app/shared/ui/page-header";
 import { Spinner } from "@app/shared/ui/loading";
+import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useRecurringForm } from "./use-recurring-form";
 import { RecurringFormSchedule } from "./recurring-form-schedule";
 import { RecurringFormItems } from "./recurring-form-items";
@@ -69,9 +70,9 @@ export function RecurringForm() {
           <Button variant="outlined" onClick={() => router.back()}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={isPending} sx={{ minWidth: 150 }}>
-            {isPending ? <Spinner size={20} /> : "Create Schedule"}
-          </Button>
+          <LoadingButton type="submit" variant="contained" loading={isPending}>
+            Create Schedule
+          </LoadingButton>
         </Box>
       </Box>
     </>

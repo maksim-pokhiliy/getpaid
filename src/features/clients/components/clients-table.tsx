@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { formatDateCompact } from "@app/shared/lib/format";
-import { PAGINATION } from "@app/shared/config/config";
+import { PAGINATION, UI } from "@app/shared/config/config";
 
 const CLIENT_COLUMNS = [
   { id: "name", label: "Name", hideOnMobile: false },
@@ -58,8 +58,7 @@ function ClientRow({
     <TableRow
       hover
       sx={{
-        transition: "background-color 0.2s",
-        "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+        "&:hover": { bgcolor: alpha(theme.palette.primary.main, UI.ALPHA_HOVER) },
       }}
     >
       <TableCell>
@@ -124,7 +123,7 @@ export function ClientsTable({
         borderRadius: 3,
         overflow: "hidden",
         "& .MuiTableHead-root": {
-          bgcolor: alpha(theme.palette.primary.main, 0.04),
+          bgcolor: alpha(theme.palette.primary.main, UI.ALPHA_HOVER),
         },
       }}
     >

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Box,
   Checkbox,
   Chip,
   IconButton,
@@ -13,7 +14,8 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
-import { STATUS_CONFIG } from "../../constants/invoice";
+import { STATUS_CONFIG, getStatusColor } from "../../constants/invoice";
+import { UI } from "@app/shared/config/config";
 import type { InvoiceData } from "../invoice-row";
 
 interface InvoiceTableRowProps {
@@ -39,6 +41,7 @@ export function InvoiceTableRow({
 }: InvoiceTableRowProps) {
   const theme = useTheme();
   const status = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.DRAFT;
+  const statusColor = getStatusColor(theme, invoice.status);
 
   return (
     <TableRow
@@ -47,9 +50,8 @@ export function InvoiceTableRow({
       selected={selected}
       sx={{
         cursor: "pointer",
-        transition: "background-color 0.2s",
         height,
-        "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+        "&:hover": { bgcolor: alpha(theme.palette.primary.main, UI.ALPHA_HOVER) },
       }}
       onMouseEnter={() => onPrefetch(invoice.id)}
       onClick={() => onRowClick(invoice.id)}
@@ -92,7 +94,31 @@ export function InvoiceTableRow({
         </Typography>
       </TableCell>
       <TableCell>
-        <Chip label={status.label} size="small" color={status.color} sx={{ fontWeight: 500 }} />
+        <Chip
+          label={status.label}
+          size="small"
+          icon={
+            <Box
+              component="span"
+              sx={{
+                width: UI.STATUS_DOT_SIZE,
+                height: UI.STATUS_DOT_SIZE,
+                borderRadius: "50%",
+                bgcolor: statusColor,
+                display: "inline-block",
+                ml: 0.5,
+              }}
+            />
+          }
+          sx={{
+            fontWeight: 500,
+            bgcolor: alpha(statusColor, UI.ALPHA_MUTED),
+            color: statusColor,
+            "& .MuiChip-icon": {
+              color: statusColor,
+            },
+          }}
+        />
       </TableCell>
       <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
         <Typography variant="body2" color="text.secondary">

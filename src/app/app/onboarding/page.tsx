@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import {
   Box,
-  Button,
   Container,
   TextField,
   Typography,
@@ -22,7 +21,7 @@ import {
   StepLabel,
 } from "@mui/material";
 import { Logo } from "@app/shared/ui/logo";
-import { Spinner } from "@app/shared/ui/loading";
+import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useToast } from "@app/shared/ui/toast";
 import { senderProfileFormSchema, SenderProfileFormInput } from "@app/shared/schemas";
 
@@ -194,16 +193,16 @@ export default function OnboardingPage() {
                 )}
               </FormControl>
 
-              <Button
+              <LoadingButton
                 type="submit"
                 variant="contained"
                 fullWidth
                 size="large"
                 sx={{ mt: 4, py: 1.5 }}
-                disabled={isLoading}
+                loading={isLoading}
               >
-                {isLoading ? <Spinner size={24} /> : "Complete Setup"}
-              </Button>
+                Complete Setup
+              </LoadingButton>
             </Box>
           </Paper>
 

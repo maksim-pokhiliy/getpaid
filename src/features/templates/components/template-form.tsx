@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { Box, Button } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import { PageHeader } from "@app/shared/ui/page-header";
-import { Spinner } from "@app/shared/ui/loading";
+import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useTemplateForm } from "./use-template-form";
 import { TemplateFormDetails } from "./template-form-details";
 import { TemplateFormItems } from "./template-form-items";
@@ -57,14 +57,14 @@ export function TemplateForm() {
           <Button variant="outlined" onClick={() => router.push("/app/templates")}>
             Cancel
           </Button>
-          <Button
+          <LoadingButton
             type="submit"
             variant="contained"
-            startIcon={isPending ? <Spinner size={16} /> : <SaveIcon />}
-            disabled={isPending}
+            startIcon={<SaveIcon />}
+            loading={isPending}
           >
             Create Template
-          </Button>
+          </LoadingButton>
         </Box>
       </Box>
     </>

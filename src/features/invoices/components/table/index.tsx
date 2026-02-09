@@ -6,6 +6,7 @@ import { InvoicesTableHeader } from "./table-header";
 import { InvoicesTableFooter } from "./table-footer";
 import { VirtualizedRows, PaginatedRows } from "./table-rows";
 import { useTableKeyboardNav } from "@app/shared/hooks";
+import { UI } from "@app/shared/config/config";
 import type { InvoiceData } from "../invoice-row";
 
 interface VirtualItem {
@@ -86,7 +87,7 @@ export function InvoicesTable({
         ref={showAll ? parentRef : undefined}
         sx={{
           maxHeight: showAll ? VIRTUAL_MAX_HEIGHT : undefined,
-          "& .MuiTableHead-root": { bgcolor: alpha(theme.palette.primary.main, 0.04) },
+          "& .MuiTableHead-root": { bgcolor: alpha(theme.palette.primary.main, UI.ALPHA_HOVER) },
         }}
       >
         <Table stickyHeader={showAll}>

@@ -116,7 +116,7 @@ export function useClientsPage() {
   };
 
   const handleEdit = () => {
-    handleMenuClose();
+    setMenuAnchorEl(null);
     setEditDialogOpen(true);
   };
 

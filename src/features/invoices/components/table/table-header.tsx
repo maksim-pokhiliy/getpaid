@@ -9,6 +9,7 @@ import {
   alpha,
   useTheme,
 } from "@mui/material";
+import { UI } from "@app/shared/config/config";
 
 interface TableHeaderProps {
   sortColumn: string;
@@ -40,7 +41,7 @@ export function InvoicesTableHeader({
 
   return (
     <TableHead>
-      <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+      <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, UI.ALPHA_HOVER) }}>
         {onToggleSelectAll && (
           <TableCell padding="checkbox">
             <Checkbox
