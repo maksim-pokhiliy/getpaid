@@ -6,7 +6,7 @@ import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useToast } from "@app/shared/ui/toast";
 import { useUpdateSenderProfile } from "@app/features/settings";
 import { ApiError } from "@app/shared/api";
-import { BRANDING } from "@app/shared/config/config";
+import { BRANDING, FONT_FAMILY_MAP } from "@app/shared/config/config";
 import type { SenderProfile } from "@app/shared/schemas/api";
 import { LogoPreview } from "./logo-preview";
 import { BrandColors } from "./brand-colors";
@@ -117,10 +117,21 @@ export function BrandingTab({ profile }: BrandingTabProps) {
           }}
           fullWidth
           helperText="Applied to public invoice pages and emails"
+          sx={{
+            "& .MuiSelect-select": {
+              fontFamily: FONT_FAMILY_MAP[fontFamily || "system"],
+            },
+          }}
         >
-          <MenuItem value="system">System (Sans-serif)</MenuItem>
-          <MenuItem value="serif">Serif (Georgia)</MenuItem>
-          <MenuItem value="mono">Monospace (Courier)</MenuItem>
+          <MenuItem value="system" sx={{ fontFamily: FONT_FAMILY_MAP.system }}>
+            System (Sans-serif)
+          </MenuItem>
+          <MenuItem value="serif" sx={{ fontFamily: FONT_FAMILY_MAP.serif }}>
+            Serif (Georgia)
+          </MenuItem>
+          <MenuItem value="mono" sx={{ fontFamily: FONT_FAMILY_MAP.mono }}>
+            Monospace (Courier)
+          </MenuItem>
         </TextField>
         <TextField
           label="Invoice Prefix"

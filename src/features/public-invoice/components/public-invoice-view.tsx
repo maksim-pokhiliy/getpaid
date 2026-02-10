@@ -79,7 +79,18 @@ export default function PublicInvoiceView({ publicId, invoice, branding, justPai
   const fontStack = branding.fontFamily ? FONT_FAMILY_MAP[branding.fontFamily] : undefined;
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: 4, fontFamily: fontStack }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        py: 4,
+        ...(fontStack && {
+          fontFamily: fontStack,
+          "& .MuiTypography-root, & .MuiChip-label, & .MuiTableCell-root, & .MuiButton-root, & .MuiAlert-message":
+            { fontFamily: "inherit" },
+        }),
+      }}
+    >
       <Container maxWidth="md">
         <InvoiceHeader
           logoUrl={branding.logoUrl}
