@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Box, Typography, TextField, Divider } from "@mui/material";
+import { Box, Typography, TextField, Divider, MenuItem } from "@mui/material";
 import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useToast } from "@app/shared/ui/toast";
 import { useUpdateSenderProfile } from "@app/features/settings";
 import { ApiError } from "@app/shared/api";
-import { BRANDING } from "@app/shared/config/config";
+import { BRANDING, FONT_FAMILY_MAP } from "@app/shared/config/config";
 import type { SenderProfile } from "@app/shared/schemas/api";
 import { LogoPreview } from "./logo-preview";
 import { BrandColors } from "./brand-colors";
@@ -25,6 +25,9 @@ export function BrandingTab({ profile }: BrandingTabProps) {
   const [logoUrl, setLogoUrl] = React.useState("");
   const [primaryColor, setPrimaryColor] = React.useState(BRANDING.DEFAULT_PRIMARY_COLOR);
   const [accentColor, setAccentColor] = React.useState(BRANDING.DEFAULT_ACCENT_COLOR);
+  const [footerText, setFooterText] = React.useState("");
+  const [fontFamily, setFontFamily] = React.useState("");
+  const [invoicePrefix, setInvoicePrefix] = React.useState("");
   const [isDirty, setIsDirty] = React.useState(false);
 
   React.useEffect(() => {
@@ -32,6 +35,9 @@ export function BrandingTab({ profile }: BrandingTabProps) {
       setLogoUrl(profile.logoUrl || "");
       setPrimaryColor(profile.primaryColor || BRANDING.DEFAULT_PRIMARY_COLOR);
       setAccentColor(profile.accentColor || BRANDING.DEFAULT_ACCENT_COLOR);
+      setFooterText(profile.footerText || "");
+      setFontFamily(profile.fontFamily || "system");
+      setInvoicePrefix(profile.invoicePrefix || "");
       setIsDirty(false);
     }
   }, [profile]);
@@ -49,6 +55,9 @@ export function BrandingTab({ profile }: BrandingTabProps) {
       logoUrl: toUndefined(logoUrl),
       primaryColor: toUndefined(primaryColor),
       accentColor: toUndefined(accentColor),
+      footerText: toUndefined(footerText),
+      fontFamily: toUndefined(fontFamily === "system" ? "" : fontFamily),
+      invoicePrefix: toUndefined(invoicePrefix),
     };
 
     mutation.mutate(data, {
@@ -96,6 +105,60 @@ export function BrandingTab({ profile }: BrandingTabProps) {
             setAccentColor(v);
             markDirty();
           }}
+        />
+        <Divider />
+        <TextField
+          select
+          label="Font Style"
+          value={fontFamily || "system"}
+          onChange={(e) => {
+            setFontFamily(e.target.value);
+            markDirty();
+          }}
+          fullWidth
+          helperText="Applied to public invoice pages and emails"
+          sx={{
+            "& .MuiSelect-select": {
+              fontFamily: FONT_FAMILY_MAP[fontFamily || "system"],
+            },
+          }}
+        >
+          <MenuItem value="system" sx={{ fontFamily: FONT_FAMILY_MAP.system }}>
+            System (Sans-serif)
+          </MenuItem>
+          <MenuItem value="serif" sx={{ fontFamily: FONT_FAMILY_MAP.serif }}>
+            Serif (Georgia)
+          </MenuItem>
+          <MenuItem value="mono" sx={{ fontFamily: FONT_FAMILY_MAP.mono }}>
+            Monospace (Courier)
+          </MenuItem>
+        </TextField>
+        <TextField
+          label="Invoice Prefix"
+          value={invoicePrefix}
+          onChange={(e) => {
+            setInvoicePrefix(e.target.value.replace(/[^A-Za-z0-9]/g, ""));
+            markDirty();
+          }}
+          fullWidth
+          placeholder="INV"
+          helperText="Prefix for payment references (e.g., MYCO → MYCO-ABC123)"
+          slotProps={{ htmlInput: { maxLength: 10 } }}
+        />
+        <TextField
+          label="Footer Text"
+          value={footerText}
+          onChange={(e) => {
+            setFooterText(e.target.value);
+            markDirty();
+          }}
+          fullWidth
+          multiline
+          minRows={2}
+          maxRows={4}
+          placeholder="Payment instructions, thank-you note, etc."
+          helperText="Shown on invoices and emails (max 500 characters)"
+          slotProps={{ htmlInput: { maxLength: 500 } }}
         />
         <Divider />
         <BrandingPreview

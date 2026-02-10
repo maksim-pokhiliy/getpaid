@@ -13,6 +13,7 @@ export const clientSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string(),
+  defaultRate: z.number().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -122,6 +123,10 @@ export const senderProfileResponseSchema = z.object({
   logoUrl: z.string().nullable(),
   primaryColor: z.string().nullable(),
   accentColor: z.string().nullable(),
+  footerText: z.string().nullable(),
+  fontFamily: z.string().nullable(),
+  invoicePrefix: z.string().nullable(),
+  defaultRate: z.number().nullable(),
 });
 
 export type SenderProfile = z.infer<typeof senderProfileResponseSchema>;

@@ -1,7 +1,8 @@
 import { prisma } from "../src/server/db";
 import { getPendingFollowUpJobs, markFollowUpJobSent } from "../src/server/followups";
-import { sendReminderEmail } from "../src/server/email";
+import { sendReminderEmail, type EmailBranding } from "../src/server/email";
 import { logInvoiceEvent } from "../src/server/invoices";
+import { BRANDING } from "../src/shared/config/config";
 
 async function main() {
   console.log("Starting follow-up job runner...");
@@ -22,14 +23,24 @@ async function main() {
       continue;
     }
 
+    const senderProfile = invoice.user.senderProfile;
+
     const senderName =
-      invoice.user.senderProfile?.companyName ||
-      invoice.user.senderProfile?.displayName ||
+      senderProfile?.companyName ||
+      senderProfile?.displayName ||
       invoice.user.email;
 
-    const senderEmail = invoice.user.senderProfile?.emailFrom || invoice.user.email;
+    const senderEmail = senderProfile?.emailFrom || invoice.user.email;
 
     const isOverdue = invoice.dueDate < new Date();
+
+    const branding: EmailBranding = {
+      primaryColor: senderProfile?.primaryColor || BRANDING.DEFAULT_PRIMARY_COLOR,
+      logoUrl: senderProfile?.logoUrl || null,
+      fontFamily: senderProfile?.fontFamily || null,
+      footerText: senderProfile?.footerText || null,
+      companyAddress: senderProfile?.address || null,
+    };
 
     console.log(`Processing job ${job.id} for invoice ${invoice.publicId}...`);
 
@@ -44,6 +55,14 @@ async function main() {
         currency: invoice.currency,
         dueDate: invoice.dueDate,
         isOverdue,
+        branding,
+        paymentReference: invoice.paymentReference || null,
+        items: invoice.items.map((item) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          amount: item.amount,
+        })),
       });
 
       await markFollowUpJobSent(job.id);

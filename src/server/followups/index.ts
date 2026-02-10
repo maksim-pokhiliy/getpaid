@@ -82,6 +82,7 @@ export async function getPendingFollowUpJobs() {
       invoice: {
         include: {
           client: true,
+          items: true,
           user: {
             include: {
               senderProfile: true,

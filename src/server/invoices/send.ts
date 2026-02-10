@@ -1,10 +1,11 @@
 import { customAlphabet } from "nanoid";
 import { prisma } from "@app/server/db";
-import { sendInvoiceEmail } from "@app/server/email";
+import { sendInvoiceEmail, type EmailBranding } from "@app/server/email";
 import { getFollowUpRule, scheduleFollowUps } from "@app/server/followups";
 import { logInvoiceEvent, updateInvoiceStatus } from "@app/server/invoices";
-import { BANKING } from "@app/shared/config/config";
+import { BANKING, BRANDING } from "@app/shared/config/config";
 import { INVOICE_STATUS, INVOICE_EVENT } from "@app/shared/config/invoice-status";
+import type { SenderProfile } from "@prisma/client";
 
 const generateReference = customAlphabet(
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
@@ -32,11 +33,30 @@ export class EmailFailedError extends Error {
   }
 }
 
+function buildEmailBranding(profile: SenderProfile | null): EmailBranding {
+  return {
+    primaryColor: profile?.primaryColor || BRANDING.DEFAULT_PRIMARY_COLOR,
+    logoUrl: profile?.logoUrl || null,
+    fontFamily: profile?.fontFamily || null,
+    footerText: profile?.footerText || null,
+    companyAddress: profile?.address || null,
+  };
+}
+
+function resolveSenderInfo(profile: SenderProfile | null, userEmail: string) {
+  return {
+    name: profile?.companyName || profile?.displayName || userEmail,
+    email: profile?.emailFrom || userEmail,
+    prefix: profile?.invoicePrefix || BANKING.PAYMENT_REFERENCE_PREFIX,
+  };
+}
+
 export async function sendInvoice(invoiceId: string, userId: string) {
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, userId },
     include: {
       client: true,
+      items: true,
       user: {
         include: {
           senderProfile: true,
@@ -53,23 +73,28 @@ export async function sendInvoice(invoiceId: string, userId: string) {
     throw new InvoiceAlreadySentError();
   }
 
-  const senderName =
-    invoice.user.senderProfile?.companyName ||
-    invoice.user.senderProfile?.displayName ||
-    invoice.user.email;
-
-  const senderEmail = invoice.user.senderProfile?.emailFrom || invoice.user.email;
+  const sender = resolveSenderInfo(invoice.user.senderProfile, invoice.user.email);
+  const paymentReference = `${sender.prefix}-${generateReference()}`;
+  const branding = buildEmailBranding(invoice.user.senderProfile);
 
   try {
     await sendInvoiceEmail({
       clientName: invoice.client.name,
       clientEmail: invoice.client.email,
-      senderName,
-      senderEmail,
+      senderName: sender.name,
+      senderEmail: sender.email,
       publicId: invoice.publicId,
       total: invoice.total,
       currency: invoice.currency,
       dueDate: invoice.dueDate,
+      branding,
+      paymentReference,
+      items: invoice.items.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        amount: item.amount,
+      })),
     });
   } catch (emailError) {
     console.error("Failed to send email:", emailError);
@@ -77,7 +102,6 @@ export async function sendInvoice(invoiceId: string, userId: string) {
   }
 
   const sentAt = new Date();
-  const paymentReference = `${BANKING.PAYMENT_REFERENCE_PREFIX}-${generateReference()}`;
 
   await updateInvoiceStatus(invoice.id, INVOICE_STATUS.SENT, { sentAt, paymentReference });
   await logInvoiceEvent(invoice.id, INVOICE_EVENT.SENT, { clientEmail: invoice.client.email });
