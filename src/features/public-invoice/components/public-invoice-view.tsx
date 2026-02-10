@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Box, Container, Paper, Typography, Chip, Alert, Divider } from "@mui/material";
+import { FONT_FAMILY_MAP } from "@app/shared/config/config";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { InvoiceHeader } from "./invoice-header";
 import { SenderBillTo } from "./sender-bill-to";
@@ -47,6 +48,7 @@ interface Branding {
   logoUrl: string | null;
   primaryColor: string;
   accentColor: string;
+  fontFamily: string | null;
 }
 
 interface Props {
@@ -56,15 +58,9 @@ interface Props {
   justPaid: boolean;
 }
 
-const STATUS_CONFIG: Record<
-  string,
-  { color: "success" | "error" | "info" | "warning" | "default"; label: string }
-> = {
+const PUBLIC_STATUS_CONFIG: Record<string, { color: "success" | "error"; label: string }> = {
   PAID: { color: "success", label: "Paid" },
   OVERDUE: { color: "error", label: "Overdue" },
-  SENT: { color: "info", label: "Sent" },
-  VIEWED: { color: "info", label: "Viewed" },
-  DRAFT: { color: "default", label: "Draft" },
 };
 
 export default function PublicInvoiceView({ publicId, invoice, branding, justPaid }: Props) {
@@ -79,10 +75,11 @@ export default function PublicInvoiceView({ publicId, invoice, branding, justPai
 
   const isPaid = invoice.status === "PAID";
   const isOverdue = invoice.status === "OVERDUE";
-  const status = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.DRAFT;
+  const statusConfig = PUBLIC_STATUS_CONFIG[invoice.status] ?? null;
+  const fontStack = branding.fontFamily ? FONT_FAMILY_MAP[branding.fontFamily] : undefined;
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: 4 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", py: 4, fontFamily: fontStack }}>
       <Container maxWidth="md">
         <InvoiceHeader
           logoUrl={branding.logoUrl}
@@ -120,11 +117,13 @@ export default function PublicInvoiceView({ publicId, invoice, branding, justPai
                 #{invoice.publicId}
               </Typography>
             </Box>
-            <Chip
-              label={status.label}
-              color={status.color}
-              sx={{ fontWeight: 600, px: 1, "@media print": { display: "none" } }}
-            />
+            {statusConfig && (
+              <Chip
+                label={statusConfig.label}
+                color={statusConfig.color}
+                sx={{ fontWeight: 600, px: 1, "@media print": { display: "none" } }}
+              />
+            )}
           </Box>
 
           <SenderBillTo

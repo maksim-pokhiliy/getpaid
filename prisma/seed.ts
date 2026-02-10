@@ -197,6 +197,9 @@ async function main() {
         defaultCurrency: "USD",
         primaryColor: "#1976d2",
         accentColor: "#9c27b0",
+        footerText: "Thank you for your business!\nPayment is due within the specified period.",
+        fontFamily: "system",
+        invoicePrefix: "DEMO",
       },
     });
     console.log(`Created sender profile: ${senderProfile.companyName}`);

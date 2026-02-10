@@ -12,6 +12,9 @@ function normalizeProfileData(data: SenderProfileInput, isCreate: boolean) {
     logoUrl: data.logoUrl ?? null,
     primaryColor: data.primaryColor ?? null,
     accentColor: data.accentColor ?? null,
+    footerText: data.footerText ?? null,
+    fontFamily: data.fontFamily ?? null,
+    invoicePrefix: data.invoicePrefix ?? null,
   };
 }
 

@@ -28,6 +28,7 @@ export default async function PublicInvoicePage({ params, searchParams }: Props)
     logoUrl: senderProfile?.logoUrl || null,
     primaryColor: senderProfile?.primaryColor || BRANDING.DEFAULT_PRIMARY_COLOR,
     accentColor: senderProfile?.accentColor || BRANDING.DEFAULT_ACCENT_COLOR,
+    fontFamily: senderProfile?.fontFamily || null,
   };
 
   return (

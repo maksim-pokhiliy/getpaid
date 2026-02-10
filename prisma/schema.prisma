@@ -82,10 +82,12 @@ model SenderProfile {
   address         String?
   taxId           String?
   defaultCurrency String   @default("USD")
-  // Branding customization
   logoUrl         String?
-  primaryColor    String?  @default("#1976d2") // MUI default primary
-  accentColor     String?  @default("#9c27b0") // MUI default secondary
+  primaryColor    String?  @default("#1976d2")
+  accentColor     String?  @default("#9c27b0")
+  footerText      String?  @db.Text
+  fontFamily      String?
+  invoicePrefix   String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

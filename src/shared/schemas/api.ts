@@ -122,6 +122,9 @@ export const senderProfileResponseSchema = z.object({
   logoUrl: z.string().nullable(),
   primaryColor: z.string().nullable(),
   accentColor: z.string().nullable(),
+  footerText: z.string().nullable(),
+  fontFamily: z.string().nullable(),
+  invoicePrefix: z.string().nullable(),
 });
 
 export type SenderProfile = z.infer<typeof senderProfileResponseSchema>;
