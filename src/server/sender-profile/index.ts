@@ -1,5 +1,6 @@
-import { prisma } from "@app/server/db";
 import { SenderProfileInput } from "@app/shared/schemas";
+
+import { prisma } from "@app/server/db";
 
 function normalizeProfileData(data: SenderProfileInput, isCreate: boolean) {
   return {

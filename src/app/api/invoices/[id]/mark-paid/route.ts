@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+
+import { notFoundResponse, withAuth } from "@app/shared/api/route-helpers";
+
 import { markInvoicePaid } from "@app/server/invoices";
-import { withAuth, notFoundResponse } from "@app/shared/api/route-helpers";
 
 export const POST = withAuth(async (user, _request, context) => {
   const { id } = await context.params;

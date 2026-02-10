@@ -1,23 +1,25 @@
 "use client";
 
+import AddIcon from "@mui/icons-material/Add";
+import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
 import {
+  Alert,
   Box,
   Button,
   IconButton,
   InputAdornment,
   TextField,
   Typography,
-  Alert,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import SearchIcon from "@mui/icons-material/Search";
-import ClearIcon from "@mui/icons-material/Clear";
-import { PageHeader } from "@app/shared/ui/page-header";
-import { MobileFab } from "@app/shared/ui/mobile-fab";
+
 import { HelpTooltip } from "@app/shared/ui/help-tooltip";
-import { calculateEstimatedTotal } from "./templates-table";
+import { MobileFab } from "@app/shared/ui/mobile-fab";
+import { PageHeader } from "@app/shared/ui/page-header";
+
 import { TemplatesContent } from "./templates-content";
 import { TemplatesOverflowMenu } from "./templates-overflow-menu";
+import { calculateEstimatedTotal } from "./templates-table";
 import { useTemplatesPage } from "./use-templates-page";
 
 function TemplatesSearchBar({

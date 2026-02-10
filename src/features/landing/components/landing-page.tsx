@@ -1,11 +1,12 @@
 "use client";
 
 import { Box } from "@mui/material";
+
+import { LandingFeatures } from "./landing-features";
+import { LandingFooter } from "./landing-footer";
 import { LandingHeader } from "./landing-header";
 import { LandingHero } from "./landing-hero";
-import { LandingFeatures } from "./landing-features";
 import { LandingSelfHosted } from "./landing-self-hosted";
-import { LandingFooter } from "./landing-footer";
 
 export function LandingPage() {
   return (

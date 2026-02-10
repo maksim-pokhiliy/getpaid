@@ -21,8 +21,10 @@ export function getConfidenceLevel(confidence: number): "high" | "medium" | "low
   if (confidence >= 0.8) {
     return "high";
   }
+
   if (confidence >= 0.6) {
     return "medium";
   }
+
   return "low";
 }

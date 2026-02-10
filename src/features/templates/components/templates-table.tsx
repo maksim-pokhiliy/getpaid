@@ -1,14 +1,16 @@
 "use client";
 
 import { Box, Chip, TableCell, Typography } from "@mui/material";
+
+import { buildDiscountInput, calculateTotals } from "@app/shared/lib/calculations";
 import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
-import { calculateTotals, buildDiscountInput } from "@app/shared/lib/calculations";
 import {
   DataTable,
-  DataTableRow,
   DataTableActions,
   type DataTableColumn,
+  DataTableRow,
 } from "@app/shared/ui/data-table";
+
 import type { Template } from "@app/features/templates";
 
 const COLUMNS: DataTableColumn[] = [
@@ -92,5 +94,6 @@ export function calculateEstimatedTotal(template: Template) {
     buildDiscountInput(template.discountType, template.discountValue),
     template.taxRate
   );
+
   return total;
 }

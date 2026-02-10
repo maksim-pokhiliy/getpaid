@@ -53,6 +53,7 @@ async function saltEdgeFetch<T>(path: string, options: RequestInit = {}): Promis
 
   if (!response.ok) {
     const errorBody = await response.text();
+
     throw new Error(`Salt Edge API error ${response.status}: ${errorBody}`);
   }
 
@@ -70,6 +71,7 @@ export async function createCustomer(identifier: string): Promise<string> {
     method: "POST",
     body: JSON.stringify({ data: { identifier } }),
   });
+
   return result.customer_id;
 }
 
@@ -115,6 +117,7 @@ export async function getTransactions(
     connection_id: connectionId,
     account_id: accountId,
   });
+
   if (fromDate) {
     params.set("from_date", fromDate);
   }
@@ -139,9 +142,9 @@ export async function refreshConnection(connectionId: string): Promise<void> {
 }
 
 export type {
-  SaltEdgeCustomer,
-  SaltEdgeConnectSession,
-  SaltEdgeConnection,
   SaltEdgeAccount,
+  SaltEdgeConnection,
+  SaltEdgeConnectSession,
+  SaltEdgeCustomer,
   SaltEdgeTransaction,
 };

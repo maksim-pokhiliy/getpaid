@@ -2,19 +2,22 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
+  Alert,
   Box,
   Button,
-  TextField,
-  Alert,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
 } from "@mui/material";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { CreateClientInput, createClientSchema } from "@app/shared/schemas";
 import { LoadingButton } from "@app/shared/ui/loading-button";
-import { createClientSchema, CreateClientInput } from "@app/shared/schemas";
 
 interface InlineClientDialogProps {
   open: boolean;

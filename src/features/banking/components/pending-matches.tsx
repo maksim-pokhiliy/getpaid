@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Typography, Stack } from "@mui/material";
+
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
+import { Box, Stack, Typography } from "@mui/material";
+
 import { EmptyState } from "@app/shared/ui/empty-state";
 import { CardSkeleton } from "@app/shared/ui/loading";
-import { usePendingTransactions, useConfirmMatch, useIgnoreTransaction } from "../hooks";
+
+import { useConfirmMatch, useIgnoreTransaction, usePendingTransactions } from "../hooks";
 import { MatchCard } from "./match-card";
 
 export function PendingMatches() {

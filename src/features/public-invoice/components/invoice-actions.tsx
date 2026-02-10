@@ -1,8 +1,8 @@
 "use client";
 
-import { Box, Button, alpha } from "@mui/material";
-import PrintIcon from "@mui/icons-material/Print";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PrintIcon from "@mui/icons-material/Print";
+import { alpha, Box, Button } from "@mui/material";
 
 interface InvoiceActionsProps {
   isPaid: boolean;

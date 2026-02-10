@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "@app/server/db";
+
 import { AUTH } from "@app/shared/config/config";
+
+import { prisma } from "@app/server/db";
 
 export class EmailExistsError extends Error {
   constructor() {

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import { useAnalytics } from "@app/features/dashboard";
 
 interface ExternalData {

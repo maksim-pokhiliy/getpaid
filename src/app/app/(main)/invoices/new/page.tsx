@@ -1,12 +1,14 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+
 import { AppLayout } from "@app/shared/layout/app-layout";
 import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
-import { InvoiceForm } from "@app/features/invoices/components";
+
 import { useClients, useCreateClient } from "@app/features/clients";
-import { useTemplate } from "@app/features/templates";
+import { InvoiceForm } from "@app/features/invoices/components";
 import { useSenderProfile } from "@app/features/settings";
+import { useTemplate } from "@app/features/templates";
 
 export default function NewInvoicePage() {
   const searchParams = useSearchParams();
@@ -22,6 +24,7 @@ export default function NewInvoicePage() {
       <Breadcrumbs
         items={[{ label: "Invoices", href: "/app/invoices" }, { label: "New Invoice" }]}
       />
+
       <InvoiceForm
         mode="create"
         templateId={templateId}

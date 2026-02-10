@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+
 import { signUpSchema } from "@app/shared/schemas";
+
 import { createUser, EmailExistsError } from "@app/server/auth/signup";
 
 export async function POST(request: Request) {
@@ -38,6 +40,7 @@ export async function POST(request: Request) {
     }
 
     console.error("Sign-up error:", error);
+
     return NextResponse.json(
       {
         error: {

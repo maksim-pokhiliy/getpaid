@@ -2,29 +2,33 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+
 import {
+  Alert,
   Box,
   Container,
-  TextField,
-  Typography,
-  Paper,
-  Alert,
-  MenuItem,
-  Select,
   FormControl,
-  InputLabel,
   FormHelperText,
-  Stepper,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
   Step,
   StepLabel,
+  Stepper,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { Logo } from "@app/shared/ui/logo";
-import { LoadingButton } from "@app/shared/ui/loading-button";
-import { useToast } from "@app/shared/ui/toast";
-import { senderProfileFormSchema, SenderProfileFormInput } from "@app/shared/schemas";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { ApiError } from "@app/shared/api/base";
+import { SenderProfileFormInput, senderProfileFormSchema } from "@app/shared/schemas";
+import { LoadingButton } from "@app/shared/ui/loading-button";
+import { Logo } from "@app/shared/ui/logo";
+import { useToast } from "@app/shared/ui/toast";
+
 import { senderProfileApi } from "@app/features/settings";
 
 const currencies = [
@@ -63,6 +67,7 @@ export default function OnboardingPage() {
 
     try {
       await senderProfileApi.create(data);
+
       toast.success("Profile saved successfully!");
       router.push("/app/invoices");
     } catch (err) {
@@ -104,6 +109,7 @@ export default function OnboardingPage() {
               <Typography variant="h5" fontWeight={700} gutterBottom>
                 Set Up Your Business Profile
               </Typography>
+
               <Typography variant="body2" color="text.secondary">
                 This information will appear on your invoices
               </Typography>
@@ -127,6 +133,7 @@ export default function OnboardingPage() {
                   "Enter your company name or leave blank if using personal name"
                 }
               />
+
               <TextField
                 {...register("displayName")}
                 label="Display Name (Personal)"
@@ -137,6 +144,7 @@ export default function OnboardingPage() {
                   errors.displayName?.message || "Your personal name if not using a company"
                 }
               />
+
               <TextField
                 {...register("emailFrom")}
                 label="Reply-to Email"
@@ -146,6 +154,7 @@ export default function OnboardingPage() {
                 error={!!errors.emailFrom}
                 helperText={errors.emailFrom?.message || "Email where clients can reply (optional)"}
               />
+
               <TextField
                 {...register("address")}
                 label="Business Address"
@@ -156,6 +165,7 @@ export default function OnboardingPage() {
                 error={!!errors.address}
                 helperText={errors.address?.message}
               />
+
               <TextField
                 {...register("taxId")}
                 label="Tax ID / VAT Number"
@@ -164,8 +174,10 @@ export default function OnboardingPage() {
                 error={!!errors.taxId}
                 helperText={errors.taxId?.message || "Optional"}
               />
+
               <FormControl fullWidth margin="normal" error={!!errors.defaultCurrency}>
                 <InputLabel id="currency-label">Default Currency</InputLabel>
+
                 <Select
                   {...register("defaultCurrency")}
                   labelId="currency-label"
@@ -178,6 +190,7 @@ export default function OnboardingPage() {
                     </MenuItem>
                   ))}
                 </Select>
+
                 {errors.defaultCurrency && (
                   <FormHelperText>{errors.defaultCurrency.message}</FormHelperText>
                 )}

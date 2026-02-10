@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
+
+import { AuthenticationError, requireUser } from "@app/server/auth/require-user";
 import { deleteConnectionById } from "@app/server/banking/connections";
 
 interface RouteParams {
@@ -28,7 +29,9 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
         { status: 401 }
       );
     }
+
     console.error("Delete bank connection error:", error);
+
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" } },
       { status: 500 }

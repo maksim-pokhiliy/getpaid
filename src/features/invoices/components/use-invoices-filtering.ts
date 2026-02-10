@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useDebouncedValue } from "@app/shared/hooks";
+
 import { SEARCH } from "@app/shared/config/config";
+import { useDebouncedValue } from "@app/shared/hooks";
 import type { InvoiceListItem } from "@app/shared/schemas/api";
 
 export function useInvoicesFiltering(
@@ -20,6 +21,7 @@ export function useInvoicesFiltering(
     if (!invoices) {
       return [];
     }
+
     const filtered = invoices.filter((invoice) => {
       const q = debouncedSearch.toLowerCase();
       const matchesSearch =
@@ -28,10 +30,13 @@ export function useInvoicesFiltering(
         invoice.client.name.toLowerCase().includes(q) ||
         invoice.client.email.toLowerCase().includes(q);
       const matchesStatus = statusFilter === "ALL" || invoice.status === statusFilter;
+
       return matchesSearch && matchesStatus;
     });
+
     return filtered.sort((a, b) => {
       const comparison = compareByColumn(a, b, sortColumn);
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [invoices, debouncedSearch, statusFilter, sortColumn, sortDirection]);
@@ -93,7 +98,9 @@ export function useInvoicesPagination(
     if (showAll) {
       return filteredInvoices;
     }
+
     const start = page * rowsPerPage;
+
     return filteredInvoices.slice(start, start + rowsPerPage);
   }, [filteredInvoices, page, rowsPerPage, showAll]);
 

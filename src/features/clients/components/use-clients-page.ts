@@ -1,12 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { useClients, clientsApi } from "@app/features/clients";
-import { useOptimisticDelete, useDebouncedValue, useItemMenu, useSort } from "@app/shared/hooks";
-import { useAnnounce } from "@app/shared/ui/screen-reader-announcer";
-import { queryKeys } from "@app/shared/config/query";
+
 import { PAGINATION, SEARCH } from "@app/shared/config/config";
+import { queryKeys } from "@app/shared/config/query";
+import { useDebouncedValue, useItemMenu, useOptimisticDelete, useSort } from "@app/shared/hooks";
 import type { Client } from "@app/shared/schemas/api";
+import { useAnnounce } from "@app/shared/ui/screen-reader-announcer";
+
+import { clientsApi, useClients } from "@app/features/clients";
 
 function filterAndSortClients(
   clients: Client[] | undefined,
@@ -18,19 +20,23 @@ function filterAndSortClients(
   if (!clients) {
     return [];
   }
+
   const lowerSearch = search.toLowerCase();
   const filtered = clients.filter((client) => {
     if (pendingIds.has(client.id)) {
       return false;
     }
+
     return (
       search === "" ||
       client.name.toLowerCase().includes(lowerSearch) ||
       client.email.toLowerCase().includes(lowerSearch)
     );
   });
+
   return filtered.sort((a, b) => {
     let comparison = 0;
+
     switch (sortColumn) {
       case "name":
         comparison = a.name.localeCompare(b.name);
@@ -44,6 +50,7 @@ function filterAndSortClients(
       default:
         comparison = a.name.localeCompare(b.name);
     }
+
     return sortDirection === "asc" ? comparison : -comparison;
   });
 }
@@ -87,7 +94,9 @@ export function useClientsPage() {
     if (!menu.selectedItem) {
       return;
     }
+
     const client = menu.selectedItem;
+
     menu.closeMenu();
     deleteItem(client);
   };

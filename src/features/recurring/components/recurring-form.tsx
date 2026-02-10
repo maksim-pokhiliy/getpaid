@@ -1,16 +1,19 @@
 "use client";
 
 import { useCallback } from "react";
+
 import { Box } from "@mui/material";
-import { PageHeader } from "@app/shared/ui/page-header";
-import { Spinner } from "@app/shared/ui/loading";
-import { FormActions } from "@app/shared/ui/form-actions";
-import type { Client } from "@app/shared/schemas/api";
+
 import type { RecurringFormData } from "@app/shared/schemas";
-import { useRecurringForm } from "./use-recurring-form";
-import { RecurringFormSchedule } from "./recurring-form-schedule";
-import { RecurringFormItems } from "./recurring-form-items";
+import type { Client } from "@app/shared/schemas/api";
+import { FormActions } from "@app/shared/ui/form-actions";
+import { Spinner } from "@app/shared/ui/loading";
+import { PageHeader } from "@app/shared/ui/page-header";
+
 import { RecurringFormDiscounts } from "./recurring-form-discounts";
+import { RecurringFormItems } from "./recurring-form-items";
+import { RecurringFormSchedule } from "./recurring-form-schedule";
+import { useRecurringForm } from "./use-recurring-form";
 
 interface RecurringFormProps {
   mode?: "create" | "edit";

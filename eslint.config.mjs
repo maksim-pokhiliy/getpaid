@@ -1,13 +1,31 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
   {
+    plugins: { "simple-import-sort": simpleImportSort },
     rules: {
+      "simple-import-sort/imports": [
+        "error",
+        {
+          groups: [
+            ["^react", "^next"],
+            ["^@mui"],
+            ["^@?\\w"],
+            ["^@app/shared"],
+            ["^@app/features"],
+            ["^@app/server"],
+            ["^@app"],
+            ["^\\."],
+          ],
+        },
+      ],
+      "simple-import-sort/exports": "error",
       "no-warning-comments": [
         "error",
         { terms: ["todo", "fixme", "hack", "xxx"], location: "anywhere" },
@@ -23,6 +41,17 @@ const eslintConfig = defineConfig([
       eqeqeq: ["error", "always"],
       curly: ["error", "all"],
       "no-nested-ternary": "error",
+      "padding-line-between-statements": [
+        "error",
+        { blankLine: "always", prev: ["const", "let", "var"], next: "*" },
+        { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var"] },
+        { blankLine: "always", prev: "*", next: "return" },
+        { blankLine: "always", prev: "directive", next: "*" },
+        { blankLine: "always", prev: "*", next: ["if", "for", "while", "do", "switch", "try"] },
+        { blankLine: "always", prev: ["if", "for", "while", "do", "switch", "try"], next: "*" },
+        { blankLine: "always", prev: "*", next: ["function", "class"] },
+        { blankLine: "always", prev: ["function", "class"], next: "*" },
+      ],
       "max-lines": ["error", { max: 300, skipBlankLines: true, skipComments: true }],
       "max-lines-per-function": ["error", { max: 100, skipBlankLines: true, skipComments: true }],
       "max-depth": ["error", 4],

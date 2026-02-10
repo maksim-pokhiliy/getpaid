@@ -1,17 +1,19 @@
 "use client";
 
+import type { UseFormRegister } from "react-hook-form";
+
 import {
   Box,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   TextField,
   Typography,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  InputAdornment,
 } from "@mui/material";
-import type { UseFormRegister } from "react-hook-form";
+
 import type { RecurringFormData } from "@app/shared/schemas";
 
 interface RecurringFormDiscountsProps {

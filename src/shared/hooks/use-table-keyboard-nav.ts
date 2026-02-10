@@ -30,12 +30,14 @@ export function useTableKeyboardNav(rowCount: number, options?: UseTableKeyboard
             e.preventDefault();
             options?.onActivate?.(focusedIndex);
           }
+
           break;
         case " ":
           if (focusedIndex >= 0 && options?.onToggleSelect) {
             e.preventDefault();
             options.onToggleSelect(focusedIndex);
           }
+
           break;
         case "Home":
           e.preventDefault();

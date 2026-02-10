@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Box, Paper, Typography, Grid, Button } from "@mui/material";
-import { RecentInvoicesContent } from "./recent-invoices";
-import { StatusBreakdown } from "./status-breakdown";
-import { RevenueChart } from "./revenue-chart";
+
+import { Box, Button, Grid, Paper, Typography } from "@mui/material";
+
 import type { AnalyticsData } from "../api";
+import { RecentInvoicesContent } from "./recent-invoices";
+import { RevenueChart } from "./revenue-chart";
+import { StatusBreakdown } from "./status-breakdown";
 
 interface DashboardChartsProps {
   isLoading: boolean;

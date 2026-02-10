@@ -2,19 +2,22 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useToast } from "@app/shared/ui/toast";
+
+import { useVirtualList } from "@app/shared/hooks";
+import { exportInvoicesToCSV } from "@app/shared/lib/export";
 import { useConfirmDialog } from "@app/shared/ui/confirm-dialog";
 import { useAnnounce } from "@app/shared/ui/screen-reader-announcer";
+import { useToast } from "@app/shared/ui/toast";
+
 import {
-  useInvoices,
   useDeleteInvoice,
   useDuplicateInvoice,
+  useInvoices,
   usePrefetchInvoice,
 } from "@app/features/invoices";
-import { exportInvoicesToCSV } from "@app/shared/lib/export";
-import { useVirtualList } from "@app/shared/hooks";
+
+import { useBulkActions, useInvoiceMenuActions, useInvoiceSelection } from "./use-invoices-actions";
 import { useInvoicesFiltering, useInvoicesPagination } from "./use-invoices-filtering";
-import { useInvoiceSelection, useInvoiceMenuActions, useBulkActions } from "./use-invoices-actions";
 
 export function useInvoicesPage() {
   const router = useRouter();
@@ -80,8 +83,10 @@ export function useInvoicesPage() {
   const handleExportCSV = () => {
     if (!filtering.filteredInvoices.length) {
       toast.error("No invoices to export");
+
       return;
     }
+
     exportInvoicesToCSV(filtering.filteredInvoices);
     toast.success(`Exported ${filtering.filteredInvoices.length} invoices`);
   };

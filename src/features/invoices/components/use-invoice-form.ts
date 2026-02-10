@@ -1,19 +1,22 @@
 "use client";
 
 import * as React from "react";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import type { FieldArrayWithId } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+
+import { DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
-import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import type { FieldArrayWithId } from "react-hook-form";
-import { useToast } from "@app/shared/ui/toast";
-import { invoiceFormSchema, InvoiceFormInput, CreateClientInput } from "@app/shared/schemas";
-import type { Client } from "@app/shared/schemas/api";
-import { useUnsavedChanges } from "@app/shared/hooks";
+
+import { ApiError } from "@app/shared/api";
 import { INVOICE, TIME } from "@app/shared/config/config";
 import { queryKeys } from "@app/shared/config/query";
-import { ApiError } from "@app/shared/api";
+import { useUnsavedChanges } from "@app/shared/hooks";
+import { CreateClientInput, InvoiceFormInput, invoiceFormSchema } from "@app/shared/schemas";
+import type { Client } from "@app/shared/schemas/api";
+import { useToast } from "@app/shared/ui/toast";
+
 import { useInvoiceDraft } from "./use-invoice-draft";
 import { useInvoiceSubmit } from "./use-invoice-submit";
 
@@ -29,9 +32,11 @@ function useDragReorder(
   const handleDragEnd = React.useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
+
       if (over && active.id !== over.id) {
         const oldIndex = fields.findIndex((f) => f.id === active.id);
         const newIndex = fields.findIndex((f) => f.id === over.id);
+
         move(oldIndex, newIndex);
       }
     },
@@ -88,7 +93,9 @@ function useInitialRate(
     ) {
       return;
     }
+
     const rateInDollars = resolvedRate / 100;
+
     items.forEach((item, index) => {
       if (item.unitPrice === 0) {
         setValue(`items.${index}.unitPrice`, rateInDollars);
@@ -244,6 +251,7 @@ export function useInvoiceForm({
   const duplicateItem = React.useCallback(
     (index: number) => {
       const item = items[index];
+
       if (item) {
         append({
           description: item.description,

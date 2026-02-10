@@ -1,6 +1,8 @@
+import { InvoiceEventType, InvoiceStatus, PaymentMethod, Prisma } from "@prisma/client";
+
+import { FOLLOWUP_STATUS, INVOICE_EVENT, INVOICE_STATUS } from "@app/shared/config/invoice-status";
+
 import { prisma } from "@app/server/db";
-import { InvoiceStatus, InvoiceEventType, PaymentMethod, Prisma } from "@prisma/client";
-import { INVOICE_STATUS, INVOICE_EVENT, FOLLOWUP_STATUS } from "@app/shared/config/invoice-status";
 
 export async function markInvoiceViewed(publicId: string) {
   const invoice = await prisma.invoice.findUnique({

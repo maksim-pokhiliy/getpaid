@@ -24,9 +24,11 @@ function remove(key: string): void {
 
 function getJson<T>(key: string): T | null {
   const raw = get(key);
+
   if (!raw) {
     return null;
   }
+
   try {
     return JSON.parse(raw) as T;
   } catch {

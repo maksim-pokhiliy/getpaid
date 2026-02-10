@@ -1,9 +1,12 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcryptjs";
 import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { prisma } from "@app/server/db";
+
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import bcrypt from "bcryptjs";
+
 import { signInSchema } from "@app/shared/schemas";
+
+import { prisma } from "@app/server/db";
 
 declare module "next-auth" {
   interface Session {
@@ -31,6 +34,7 @@ export const authOptions: NextAuthConfig = {
       },
       async authorize(credentials) {
         const parsed = signInSchema.safeParse(credentials);
+
         if (!parsed.success) {
           return null;
         }
@@ -46,6 +50,7 @@ export const authOptions: NextAuthConfig = {
         }
 
         const isValid = await bcrypt.compare(password, user.passwordHash);
+
         if (!isValid) {
           return null;
         }
@@ -63,6 +68,7 @@ export const authOptions: NextAuthConfig = {
         token.id = user.id;
         token.email = user.email;
       }
+
       return token;
     },
     async session({ session, token }) {
@@ -70,6 +76,7 @@ export const authOptions: NextAuthConfig = {
         session.user.id = token.id;
         session.user.email = token.email;
       }
+
       return session;
     },
   },

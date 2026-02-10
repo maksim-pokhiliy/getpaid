@@ -1,7 +1,8 @@
 "use client";
 
-import { Chip, Container, Paper, Stack, Typography, alpha, useTheme } from "@mui/material";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import { alpha, Chip, Container, Paper, Stack, Typography, useTheme } from "@mui/material";
+
 import { TECH_STACK } from "../constants";
 
 export function LandingSelfHosted() {

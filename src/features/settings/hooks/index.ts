@@ -1,9 +1,11 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { queryKeys, STALE_TIME } from "@app/shared/config/query";
-import { senderProfileApi, remindersApi, type ReminderSettings } from "../api";
 import type { SenderProfileInput } from "@app/shared/schemas";
+
+import { remindersApi, type ReminderSettings, senderProfileApi } from "../api";
 
 export function useSenderProfile() {
   return useQuery({

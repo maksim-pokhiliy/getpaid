@@ -19,5 +19,6 @@ export async function requireUser() {
 
 export async function getUser() {
   const session = await auth();
+
   return session?.user ?? null;
 }

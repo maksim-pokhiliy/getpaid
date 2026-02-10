@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Button, Typography } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
 
 interface BrandingPreviewProps {

@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Box, Container, Typography, Link as MuiLink } from "@mui/material";
+
+import { Box, Container, Link as MuiLink, Typography } from "@mui/material";
+
 import { Logo } from "@app/shared/ui/logo";
 
 export function Footer() {

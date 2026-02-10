@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Box, CircularProgress, Skeleton, Typography, keyframes } from "@mui/material";
+
+import { Box, CircularProgress, keyframes, Skeleton, Typography } from "@mui/material";
 
 const pulse = keyframes`
   0%, 100% {

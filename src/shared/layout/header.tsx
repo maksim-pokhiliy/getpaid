@@ -2,17 +2,21 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Box, IconButton, alpha, useTheme } from "@mui/material";
+
 import MenuIcon from "@mui/icons-material/Menu";
-import { Logo } from "@app/shared/ui/logo";
-import { useThemeMode } from "@app/providers/theme-registry";
+import { alpha, Box, IconButton, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
-import { DesktopNav } from "./components/desktop-nav";
-import { MobileDrawer } from "./components/mobile-drawer";
+import { Logo } from "@app/shared/ui/logo";
+
+import { useThemeMode } from "@app/providers/theme-registry";
+
 import { AccountMenu } from "./components/account-menu";
+import { DesktopNav } from "./components/desktop-nav";
 import { HeaderActions } from "./components/header-actions";
+import { MobileDrawer } from "./components/mobile-drawer";
 
 export function Header() {
   const router = useRouter();

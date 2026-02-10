@@ -1,20 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+
 import { Box, Container, Link } from "@mui/material";
-import { Sidebar } from "./sidebar";
-import { TopBar } from "./top-bar";
-import { MobileDrawer } from "./components/mobile-drawer";
-import { KeyboardShortcutsDialog } from "@app/shared/ui/keyboard-shortcuts-dialog";
-import { PageTransition } from "@app/shared/ui/page-transition";
-import { ErrorBoundary } from "@app/shared/ui/error-boundary";
+
+import { ANIMATION, SHORTCUTS, STORAGE_KEYS, UI } from "@app/shared/config/config";
 import { useKeyboardShortcuts } from "@app/shared/hooks";
 import { useCommandPalette } from "@app/shared/hooks/use-command-palette";
-import { useThemeMode } from "@app/providers/theme-registry";
-import { ANIMATION, UI, SHORTCUTS, STORAGE_KEYS } from "@app/shared/config/config";
 import { storage } from "@app/shared/lib/storage";
+import { ErrorBoundary } from "@app/shared/ui/error-boundary";
+import { KeyboardShortcutsDialog } from "@app/shared/ui/keyboard-shortcuts-dialog";
+import { PageTransition } from "@app/shared/ui/page-transition";
+
+import { useThemeMode } from "@app/providers/theme-registry";
+
+import { MobileDrawer } from "./components/mobile-drawer";
+import { Sidebar } from "./sidebar";
+import { TopBar } from "./top-bar";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -129,7 +133,9 @@ export function AppLayout({ children, maxWidth = "lg", disablePadding = false }:
   const handleToggleSidebar = React.useCallback(() => {
     setSidebarCollapsed((prev) => {
       const next = !prev;
+
       storage.set(STORAGE_KEYS.SIDEBAR_COLLAPSED, String(next));
+
       return next;
     });
   }, []);

@@ -1,12 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@mui/material";
-import { useQueryClient } from "@tanstack/react-query";
+
 import AddIcon from "@mui/icons-material/Add";
-import { queryKeys } from "@app/shared/config/query";
+import { Button } from "@mui/material";
+
+import { useQueryClient } from "@tanstack/react-query";
+
 import { BANKING } from "@app/shared/config/config";
+import { queryKeys } from "@app/shared/config/query";
 import { useToast } from "@app/shared/ui/toast";
+
 import { useCreateConnection } from "../hooks";
 
 export function ConnectBankButton() {
@@ -25,6 +29,7 @@ export function ConnectBankButton() {
       if (event.origin !== window.location.origin) {
         return;
       }
+
       if (event.data?.type === "bank-connected") {
         toast.success("Bank connected successfully!");
         invalidateBankingQueries();
@@ -41,6 +46,7 @@ export function ConnectBankButton() {
 
     window.addEventListener("message", handleMessage);
     window.addEventListener("focus", handleFocus);
+
     return () => {
       window.removeEventListener("message", handleMessage);
       window.removeEventListener("focus", handleFocus);

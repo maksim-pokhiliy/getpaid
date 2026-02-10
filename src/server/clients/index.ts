@@ -1,5 +1,6 @@
-import { prisma } from "@app/server/db";
 import { CreateClientInput, UpdateClientInput } from "@app/shared/schemas";
+
+import { prisma } from "@app/server/db";
 
 export async function getClients(userId: string) {
   return prisma.client.findMany({

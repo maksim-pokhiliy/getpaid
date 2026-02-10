@@ -1,12 +1,13 @@
 "use client";
 
 import { TableCell, Typography } from "@mui/material";
+
 import { formatDateCompact } from "@app/shared/lib/format";
 import {
   DataTable,
-  DataTableRow,
   DataTableActions,
   type DataTableColumn,
+  DataTableRow,
 } from "@app/shared/ui/data-table";
 
 const COLUMNS: DataTableColumn[] = [

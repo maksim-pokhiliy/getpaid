@@ -1,5 +1,7 @@
 "use client";
 
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
+
 import {
   FormControl,
   FormHelperText,
@@ -12,9 +14,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
-import type { TemplateFormData } from "@app/shared/schemas";
+
 import { CURRENCIES } from "@app/shared/config/currencies";
+import type { TemplateFormData } from "@app/shared/schemas";
 
 interface TemplateFormDetailsProps {
   register: UseFormRegister<TemplateFormData>;

@@ -1,18 +1,21 @@
 "use client";
 
 import Link from "next/link";
+
 import {
+  alpha,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Tooltip,
-  alpha,
   useTheme,
 } from "@mui/material";
+
 import { ANIMATION, UI } from "@app/shared/config/config";
-import { NAV_ITEMS, isNavActive } from "./desktop-nav";
+
+import { isNavActive, NAV_ITEMS } from "./desktop-nav";
 
 interface SidebarNavProps {
   pathname: string;
@@ -79,6 +82,7 @@ export function SidebarNav({ pathname, collapsed }: SidebarNavProps) {
             </Tooltip>
           );
         }
+
         return button;
       })}
     </List>

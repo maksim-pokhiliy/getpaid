@@ -1,9 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useQueryClient, type QueryKey } from "@tanstack/react-query";
-import { useToast } from "@app/shared/ui/toast";
+
+import { type QueryKey, useQueryClient } from "@tanstack/react-query";
+
 import { UI } from "@app/shared/config/config";
+import { useToast } from "@app/shared/ui/toast";
 
 interface UseOptimisticDeleteOptions<T> {
   queryKey: QueryKey;
@@ -24,6 +26,7 @@ export function useOptimisticDelete<T>({
   const [pendingIds, setPendingIds] = React.useState<Set<string>>(new Set());
   const pendingRef = React.useRef(new Map<string, NodeJS.Timeout>());
   const optionsRef = React.useRef({ queryKey, getId, entityName, deleteFn });
+
   optionsRef.current = { queryKey, getId, entityName, deleteFn };
 
   const deleteItem = React.useCallback(
@@ -32,6 +35,7 @@ export function useOptimisticDelete<T>({
       const id = getId(item);
 
       const existing = pendingRef.current.get(id);
+
       if (existing) {
         clearTimeout(existing);
       }
@@ -40,6 +44,7 @@ export function useOptimisticDelete<T>({
 
       const timeout = setTimeout(async () => {
         pendingRef.current.delete(id);
+
         try {
           await deleteFn(id);
           queryClient.invalidateQueries({ queryKey });
@@ -48,7 +53,9 @@ export function useOptimisticDelete<T>({
         } finally {
           setPendingIds((prev) => {
             const next = new Set(prev);
+
             next.delete(id);
+
             return next;
           });
         }
@@ -63,7 +70,9 @@ export function useOptimisticDelete<T>({
           pendingRef.current.delete(id);
           setPendingIds((prev) => {
             const next = new Set(prev);
+
             next.delete(id);
+
             return next;
           });
         },
@@ -74,8 +83,10 @@ export function useOptimisticDelete<T>({
 
   React.useEffect(() => {
     const pending = pendingRef.current;
+
     return () => {
       const { deleteFn } = optionsRef.current;
+
       pending.forEach((timeout, id) => {
         clearTimeout(timeout);
         deleteFn(id).catch((error) => {

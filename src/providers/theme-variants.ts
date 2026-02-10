@@ -1,7 +1,8 @@
 import { createTheme } from "@mui/material/styles";
 
-import { brand, sharedComponents, typography } from "./theme-base";
 import { UI } from "@app/shared/config/config";
+
+import { brand, sharedComponents, typography } from "./theme-base";
 
 export const lightTheme = createTheme({
   palette: {

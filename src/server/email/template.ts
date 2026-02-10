@@ -20,6 +20,7 @@ export function buildInvoiceDetailsBlock(
   const referenceRow = paymentReference
     ? `<p style="margin: 10px 0 0;"><strong>Reference:</strong> ${paymentReference}</p>`
     : "";
+
   return `<div style="background: white; padding: 20px; border-radius: 4px; margin: 20px 0;">
       <p style="margin: 0;"><strong>Amount Due:</strong> ${formattedTotal}</p>
       <p style="margin: 10px 0 0;"><strong>Due Date:</strong> ${formattedDueDate}</p>
@@ -58,17 +59,21 @@ export function buildEmailFooter(
   footerText: string | null
 ) {
   const parts: string[] = [];
+
   if (footerText) {
     parts.push(`<p style="margin: 0 0 8px; white-space: pre-line;">${footerText}</p>`);
   }
+
   if (companyAddress) {
     parts.push(
       `<p style="margin: 0; color: #999; font-size: 12px; white-space: pre-line;">${senderName}<br>${companyAddress}</p>`
     );
   }
+
   if (parts.length === 0) {
     return "";
   }
+
   return `<div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 13px;">
     ${parts.join("")}
   </div>`;
@@ -85,6 +90,7 @@ export function buildEmailLayout(
   fontFamily?: string | null
 ) {
   const fontStack = (fontFamily && FONT_FAMILY_MAP[fontFamily]) || FONT_FAMILY_MAP.system;
+
   return `<!DOCTYPE html>
 <html>
 <head>

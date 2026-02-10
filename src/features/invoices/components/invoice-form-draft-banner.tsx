@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, Alert, Typography } from "@mui/material";
+import { Alert, Box, Button, Typography } from "@mui/material";
 
 interface DraftBannerProps {
   showBanner: boolean;

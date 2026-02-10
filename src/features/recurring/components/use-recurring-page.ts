@@ -2,22 +2,24 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@app/shared/ui/toast";
+
+import { ApiError } from "@app/shared/api";
+import { PAGINATION, SEARCH } from "@app/shared/config/config";
+import { queryKeys } from "@app/shared/config/query";
+import { useDebouncedValue, useOptimisticDelete } from "@app/shared/hooks";
+import { buildDiscountInput, calculateTotals } from "@app/shared/lib/calculations";
 import { useConfirmDialog } from "@app/shared/ui/confirm-dialog";
+import { useAnnounce } from "@app/shared/ui/screen-reader-announcer";
+import { useToast } from "@app/shared/ui/toast";
+
 import {
-  useRecurringInvoices,
-  useUpdateRecurring,
-  useGenerateFromRecurring,
   recurringApi,
   type RecurringInvoice,
   type RecurringStatus,
+  useGenerateFromRecurring,
+  useRecurringInvoices,
+  useUpdateRecurring,
 } from "@app/features/recurring";
-import { useOptimisticDelete, useDebouncedValue } from "@app/shared/hooks";
-import { calculateTotals, buildDiscountInput } from "@app/shared/lib/calculations";
-import { useAnnounce } from "@app/shared/ui/screen-reader-announcer";
-import { queryKeys } from "@app/shared/config/query";
-import { PAGINATION, SEARCH } from "@app/shared/config/config";
-import { ApiError } from "@app/shared/api";
 
 function useRecurringFiltering(recurring: RecurringInvoice[] | undefined, pendingIds: Set<string>) {
   const announce = useAnnounce();
@@ -31,14 +33,18 @@ function useRecurringFiltering(recurring: RecurringInvoice[] | undefined, pendin
     if (!recurring) {
       return [];
     }
+
     return recurring.filter((item) => {
       if (pendingIds.has(item.id)) {
         return false;
       }
+
       if (debouncedSearch === "") {
         return true;
       }
+
       const query = debouncedSearch.toLowerCase();
+
       return (
         item.name.toLowerCase().includes(query) ||
         item.client.name.toLowerCase().includes(query) ||
@@ -93,9 +99,11 @@ function useRecurringActions(selectedItem: RecurringInvoice | null, handleMenuCl
     if (!selectedItem) {
       return;
     }
+
     const item = selectedItem;
     const newStatus: RecurringStatus = item.status === "ACTIVE" ? "PAUSED" : "ACTIVE";
     const action = newStatus === "PAUSED" ? "pause" : "activate";
+
     handleMenuClose();
     confirm({
       title: `${action.charAt(0).toUpperCase() + action.slice(1)} Recurring Invoice`,
@@ -116,6 +124,7 @@ function useRecurringActions(selectedItem: RecurringInvoice | null, handleMenuCl
     if (!selectedItem) {
       return;
     }
+
     generateMutation.mutate(selectedItem.id, {
       onSuccess: (data) => {
         toast.success("Invoice generated successfully");
@@ -137,6 +146,7 @@ const calculateTotal = (item: RecurringInvoice) => {
     buildDiscountInput(item.discountType, item.discountValue),
     item.taxRate
   );
+
   return total;
 };
 
@@ -171,7 +181,9 @@ export function useRecurringPage() {
     if (!selectedItem) {
       return;
     }
+
     const item = selectedItem;
+
     handleMenuClose();
     deleteItem(item);
   }, [selectedItem, handleMenuClose, deleteItem]);

@@ -64,7 +64,9 @@ function calculateMonthlyRevenue(
         if (!inv.paidAt) {
           return false;
         }
+
         const paidDate = new Date(inv.paidAt);
+
         return paidDate >= monthStart && paidDate <= monthEnd;
       })
       .reduce((sum, inv) => sum + inv.total, 0);
@@ -135,6 +137,7 @@ export async function getAnalytics(userId: string): Promise<AnalyticsData> {
     const paidInvoices = currencyInvoices.filter((inv) => inv.status === "PAID" || inv.paidAt);
     const metrics = calculateMetricsForInvoices(currencyInvoices, now, thirtyDaysAgo, sixtyDaysAgo);
     const monthlyRevenue = calculateMonthlyRevenue(paidInvoices, now);
+
     byCurrency[currency] = { ...metrics, monthlyRevenue };
   }
 
@@ -147,10 +150,13 @@ export async function getAnalytics(userId: string): Promise<AnalyticsData> {
   const statusCounts = invoices.reduce(
     (acc, inv) => {
       let status = inv.status;
+
       if (!inv.paidAt && inv.status !== "DRAFT" && new Date(inv.dueDate) < now) {
         status = "OVERDUE";
       }
+
       acc[status] = (acc[status] || 0) + 1;
+
       return acc;
     },
     {} as Record<string, number>

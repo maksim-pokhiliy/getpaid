@@ -16,6 +16,7 @@ export function formatCurrencyCompact(amount: number, currency = "USD"): string 
 
 export function formatDate(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
@@ -25,6 +26,7 @@ export function formatDate(date: string | Date): string {
 
 export function formatDateCompact(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
@@ -34,6 +36,7 @@ export function formatDateCompact(date: string | Date): string {
 
 export function formatDateShort(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;
+
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
@@ -42,6 +45,7 @@ export function formatDateShort(date: string | Date): string {
 
 export function formatDateTime(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",

@@ -13,6 +13,7 @@ export function useUnsavedChanges(isDirty: boolean) {
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
+
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty]);
 }

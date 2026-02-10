@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback } from "react";
-import { Box, Button } from "@mui/material";
+
 import SaveIcon from "@mui/icons-material/Save";
-import { PageHeader } from "@app/shared/ui/page-header";
-import { LoadingButton } from "@app/shared/ui/loading-button";
+import { Box, Button } from "@mui/material";
+
 import type { TemplateFormData } from "@app/shared/schemas";
-import { useTemplateForm } from "./use-template-form";
+import { LoadingButton } from "@app/shared/ui/loading-button";
+import { PageHeader } from "@app/shared/ui/page-header";
+
 import { TemplateFormDetails } from "./template-form-details";
 import { TemplateFormItems } from "./template-form-items";
+import { useTemplateForm } from "./use-template-form";
 
 interface TemplateFormProps {
   mode?: "create" | "edit";

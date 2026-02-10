@@ -1,25 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Chip,
-  Stack,
-  Card,
-  CardContent,
-  Tooltip,
-} from "@mui/material";
+
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import SyncIcon from "@mui/icons-material/Sync";
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+
+import { formatDateTime } from "@app/shared/lib/format";
+import { ConfirmDialog } from "@app/shared/ui/confirm-dialog";
 import { EmptyState } from "@app/shared/ui/empty-state";
 import { CardSkeleton } from "@app/shared/ui/loading";
-import { ConfirmDialog } from "@app/shared/ui/confirm-dialog";
-import { useConnections, useDeleteConnection, useSyncConnection } from "../hooks";
+
 import { CONNECTION_STATUS_CONFIG } from "../constants";
-import { formatDateTime } from "@app/shared/lib/format";
+import { useConnections, useDeleteConnection, useSyncConnection } from "../hooks";
 
 export function ConnectionList() {
   const { data: connections, isLoading } = useConnections();
@@ -37,6 +40,7 @@ export function ConnectionList() {
     if (!deleteTarget) {
       return;
     }
+
     deleteConnection.mutate(deleteTarget.id, { onSettled: () => setDeleteTarget(null) });
   };
 

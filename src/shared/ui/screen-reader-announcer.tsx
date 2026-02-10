@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import { Box } from "@mui/material";
 
 interface AnnounceContextValue {
@@ -11,9 +12,11 @@ const AnnounceContext = React.createContext<AnnounceContextValue | null>(null);
 
 export function useAnnounce() {
   const context = React.useContext(AnnounceContext);
+
   if (!context) {
     throw new Error("useAnnounce must be used within ScreenReaderProvider");
   }
+
   return context.announce;
 }
 

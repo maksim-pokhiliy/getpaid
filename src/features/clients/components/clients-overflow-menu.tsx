@@ -1,7 +1,8 @@
 "use client";
 
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+
 import { OverflowMenu } from "@app/shared/ui/overflow-menu";
 
 interface ClientsOverflowMenuProps {

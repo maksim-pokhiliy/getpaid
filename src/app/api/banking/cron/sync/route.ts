@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { syncAllConnections } from "@app/server/banking/sync";
+
 import { env } from "@app/shared/config/env";
+
+import { syncAllConnections } from "@app/server/banking/sync";
 
 export async function POST(request: Request) {
   try {
@@ -18,6 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Cron sync error:", error);
+
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "Sync failed" } },
       { status: 500 }

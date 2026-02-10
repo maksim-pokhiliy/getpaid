@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
+
 import type { ZodType } from "zod";
+
+import { AuthenticationError, requireUser } from "@app/server/auth/require-user";
 
 type ErrorCode =
   | "UNAUTHORIZED"
@@ -49,11 +51,13 @@ export function withAuth(handler: AuthHandler, errorHandlers?: ErrorHandler[]) {
   return async (request: Request, context: RouteContext) => {
     try {
       const user = await requireUser();
+
       return await handler(user, request, context);
     } catch (error) {
       if (error instanceof AuthenticationError) {
         return unauthorizedResponse();
       }
+
       if (errorHandlers) {
         for (const { check, respond } of errorHandlers) {
           if (check(error)) {
@@ -61,7 +65,9 @@ export function withAuth(handler: AuthHandler, errorHandlers?: ErrorHandler[]) {
           }
         }
       }
+
       console.error(error);
+
       return internalErrorResponse();
     }
   };
@@ -70,8 +76,10 @@ export function withAuth(handler: AuthHandler, errorHandlers?: ErrorHandler[]) {
 export async function parseBody<T>(request: Request, schema: ZodType<T>) {
   const body = await request.json();
   const parsed = schema.safeParse(body);
+
   if (!parsed.success) {
     return { data: null as never, error: validationErrorResponse(parsed.error) };
   }
+
   return { data: parsed.data, error: null };
 }

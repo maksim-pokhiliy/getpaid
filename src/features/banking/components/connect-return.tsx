@@ -1,10 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Box, Typography, CircularProgress } from "@mui/material";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import { Box, CircularProgress, Typography } from "@mui/material";
+
 import { BANKING } from "@app/shared/config/config";
+
 import { useCompleteConnection } from "../hooks";
 
 type ConnectionStatus = "loading" | "success" | "error";
@@ -18,6 +21,7 @@ export function ConnectReturn() {
     if (didRun.current) {
       return;
     }
+
     didRun.current = true;
 
     completeConnection

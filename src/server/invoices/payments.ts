@@ -1,11 +1,13 @@
-import { prisma } from "@app/server/db";
 import { PaymentMethod } from "@prisma/client";
+
 import {
-  INVOICE_STATUS,
-  INVOICE_EVENT,
   FOLLOWUP_STATUS,
+  INVOICE_EVENT,
+  INVOICE_STATUS,
   type InvoiceStatusValue,
 } from "@app/shared/config/invoice-status";
+
+import { prisma } from "@app/server/db";
 
 export interface RecordPaymentInput {
   amount: number;
@@ -28,6 +30,7 @@ export async function recordPayment(id: string, userId: string, data: RecordPaym
   }
 
   const remainingBalance = invoice.total - invoice.paidAmount;
+
   if (data.amount > remainingBalance) {
     return null;
   }
@@ -121,6 +124,7 @@ export async function deletePayment(paymentId: string, userId: string) {
   const newPaidAmount = payment.invoice.paidAmount - payment.amount;
 
   let newStatus: InvoiceStatusValue;
+
   if (newPaidAmount > 0) {
     newStatus = INVOICE_STATUS.PARTIALLY_PAID;
   } else if (payment.invoice.viewedAt) {

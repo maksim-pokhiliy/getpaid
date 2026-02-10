@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
+
 import { Box, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
 
 interface PageTransitionProps {

@@ -2,14 +2,17 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+
+import { useQueryClient } from "@tanstack/react-query";
+
+import { ApiError } from "@app/shared/api";
+import { queryKeys } from "@app/shared/config/query";
+import { exportInvoicesToCSV } from "@app/shared/lib/export";
+import type { InvoiceListItem } from "@app/shared/schemas/api";
 import { useConfirmDialog } from "@app/shared/ui/confirm-dialog";
 import { useToast } from "@app/shared/ui/toast";
-import { useDeleteInvoice, useDuplicateInvoice, invoicesApi } from "@app/features/invoices";
-import { ApiError } from "@app/shared/api";
-import { exportInvoicesToCSV } from "@app/shared/lib/export";
-import { queryKeys } from "@app/shared/config/query";
-import { useQueryClient } from "@tanstack/react-query";
-import type { InvoiceListItem } from "@app/shared/schemas/api";
+
+import { invoicesApi, useDeleteInvoice, useDuplicateInvoice } from "@app/features/invoices";
 
 export function useInvoiceSelection(
   filteredInvoices: InvoiceListItem[],
@@ -26,11 +29,13 @@ export function useInvoiceSelection(
   const handleToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
+
       if (next.has(id)) {
         next.delete(id);
       } else {
         next.add(id);
       }
+
       return next;
     });
   };
@@ -38,6 +43,7 @@ export function useInvoiceSelection(
   const handleToggleSelectAll = () => {
     const visibleIds = filteredInvoices.map((inv) => inv.id);
     const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
+
     setSelectedIds(allSelected ? new Set() : new Set(visibleIds));
   };
 
@@ -74,6 +80,7 @@ export function useInvoiceMenuActions(
     if (!selectedInvoice) {
       return;
     }
+
     handleMenuClose();
     confirm({
       title: "Delete Invoice",
@@ -91,6 +98,7 @@ export function useInvoiceMenuActions(
     if (!selectedInvoice) {
       return;
     }
+
     handleMenuClose();
     duplicateMutation.mutate(selectedInvoice.id, {
       onSuccess: (newInvoice) => {
@@ -107,6 +115,7 @@ export function useInvoiceMenuActions(
     if (!selectedInvoice) {
       return;
     }
+
     handleMenuClose();
     router.push(`/app/invoices/${selectedInvoice.id}`);
   };
@@ -115,6 +124,7 @@ export function useInvoiceMenuActions(
     if (!selectedInvoice) {
       return;
     }
+
     handleMenuClose();
     router.push(`/app/invoices/${selectedInvoice.id}/edit`);
   };
@@ -147,6 +157,7 @@ export function useBulkActions(
     errorMsg: string
   ) => {
     setBulkProcessing(true);
+
     try {
       await Promise.all([...selectedIds].map(fn));
       queryClient.invalidateQueries({ queryKey: queryKeys.invoices });
@@ -176,6 +187,7 @@ export function useBulkActions(
 
   const handleBulkExport = () => {
     const selected = filteredInvoices.filter((inv) => selectedIds.has(inv.id));
+
     exportInvoicesToCSV(selected);
     toast.success(`Exported ${selected.length} invoices`);
   };

@@ -26,6 +26,7 @@ export async function fetchApi<T>(url: string, options?: RequestInit): Promise<T
       typeof body.error === "object" && body.error !== null
         ? (body.error as Record<string, unknown>)
         : {};
+
     throw new ApiError(
       typeof error.code === "string" ? error.code : "UNKNOWN_ERROR",
       typeof error.message === "string" ? error.message : "An unexpected error occurred",

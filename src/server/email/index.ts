@@ -1,13 +1,15 @@
 import { Resend } from "resend";
-import { formatCurrency, formatDate } from "@app/shared/lib/format";
+
 import { EMAIL } from "@app/shared/config/config";
 import { env } from "@app/shared/config/env";
+import { formatCurrency, formatDate } from "@app/shared/lib/format";
+
 import {
-  buildEmailLayout,
   buildEmailButton,
+  buildEmailFooter,
+  buildEmailLayout,
   buildInvoiceDetailsBlock,
   buildLineItemsTable,
-  buildEmailFooter,
   buildLogoBlock,
   type EmailLineItem,
 } from "./template";
@@ -18,6 +20,7 @@ function getResend(): Resend {
   if (!resend) {
     resend = new Resend(env.RESEND_API_KEY);
   }
+
   return resend;
 }
 

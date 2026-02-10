@@ -1,17 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Box, Button, Chip, Typography } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import LinkIcon from "@mui/icons-material/Link";
+
+import AddIcon from "@mui/icons-material/Add";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
+import LinkIcon from "@mui/icons-material/Link";
 import PreviewIcon from "@mui/icons-material/Preview";
-import AddIcon from "@mui/icons-material/Add";
-import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+import SendIcon from "@mui/icons-material/Send";
+import { Box, Button, Chip, Typography } from "@mui/material";
+
 import { formatDate } from "@app/shared/lib/format";
 import type { Invoice } from "@app/shared/schemas/api";
+import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
+
 import { InvoiceOverflowMenu } from "@app/features/invoices/components";
+
 import { useInvoiceDetail } from "./use-invoice-detail";
 
 type InvoiceDetailReturn = ReturnType<typeof useInvoiceDetail>;

@@ -1,14 +1,15 @@
 "use client";
 
-import { Grid, useTheme } from "@mui/material";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import WarningIcon from "@mui/icons-material/Warning";
+import { Grid, useTheme } from "@mui/material";
+
+import { formatCurrencyCompact } from "@app/shared/lib/format";
 import { StatSkeleton } from "@app/shared/ui/loading";
 import { MetricCard } from "@app/shared/ui/metric-card";
 import { StaggerList } from "@app/shared/ui/stagger-list";
-import { formatCurrencyCompact } from "@app/shared/lib/format";
 
 interface DashboardMetricsProps {
   isLoading: boolean;

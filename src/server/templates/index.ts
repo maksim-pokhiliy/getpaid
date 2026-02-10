@@ -1,5 +1,6 @@
-import { prisma } from "@app/server/db";
 import { DiscountType } from "@prisma/client";
+
+import { prisma } from "@app/server/db";
 
 export interface TemplateItemInput {
   description: string;
@@ -94,18 +95,23 @@ export async function updateTemplate(id: string, userId: string, data: UpdateTem
   if (data.name !== undefined) {
     updateData.name = data.name;
   }
+
   if (data.description !== undefined) {
     updateData.description = data.description;
   }
+
   if (data.currency !== undefined) {
     updateData.currency = data.currency;
   }
+
   if (data.taxRate !== undefined) {
     updateData.taxRate = data.taxRate;
   }
+
   if (data.notes !== undefined) {
     updateData.notes = data.notes;
   }
+
   if (data.dueDays !== undefined) {
     updateData.dueDays = data.dueDays;
   }

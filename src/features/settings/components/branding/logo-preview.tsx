@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Typography, alpha, useTheme } from "@mui/material";
+import { alpha, Box, Typography, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
 
 interface LogoPreviewProps {

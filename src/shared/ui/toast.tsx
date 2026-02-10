@@ -1,22 +1,24 @@
 "use client";
 
 import * as React from "react";
-import {
-  Snackbar,
-  Alert,
-  AlertTitle,
-  Slide,
-  SlideProps,
-  IconButton,
-  Button,
-  LinearProgress,
-  keyframes,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CloseIcon from "@mui/icons-material/Close";
 import ErrorIcon from "@mui/icons-material/Error";
 import InfoIcon from "@mui/icons-material/Info";
 import WarningIcon from "@mui/icons-material/Warning";
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  IconButton,
+  keyframes,
+  LinearProgress,
+  Slide,
+  SlideProps,
+  Snackbar,
+} from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
 
 type ToastSeverity = "success" | "error" | "warning" | "info";
@@ -152,11 +154,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       action?: ToastAction
     ) => {
       const id = Math.random().toString(36).substring(2, 9);
+
       setToasts((prev) => {
         const next = [...prev, { id, message, severity, title, duration, action }];
+
         if (next.length > UI.MAX_VISIBLE_TOASTS) {
           return next.slice(next.length - UI.MAX_VISIBLE_TOASTS);
         }
+
         return next;
       });
     },
@@ -191,8 +196,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
 export function useToast() {
   const context = React.useContext(ToastContext);
+
   if (!context) {
     throw new Error("useToast must be used within ToastProvider");
   }
+
   return context;
 }

@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import {
-  getRecurringInvoice,
-  updateRecurringInvoice,
-  deleteRecurringInvoice,
-  RecurringInvoiceNotFoundError,
-} from "@app/server/recurring";
-import { withAuth, parseBody, notFoundResponse } from "@app/shared/api/route-helpers";
+
+import { notFoundResponse, parseBody, withAuth } from "@app/shared/api/route-helpers";
 import { updateRecurringApiSchema } from "@app/shared/schemas";
+
+import {
+  deleteRecurringInvoice,
+  getRecurringInvoice,
+  RecurringInvoiceNotFoundError,
+  updateRecurringInvoice,
+} from "@app/server/recurring";
 
 const recurringNotFoundHandler = {
   check: (error: unknown) => error instanceof RecurringInvoiceNotFoundError,
@@ -34,6 +36,7 @@ export const PATCH = withAuth(
     }
 
     const recurring = await updateRecurringInvoice(user.id, id, data);
+
     return NextResponse.json(recurring);
   },
   [recurringNotFoundHandler]
@@ -42,7 +45,9 @@ export const PATCH = withAuth(
 export const DELETE = withAuth(
   async (user, _request, context) => {
     const { id } = await context.params;
+
     await deleteRecurringInvoice(user.id, id);
+
     return NextResponse.json({ success: true });
   },
   [recurringNotFoundHandler]

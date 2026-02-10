@@ -1,6 +1,6 @@
 import { fetchApi } from "@app/shared/api/base";
-import type { Client } from "@app/shared/schemas/api";
 import type { CreateClientInput, UpdateClientInput } from "@app/shared/schemas";
+import type { Client } from "@app/shared/schemas/api";
 
 export const clientsApi = {
   list: () => fetchApi<Client[]>("/api/clients"),

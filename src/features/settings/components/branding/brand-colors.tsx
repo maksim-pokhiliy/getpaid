@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
+
 import { ColorPicker } from "./color-picker";
 
 interface BrandColorsProps {

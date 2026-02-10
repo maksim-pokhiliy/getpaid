@@ -1,8 +1,8 @@
 "use client";
 
-import { Box, Typography, IconButton, TextField, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 
 interface ClientsSearchFieldProps {
   searchQuery: string;

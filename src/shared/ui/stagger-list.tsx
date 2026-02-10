@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
+
 import { keyframes, type SxProps, type Theme } from "@mui/material";
+
 import { ANIMATION, UI } from "@app/shared/config/config";
 
 const fadeSlideIn = keyframes`

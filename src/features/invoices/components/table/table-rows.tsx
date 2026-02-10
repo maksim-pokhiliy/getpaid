@@ -1,8 +1,9 @@
 "use client";
 
 import { TableCell, TableRow } from "@mui/material";
-import { InvoiceTableRow } from "./table-row";
+
 import type { InvoiceData } from "../invoice-row";
+import { InvoiceTableRow } from "./table-row";
 
 interface VirtualItem {
   index: number;
@@ -45,6 +46,7 @@ export function VirtualizedRows({
       )}
       {virtualItems.map((virtualRow) => {
         const invoice = filteredInvoices[virtualRow.index];
+
         return (
           <InvoiceTableRow
             key={invoice.id}

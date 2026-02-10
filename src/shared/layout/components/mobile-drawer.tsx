@@ -1,5 +1,8 @@
 "use client";
 
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import SettingsIcon from "@mui/icons-material/Settings";
 import {
   Box,
   Divider,
@@ -11,13 +14,12 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import AddIcon from "@mui/icons-material/Add";
-import SettingsIcon from "@mui/icons-material/Settings";
-import { Logo } from "@app/shared/ui/logo";
+
 import { UI } from "@app/shared/config/config";
-import { DrawerNavList } from "./drawer-nav-list";
+import { Logo } from "@app/shared/ui/logo";
+
 import { DrawerFooter } from "./drawer-footer";
+import { DrawerNavList } from "./drawer-nav-list";
 
 interface MobileDrawerProps {
   open: boolean;

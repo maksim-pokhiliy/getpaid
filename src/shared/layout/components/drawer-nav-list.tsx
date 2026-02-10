@@ -1,15 +1,16 @@
 "use client";
 
 import {
+  alpha,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  alpha,
   useTheme,
 } from "@mui/material";
-import { NAV_ITEMS, isNavActive } from "./desktop-nav";
+
+import { isNavActive, NAV_ITEMS } from "./desktop-nav";
 
 interface DrawerNavListProps {
   pathname: string;
@@ -23,6 +24,7 @@ export function DrawerNavList({ pathname, onNavigate }: DrawerNavListProps) {
     <List sx={{ px: 1 }}>
       {NAV_ITEMS.map((item) => {
         const isActive = isNavActive(pathname, item);
+
         return (
           <ListItem key={item.href} disablePadding>
             <ListItemButton

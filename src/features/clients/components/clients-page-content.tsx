@@ -1,9 +1,11 @@
 "use client";
 
-import { Button, Alert } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { PageHeader } from "@app/shared/ui/page-header";
+import { Alert, Button } from "@mui/material";
+
 import { MobileFab } from "@app/shared/ui/mobile-fab";
+import { PageHeader } from "@app/shared/ui/page-header";
+
 import { ClientDialog } from "./client-dialog";
 import { ClientsContent } from "./clients-content";
 import { ClientsOverflowMenu } from "./clients-overflow-menu";

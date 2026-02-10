@@ -1,20 +1,23 @@
 "use client";
 
-import { Box, Button, Chip, Paper, TableCell, Typography, alpha, useTheme } from "@mui/material";
-import RepeatIcon from "@mui/icons-material/Repeat";
 import AddIcon from "@mui/icons-material/Add";
+import RepeatIcon from "@mui/icons-material/Repeat";
+import { alpha, Box, Button, Chip, Paper, TableCell, Typography, useTheme } from "@mui/material";
+
+import { UI } from "@app/shared/config/config";
+import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
+import {
+  DataTable,
+  DataTableActions,
+  type DataTableColumn,
+  DataTableRow,
+} from "@app/shared/ui/data-table";
 import { EmptyState, NoResults } from "@app/shared/ui/empty-state";
 import { EmptyRecurringIllustration } from "@app/shared/ui/illustrations/empty-recurring";
 import { TableSkeleton } from "@app/shared/ui/loading";
-import {
-  DataTable,
-  DataTableRow,
-  DataTableActions,
-  type DataTableColumn,
-} from "@app/shared/ui/data-table";
-import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
-import { UI } from "@app/shared/config/config";
+
 import type { RecurringInvoice } from "@app/features/recurring";
+
 import { RECURRING_FREQUENCY_LABELS, RECURRING_STATUS_CONFIG } from "../constants";
 
 const COLUMNS: DataTableColumn[] = [

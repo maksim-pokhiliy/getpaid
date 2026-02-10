@@ -2,8 +2,9 @@
 
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import EditIcon from "@mui/icons-material/Edit";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+
 import { OverflowMenu } from "@app/shared/ui/overflow-menu";
 
 interface InvoicesOverflowMenuProps {

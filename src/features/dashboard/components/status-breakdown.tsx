@@ -1,10 +1,11 @@
 "use client";
 
-import { Box, Typography, alpha, useTheme } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
-import { CardSkeleton } from "@app/shared/ui/loading";
-import { STATUS_CONFIG, getStatusColor } from "@app/shared/config/invoice-status";
+import { alpha, Box, Typography, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
+import { getStatusColor, STATUS_CONFIG } from "@app/shared/config/invoice-status";
+import { CardSkeleton } from "@app/shared/ui/loading";
 
 interface StatusBreakdownProps {
   isLoading: boolean;
@@ -38,6 +39,7 @@ export function StatusBreakdown({ isLoading, statusCounts, clientCount }: Status
       {entries.map(([status, count]) => {
         const color = getStatusColor(theme, status);
         const percentage = total > 0 ? (count / total) * 100 : 0;
+
         return (
           <Box key={status} sx={{ mb: 2.5, "&:last-child": { mb: 1.5 } }}>
             <Box

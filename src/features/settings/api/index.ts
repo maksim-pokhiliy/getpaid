@@ -1,6 +1,6 @@
 import { fetchApi } from "@app/shared/api/base";
-import type { SenderProfile } from "@app/shared/schemas/api";
 import type { SenderProfileInput } from "@app/shared/schemas";
+import type { SenderProfile } from "@app/shared/schemas/api";
 
 export interface ReminderSettings {
   enabled: boolean;

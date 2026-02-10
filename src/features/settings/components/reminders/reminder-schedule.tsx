@@ -1,8 +1,9 @@
 "use client";
 
 import { Divider } from "@mui/material";
-import { ReminderModeSelector } from "./reminder-mode-selector";
+
 import { ReminderDaysEditor } from "./reminder-days-editor";
+import { ReminderModeSelector } from "./reminder-mode-selector";
 
 type ReminderMode = "AFTER_SENT" | "AFTER_DUE";
 

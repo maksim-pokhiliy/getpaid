@@ -1,8 +1,9 @@
 "use client";
 
 import { AppLayout } from "@app/shared/layout/app-layout";
-import { DashboardContent } from "@app/features/dashboard/components";
+
 import { useClients } from "@app/features/clients";
+import { DashboardContent } from "@app/features/dashboard/components";
 import { useInvoices } from "@app/features/invoices";
 import { useSenderProfile } from "@app/features/settings";
 

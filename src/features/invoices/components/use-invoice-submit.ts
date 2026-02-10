@@ -2,10 +2,12 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@app/shared/ui/toast";
-import type { InvoiceFormInput } from "@app/shared/schemas";
-import { useCreateInvoice, useUpdateInvoice } from "@app/features/invoices";
+
 import { ApiError } from "@app/shared/api";
+import type { InvoiceFormInput } from "@app/shared/schemas";
+import { useToast } from "@app/shared/ui/toast";
+
+import { useCreateInvoice, useUpdateInvoice } from "@app/features/invoices";
 
 interface UseInvoiceSubmitOptions {
   mode: "create" | "edit";
@@ -48,16 +50,19 @@ export function useInvoiceSubmit({ mode, invoiceId, onDraftClear }: UseInvoiceSu
             },
             onError: (err) => {
               const message = err instanceof ApiError ? err.message : "Failed to create invoice";
+
               setError(message);
               toast.error(message);
             },
           }
         );
+
         return;
       }
 
       if (!invoiceId) {
         setError("Invoice ID is required for editing");
+
         return;
       }
 
@@ -79,6 +84,7 @@ export function useInvoiceSubmit({ mode, invoiceId, onDraftClear }: UseInvoiceSu
           },
           onError: (err) => {
             const message = err instanceof ApiError ? err.message : "Failed to update invoice";
+
             setError(message);
             toast.error(message);
           },

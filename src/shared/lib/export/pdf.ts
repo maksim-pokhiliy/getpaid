@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+
 import { formatCurrency, formatDate } from "@app/shared/lib/format";
 
 type RGB = [number, number, number];
@@ -68,6 +69,7 @@ function renderHeader(doc: jsPDF, invoice: InvoicePdfData): void {
   doc.text(`#${invoice.publicId}`, 20, 38);
 
   const statusColor = STATUS_COLORS[invoice.status] || STATUS_COLORS.DRAFT;
+
   doc.setFillColor(...statusColor);
   doc.roundedRect(pageWidth - 50, 22, 30, 10, 2, 2, "F");
   doc.setFontSize(8);
@@ -91,15 +93,19 @@ function renderSenderInfo(doc: jsPDF, invoice: InvoicePdfData): number {
     doc.text(invoice.sender.companyName, 20, yPos);
     yPos += 5;
   }
+
   doc.setFont("helvetica", "normal");
+
   if (invoice.sender?.displayName) {
     doc.text(invoice.sender.displayName, 20, yPos);
     yPos += 5;
   }
+
   if (invoice.sender?.email) {
     doc.text(invoice.sender.email, 20, yPos);
     yPos += 5;
   }
+
   if (invoice.sender?.address) {
     invoice.sender.address.split("\n").forEach((line) => {
       doc.text(line, 20, yPos);
@@ -139,6 +145,7 @@ function renderDates(doc: jsPDF, invoice: InvoicePdfData): void {
   doc.setTextColor(...PDF_COLORS.muted);
   doc.text("INVOICE DATE", 30, yPos + 3);
   doc.text("DUE DATE", 90, yPos + 3);
+
   if (invoice.paidAt) {
     doc.text("PAID DATE", 150, yPos + 3);
   }
@@ -147,6 +154,7 @@ function renderDates(doc: jsPDF, invoice: InvoicePdfData): void {
   doc.setTextColor(...PDF_COLORS.text);
   doc.text(formatDate(invoice.createdAt), 30, yPos + 12);
   doc.text(formatDate(invoice.dueDate), 90, yPos + 12);
+
   if (invoice.paidAt) {
     doc.text(formatDate(invoice.paidAt), 150, yPos + 12);
   }
@@ -203,6 +211,7 @@ function renderTotals(doc: jsPDF, invoice: InvoicePdfData, startY: number): numb
     doc.setTextColor(...PDF_COLORS.muted);
     const discountLabel =
       invoice.discountType === "PERCENTAGE" ? `Discount (${invoice.discountValue}%)` : "Discount";
+
     doc.text(discountLabel, totalsX, yPos);
     doc.setTextColor(...PDF_COLORS.error);
     doc.text(
@@ -258,6 +267,7 @@ function renderNotes(doc: jsPDF, invoice: InvoicePdfData, startY: number): void 
   doc.setFontSize(10);
   doc.setTextColor(...PDF_COLORS.text);
   const noteLines = doc.splitTextToSize(invoice.notes, pageWidth - 40);
+
   doc.text(noteLines, 20, yPos);
 }
 
@@ -279,6 +289,7 @@ export function generateInvoicePdf(invoice: InvoicePdfData): void {
   renderDates(doc, invoice);
   const tableEndY = renderItemsTable(doc, invoice);
   const totalsEndY = renderTotals(doc, invoice, tableEndY);
+
   renderNotes(doc, invoice, totalsEndY);
   renderFooter(doc);
 

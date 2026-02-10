@@ -1,12 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Alert, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
+
 import AddIcon from "@mui/icons-material/Add";
+import { Alert, Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
+
 import { PageHeader } from "@app/shared/ui/page-header";
-import { OnboardingChecklist } from "./onboarding-checklist";
-import { DashboardMetrics } from "./dashboard-metrics";
+
 import { DashboardCharts } from "./dashboard-charts";
+import { DashboardMetrics } from "./dashboard-metrics";
+import { OnboardingChecklist } from "./onboarding-checklist";
 import { useDashboard } from "./use-dashboard";
 
 interface DashboardContentProps {

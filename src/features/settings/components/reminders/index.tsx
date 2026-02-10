@@ -1,13 +1,17 @@
 "use client";
 
 import * as React from "react";
+
 import { Box, Typography } from "@mui/material";
+
+import { ApiError } from "@app/shared/api";
 import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useToast } from "@app/shared/ui/toast";
-import { useUpdateReminderSettings, type ReminderSettings } from "@app/features/settings";
-import { ApiError } from "@app/shared/api";
-import { ReminderToggle } from "./reminder-toggle";
+
+import { type ReminderSettings, useUpdateReminderSettings } from "@app/features/settings";
+
 import { ReminderSchedule } from "./reminder-schedule";
+import { ReminderToggle } from "./reminder-toggle";
 
 interface RemindersTabProps {
   settings: ReminderSettings | undefined;

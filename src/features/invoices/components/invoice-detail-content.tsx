@@ -1,26 +1,30 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Box, Button, Alert } from "@mui/material";
+
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { AppLayout } from "@app/shared/layout/app-layout";
-import { CardSkeleton } from "@app/shared/ui/loading";
-import { ConfirmDialog } from "@app/shared/ui/confirm-dialog";
-import { useInvoice } from "@app/features/invoices";
+import { Alert, Box, Button } from "@mui/material";
+
 import { STATUS_CONFIG } from "@app/shared/config/invoice-status";
+import { AppLayout } from "@app/shared/layout/app-layout";
 import type { Invoice } from "@app/shared/schemas/api";
+import { ConfirmDialog } from "@app/shared/ui/confirm-dialog";
+import { CardSkeleton } from "@app/shared/ui/loading";
+
+import { useInvoice } from "@app/features/invoices";
 import {
-  InvoiceTimeline,
-  PaymentHistory,
   ActivityHistory,
-  SendDialog,
-  MarkPaidDialog,
-  RecordPaymentDialog,
   InvoicePreviewDialog,
+  InvoiceTimeline,
+  MarkPaidDialog,
+  PaymentHistory,
+  RecordPaymentDialog,
+  SendDialog,
 } from "@app/features/invoices/components";
-import { useInvoiceDetail } from "./use-invoice-detail";
-import { DetailHeader } from "./detail-header";
+
 import { BillingCard } from "./billing-card";
+import { DetailHeader } from "./detail-header";
+import { useInvoiceDetail } from "./use-invoice-detail";
 
 type InvoiceDetailReturn = ReturnType<typeof useInvoiceDetail>;
 

@@ -1,6 +1,7 @@
+import { BANKING } from "@app/shared/config/config";
+
 import { prisma } from "@app/server/db";
 import { recordPayment } from "@app/server/invoices";
-import { BANKING } from "@app/shared/config/config";
 
 interface MatchCandidate {
   invoiceId: string;
@@ -74,6 +75,7 @@ export async function matchTransaction(transactionId: string, userId: string) {
 
   for (const invoice of invoices) {
     const match = calculateMatchScore(transaction, invoice);
+
     if (match && match.score >= BANKING.MATCH_SUGGEST_THRESHOLD) {
       candidates.push(match);
     }

@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  alpha,
   Box,
   Divider,
+  LinearProgress,
   Paper,
   Table,
   TableBody,
@@ -11,10 +13,9 @@ import {
   TableHead,
   TableRow,
   Typography,
-  alpha,
   useTheme,
-  LinearProgress,
 } from "@mui/material";
+
 import { formatCurrency } from "@app/shared/lib/format";
 import type { Invoice } from "@app/shared/schemas/api";
 

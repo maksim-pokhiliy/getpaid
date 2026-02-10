@@ -2,30 +2,33 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Box,
-  Container,
-  TextField,
-  Typography,
-  Paper,
-  Link as MuiLink,
-  InputAdornment,
-  IconButton,
-  alpha,
-  useTheme,
-} from "@mui/material";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
+
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { Logo } from "@app/shared/ui/logo";
+import {
+  alpha,
+  Box,
+  Container,
+  IconButton,
+  InputAdornment,
+  Link as MuiLink,
+  Paper,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { SignInInput, signInSchema } from "@app/shared/schemas";
 import { LoadingButton } from "@app/shared/ui/loading-button";
+import { Logo } from "@app/shared/ui/logo";
 import { useToast } from "@app/shared/ui/toast";
-import { signInSchema, SignInInput } from "@app/shared/schemas";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -56,6 +59,7 @@ export default function SignInPage() {
 
       if (result?.error) {
         toast.error("Invalid email or password");
+
         return;
       }
 
@@ -94,6 +98,7 @@ export default function SignInPage() {
           pointerEvents: "none",
         }}
       />
+
       <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <Box sx={{ mb: 4 }}>
@@ -105,6 +110,7 @@ export default function SignInPage() {
               <Typography variant="h5" fontWeight={700} gutterBottom>
                 Welcome back
               </Typography>
+
               <Typography variant="body2" color="text.secondary">
                 Sign in to your account
               </Typography>
@@ -128,6 +134,7 @@ export default function SignInPage() {
                   ),
                 }}
               />
+
               <TextField
                 {...register("password")}
                 label="Password"
@@ -156,6 +163,7 @@ export default function SignInPage() {
                   ),
                 }}
               />
+
               <LoadingButton
                 type="submit"
                 variant="contained"

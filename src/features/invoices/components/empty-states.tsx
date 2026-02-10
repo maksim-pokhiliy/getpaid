@@ -1,8 +1,9 @@
 "use client";
 
-import { Button } from "@mui/material";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import AddIcon from "@mui/icons-material/Add";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import { Button } from "@mui/material";
+
 import { EmptyState } from "@app/shared/ui/empty-state";
 import { EmptyInvoicesIllustration } from "@app/shared/ui/illustrations/empty-invoices";
 

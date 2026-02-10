@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
+
+import { AuthenticationError, requireUser } from "@app/server/auth/require-user";
 import { getPendingTransactions, getRecentAutoMatched } from "@app/server/banking/matching";
 
 export async function GET() {
@@ -19,7 +20,9 @@ export async function GET() {
         { status: 401 }
       );
     }
+
     console.error("Get bank transactions error:", error);
+
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" } },
       { status: 500 }
