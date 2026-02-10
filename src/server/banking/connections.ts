@@ -1,7 +1,9 @@
+import { CURRENCY } from "@app/shared/config/config";
+
 import { prisma } from "@app/server/db";
+
 import * as saltEdge from "./salt-edge-client";
 import { syncTransactions } from "./sync";
-import { CURRENCY } from "@app/shared/config/config";
 
 export async function ensureCustomer(userId: string): Promise<string> {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
@@ -23,6 +25,7 @@ export async function ensureCustomer(userId: string): Promise<string> {
 export async function createConnectSession(userId: string, returnUrl: string) {
   const customerId = await ensureCustomer(userId);
   const session = await saltEdge.createConnectSession(customerId, returnUrl);
+
   return session;
 }
 
@@ -85,6 +88,7 @@ export async function discoverNewConnections(userId: string) {
 
   for (const conn of newConnections) {
     const bankConnection = await handleConnectionSuccess(conn.id, userId);
+
     saved.push(bankConnection);
   }
 
@@ -133,6 +137,7 @@ export async function refreshConnectionById(connectionId: string, userId: string
   }
 
   await saltEdge.refreshConnection(connection.saltEdgeConnectionId);
+
   return { success: true };
 }
 
@@ -157,11 +162,13 @@ export async function handleCallback(body: CallbackBody) {
 
   if (!user) {
     console.error("Callback: user not found for customer", data.customer_id);
+
     return;
   }
 
   if (data.stage === "finish") {
     const connection = await handleConnectionSuccess(data.connection_id, user.id);
+
     await syncTransactions(connection.id);
   }
 

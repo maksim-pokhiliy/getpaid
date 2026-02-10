@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSenderProfile, upsertSenderProfile } from "@app/server/sender-profile";
+
+import { notFoundResponse, parseBody, withAuth } from "@app/shared/api/route-helpers";
 import { createSenderProfileSchema } from "@app/shared/schemas";
-import { withAuth, parseBody, notFoundResponse } from "@app/shared/api/route-helpers";
+
+import { getSenderProfile, upsertSenderProfile } from "@app/server/sender-profile";
 
 export const GET = withAuth(async (user) => {
   const profile = await getSenderProfile(user.id);
@@ -21,6 +23,7 @@ export const POST = withAuth(async (user, request) => {
   }
 
   const profile = await upsertSenderProfile(user.id, data);
+
   return NextResponse.json(profile, { status: 201 });
 });
 
@@ -32,5 +35,6 @@ export const PUT = withAuth(async (user, request) => {
   }
 
   const profile = await upsertSenderProfile(user.id, data);
+
   return NextResponse.json(profile);
 });

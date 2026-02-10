@@ -1,8 +1,9 @@
 "use client";
 
-import { Divider, ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
-import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { Divider, ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
 
 interface AccountMenuProps {

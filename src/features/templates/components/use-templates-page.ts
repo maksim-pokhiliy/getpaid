@@ -2,11 +2,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useTemplates, templatesApi, type Template } from "@app/features/templates";
-import { useOptimisticDelete, useDebouncedValue, useItemMenu, useSort } from "@app/shared/hooks";
-import { useAnnounce } from "@app/shared/ui/screen-reader-announcer";
-import { queryKeys } from "@app/shared/config/query";
+
 import { SEARCH } from "@app/shared/config/config";
+import { queryKeys } from "@app/shared/config/query";
+import { useDebouncedValue, useItemMenu, useOptimisticDelete, useSort } from "@app/shared/hooks";
+import { useAnnounce } from "@app/shared/ui/screen-reader-announcer";
+
+import { type Template, templatesApi, useTemplates } from "@app/features/templates";
+
 import { calculateEstimatedTotal } from "./templates-table";
 
 function useSortedTemplates(
@@ -20,10 +23,12 @@ function useSortedTemplates(
     if (!templates) {
       return undefined;
     }
+
     let filtered = templates.filter((t) => !pendingIds.has(t.id));
 
     if (debouncedSearch) {
       const query = debouncedSearch.toLowerCase();
+
       filtered = filtered.filter(
         (t) =>
           t.name.toLowerCase().includes(query) ||
@@ -33,6 +38,7 @@ function useSortedTemplates(
 
     return filtered.sort((a, b) => {
       let comparison = 0;
+
       switch (sortColumn) {
         case "name":
           comparison = a.name.localeCompare(b.name);
@@ -49,6 +55,7 @@ function useSortedTemplates(
         default:
           comparison = 0;
       }
+
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [templates, pendingIds, debouncedSearch, sortColumn, sortDirection]);
@@ -81,6 +88,7 @@ export function useTemplatesPage() {
   );
 
   const sortedCount = sortedTemplates?.length ?? 0;
+
   React.useEffect(() => {
     if (debouncedSearch && sortedCount > 0) {
       announce(`${sortedCount} template${sortedCount !== 1 ? "s" : ""} found`);
@@ -91,7 +99,9 @@ export function useTemplatesPage() {
     if (!menu.selectedItem) {
       return;
     }
+
     const template = menu.selectedItem;
+
     menu.closeMenu();
     deleteItem(template);
   }, [menu, deleteItem]);
@@ -100,7 +110,9 @@ export function useTemplatesPage() {
     if (!menu.selectedItem) {
       return;
     }
+
     const templateId = menu.selectedItem.id;
+
     menu.closeMenu();
     router.push(`/app/templates/${templateId}/edit`);
   }, [menu, router]);

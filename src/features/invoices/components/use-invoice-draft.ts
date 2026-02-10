@@ -1,12 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useToast } from "@app/shared/ui/toast";
-import { useAutosave } from "@app/shared/hooks";
-import type { InvoiceFormInput } from "@app/shared/schemas";
 import type { UseFormReset } from "react-hook-form";
+
 import { STORAGE_KEYS } from "@app/shared/config/config";
+import { useAutosave } from "@app/shared/hooks";
 import { storage } from "@app/shared/lib/storage";
+import type { InvoiceFormInput } from "@app/shared/schemas";
+import { useToast } from "@app/shared/ui/toast";
 
 const DRAFT_KEY = STORAGE_KEYS.INVOICE_DRAFT;
 
@@ -36,6 +37,7 @@ export function useInvoiceDraft({ mode, formValues, isDirty, reset }: UseInvoice
     if (!isCreateMode) {
       return;
     }
+
     if (storage.get(DRAFT_KEY)) {
       setShowDraftBanner(true);
     }

@@ -1,7 +1,8 @@
 "use client";
 
-import { Box, Drawer, IconButton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { Box, Drawer, IconButton, Typography } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
 
 interface FilterDrawerProps {

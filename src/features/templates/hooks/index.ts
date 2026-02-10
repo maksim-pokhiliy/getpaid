@@ -1,11 +1,13 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { queryKeys, STALE_TIME } from "@app/shared/config/query";
+
 import {
-  templatesApi,
-  type Template,
   type CreateTemplateInput,
+  type Template,
+  templatesApi,
   type UpdateTemplateInput,
 } from "../api";
 
@@ -58,9 +60,11 @@ export function useDeleteTemplate() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.templates });
       const previousTemplates = queryClient.getQueryData<Template[]>(queryKeys.templates);
+
       queryClient.setQueryData<Template[]>(queryKeys.templates, (old) =>
         old?.filter((template) => template.id !== id)
       );
+
       return { previousTemplates };
     },
     onError: (_, __, context) => {

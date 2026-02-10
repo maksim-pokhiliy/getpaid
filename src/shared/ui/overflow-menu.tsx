@@ -1,6 +1,7 @@
 "use client";
 
-import { Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
+import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
 
 interface OverflowMenuItem {

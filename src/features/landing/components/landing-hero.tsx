@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Button, Chip, Container, Stack, Typography } from "@mui/material";
+
 import CodeIcon from "@mui/icons-material/Code";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import { Button, Chip, Container, Stack, Typography } from "@mui/material";
+
 import { GITHUB_URL } from "../constants";
 
 export function LandingHero() {

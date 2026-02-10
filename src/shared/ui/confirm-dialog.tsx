@@ -1,14 +1,16 @@
 "use client";
 
 import * as React from "react";
+
 import {
+  Button,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
+  DialogTitle,
 } from "@mui/material";
+
 import { LoadingButton } from "./loading-button";
 
 interface ConfirmDialogProps {
@@ -93,10 +95,12 @@ export function useConfirmDialog() {
   }, [isLoading]);
 
   const onConfirmRef = React.useRef(state.onConfirm);
+
   onConfirmRef.current = state.onConfirm;
 
   const handleConfirm = React.useCallback(async () => {
     setIsLoading(true);
+
     try {
       await onConfirmRef.current();
       setState((prev) => ({ ...prev, open: false }));

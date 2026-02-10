@@ -2,27 +2,30 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import { Box, Paper, Typography, Tabs, Tab, Divider, Stack, alpha, useTheme } from "@mui/material";
-import BusinessIcon from "@mui/icons-material/Business";
-import PaymentIcon from "@mui/icons-material/Payment";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+
 import BrushIcon from "@mui/icons-material/Brush";
+import BusinessIcon from "@mui/icons-material/Business";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import PaymentIcon from "@mui/icons-material/Payment";
+import { alpha, Box, Divider, Paper, Stack, Tab, Tabs, Typography, useTheme } from "@mui/material";
+
+import { env } from "@app/shared/config/env";
 import { AppLayout } from "@app/shared/layout/app-layout";
 import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
 import { CardSkeleton } from "@app/shared/ui/loading";
-import { useSenderProfile, useReminderSettings } from "@app/features/settings";
+
 import {
+  ConnectBankButton,
+  ConnectionList,
+  PendingMatches,
+} from "@app/features/banking/components";
+import { useReminderSettings, useSenderProfile } from "@app/features/settings";
+import {
+  BrandingTab,
   BusinessProfileTab,
   PaymentsTab,
   RemindersTab,
-  BrandingTab,
 } from "@app/features/settings/components";
-import {
-  ConnectionList,
-  ConnectBankButton,
-  PendingMatches,
-} from "@app/features/banking/components";
-import { env } from "@app/shared/config/env";
 
 const BANKING_ENABLED = env.NEXT_PUBLIC_BANKING_ENABLED;
 
@@ -49,6 +52,7 @@ interface TabPanelProps {
 
 function TabPanel({ children, tabKey, activeKey, ...other }: TabPanelProps) {
   const isActive = tabKey === activeKey;
+
   return (
     <Box role="tabpanel" hidden={!isActive} {...other}>
       {isActive && <Box sx={{ pt: 3 }}>{children}</Box>}
@@ -79,6 +83,7 @@ export default function SettingsPage() {
         <Typography variant="h4" component="h1" fontWeight={700}>
           Settings
         </Typography>
+
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
           Manage your account and business settings
         </Typography>
@@ -125,8 +130,11 @@ export default function SettingsPage() {
                     >
                       <ConnectBankButton />
                     </Stack>
+
                     <ConnectionList />
+
                     <Divider sx={{ my: 4 }} />
+
                     <PendingMatches />
                   </PaymentsTab>
                 </TabPanel>

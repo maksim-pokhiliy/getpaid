@@ -1,19 +1,21 @@
 "use client";
 
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
+
 import {
   Box,
+  FormControl,
+  FormHelperText,
+  InputAdornment,
+  InputLabel,
   MenuItem,
   Select,
-  FormControl,
-  InputLabel,
-  FormHelperText,
   TextField,
   Typography,
-  InputAdornment,
 } from "@mui/material";
-import type { UseFormRegister, FieldErrors } from "react-hook-form";
-import type { SenderProfileFormInput } from "@app/shared/schemas";
+
 import { CURRENCIES } from "@app/shared/config/currencies";
+import type { SenderProfileFormInput } from "@app/shared/schemas";
 
 interface CurrencySelectorProps {
   register: UseFormRegister<SenderProfileFormInput>;

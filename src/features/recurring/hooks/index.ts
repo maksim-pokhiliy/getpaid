@@ -1,11 +1,13 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { queryKeys, STALE_TIME } from "@app/shared/config/query";
+
 import {
+  type CreateRecurringInput,
   recurringApi,
   type RecurringInvoice,
-  type CreateRecurringInput,
   type UpdateRecurringInput,
 } from "../api";
 
@@ -58,9 +60,11 @@ export function useDeleteRecurring() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.recurring });
       const previous = queryClient.getQueryData<RecurringInvoice[]>(queryKeys.recurring);
+
       queryClient.setQueryData<RecurringInvoice[]>(queryKeys.recurring, (old) =>
         old?.filter((r) => r.id !== id)
       );
+
       return { previous };
     },
     onError: (_, __, context) => {

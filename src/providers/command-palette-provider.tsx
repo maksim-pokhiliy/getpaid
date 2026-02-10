@@ -2,17 +2,19 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+
+import AddIcon from "@mui/icons-material/Add";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import PeopleIcon from "@mui/icons-material/People";
 import DescriptionIcon from "@mui/icons-material/Description";
+import PeopleIcon from "@mui/icons-material/People";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import SettingsIcon from "@mui/icons-material/Settings";
-import AddIcon from "@mui/icons-material/Add";
-import { CommandPaletteContext, type CommandItem } from "@app/shared/hooks/use-command-palette";
-import { CommandPalette } from "@app/shared/ui/command-palette";
-import { useRecentItems, type RecentItem } from "@app/shared/hooks/use-recent-items";
+
 import { SHORTCUTS } from "@app/shared/config/config";
+import { type CommandItem, CommandPaletteContext } from "@app/shared/hooks/use-command-palette";
+import { type RecentItem, useRecentItems } from "@app/shared/hooks/use-recent-items";
+import { CommandPalette } from "@app/shared/ui/command-palette";
 
 function recentToCommandItem(item: RecentItem, router: ReturnType<typeof useRouter>): CommandItem {
   return {
@@ -132,6 +134,7 @@ export function CommandPaletteProvider({ children }: { children: React.ReactNode
 
   const items = React.useMemo<CommandItem[]>(() => {
     const recentCommandItems = recentItems.map((item) => recentToCommandItem(item, router));
+
     return [
       ...buildNavItems(router),
       ...buildActionItems(router),

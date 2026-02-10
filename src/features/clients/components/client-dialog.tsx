@@ -2,23 +2,27 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
+  Alert,
   Box,
   Button,
-  TextField,
-  Alert,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
   InputAdornment,
+  TextField,
 } from "@mui/material";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { ApiError } from "@app/shared/api";
+import { ClientFormInput, clientFormSchema } from "@app/shared/schemas";
 import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useToast } from "@app/shared/ui/toast";
+
 import { useCreateClient, useUpdateClient } from "@app/features/clients";
-import { ApiError } from "@app/shared/api";
-import { clientFormSchema, ClientFormInput } from "@app/shared/schemas";
 
 interface ClientDialogProps {
   open: boolean;
@@ -65,6 +69,7 @@ export function ClientDialog({ open, onClose, mode, client }: ClientDialogProps)
       ...formData,
       defaultRate: formData.defaultRate ? Math.round(formData.defaultRate * 100) : undefined,
     };
+
     if (mode === "create") {
       createMutation.mutate(data, {
         onSuccess: () => {

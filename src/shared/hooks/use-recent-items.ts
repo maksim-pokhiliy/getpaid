@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import { STORAGE_KEYS } from "@app/shared/config/config";
 import { storage } from "@app/shared/lib/storage";
 
@@ -25,7 +26,9 @@ export function useRecentItems() {
     setItems((prev) => {
       const filtered = prev.filter((existing) => existing.id !== item.id);
       const next = [{ ...item, timestamp: Date.now() }, ...filtered].slice(0, MAX_ITEMS);
+
       storage.setJson(STORAGE_KEYS.RECENT_ITEMS, next);
+
       return next;
     });
   }, []);

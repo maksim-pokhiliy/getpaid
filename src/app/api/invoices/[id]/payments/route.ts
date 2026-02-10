@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { recordPayment, getPayments, deletePayment } from "@app/server/invoices";
-import { recordPaymentApiSchema } from "@app/shared/schemas";
+
 import {
-  withAuth,
-  parseBody,
-  notFoundResponse,
   errorResponse,
+  notFoundResponse,
+  parseBody,
+  withAuth,
 } from "@app/shared/api/route-helpers";
+import { recordPaymentApiSchema } from "@app/shared/schemas";
+
+import { deletePayment, getPayments, recordPayment } from "@app/server/invoices";
 
 export const GET = withAuth(async (user, _request, context) => {
   const { id } = await context.params;

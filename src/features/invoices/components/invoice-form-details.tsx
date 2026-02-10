@@ -1,22 +1,25 @@
 "use client";
 
+import { Control, Controller, FieldErrors, UseFormRegister } from "react-hook-form";
+
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   TextField,
   Typography,
-  Divider,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Controller, Control, FieldErrors, UseFormRegister } from "react-hook-form";
+
 import dayjs from "dayjs";
+
+import { CURRENCIES } from "@app/shared/config/currencies";
 import type { InvoiceFormInput } from "@app/shared/schemas";
 import type { Client } from "@app/shared/schemas/api";
-import { CURRENCIES } from "@app/shared/config/currencies";
 
 interface InvoiceFormDetailsProps {
   register: UseFormRegister<InvoiceFormInput>;

@@ -1,18 +1,20 @@
 "use client";
 
 import { Box, useTheme } from "@mui/material";
+
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-import { CardSkeleton } from "@app/shared/ui/loading";
-import { formatCurrencyCompact } from "@app/shared/lib/format";
+
 import { CHART } from "@app/shared/config/config";
+import { formatCurrencyCompact } from "@app/shared/lib/format";
+import { CardSkeleton } from "@app/shared/ui/loading";
 
 interface MonthlyRevenue {
   month: string;

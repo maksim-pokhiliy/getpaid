@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+
+import { notFoundResponse, withAuth } from "@app/shared/api/route-helpers";
+
 import { getUserProfile } from "@app/server/user";
-import { withAuth, notFoundResponse } from "@app/shared/api/route-helpers";
 
 export const GET = withAuth(async (user) => {
   const profile = await getUserProfile(user.id);

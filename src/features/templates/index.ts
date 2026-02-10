@@ -1,3 +1,3 @@
+export type { CreateTemplateInput, Template, TemplateItem, UpdateTemplateInput } from "./api";
 export { templatesApi } from "./api";
-export type { Template, TemplateItem, CreateTemplateInput, UpdateTemplateInput } from "./api";
 export * from "./hooks";

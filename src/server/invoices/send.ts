@@ -1,11 +1,13 @@
+import type { SenderProfile } from "@prisma/client";
 import { customAlphabet } from "nanoid";
+
+import { BANKING, BRANDING } from "@app/shared/config/config";
+import { INVOICE_EVENT, INVOICE_STATUS } from "@app/shared/config/invoice-status";
+
 import { prisma } from "@app/server/db";
-import { sendInvoiceEmail, type EmailBranding } from "@app/server/email";
+import { type EmailBranding, sendInvoiceEmail } from "@app/server/email";
 import { getFollowUpRule, scheduleFollowUps } from "@app/server/followups";
 import { logInvoiceEvent, updateInvoiceStatus } from "@app/server/invoices";
-import { BANKING, BRANDING } from "@app/shared/config/config";
-import { INVOICE_STATUS, INVOICE_EVENT } from "@app/shared/config/invoice-status";
-import type { SenderProfile } from "@prisma/client";
 
 const generateReference = customAlphabet(
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
@@ -107,6 +109,7 @@ export async function sendInvoice(invoiceId: string, userId: string) {
   await logInvoiceEvent(invoice.id, INVOICE_EVENT.SENT, { clientEmail: invoice.client.email });
 
   const followUpRule = await getFollowUpRule(userId);
+
   if (followUpRule?.enabled) {
     await scheduleFollowUps(invoice.id, sentAt, invoice.dueDate, {
       mode: followUpRule.mode,

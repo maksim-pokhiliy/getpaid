@@ -1,6 +1,6 @@
 import { fetchApi } from "@app/shared/api/base";
-import type { Invoice, InvoiceListItem } from "@app/shared/schemas/api";
 import type { CreateInvoiceInput, UpdateInvoiceInput } from "@app/shared/schemas";
+import type { Invoice, InvoiceListItem } from "@app/shared/schemas/api";
 
 export interface Payment {
   id: string;

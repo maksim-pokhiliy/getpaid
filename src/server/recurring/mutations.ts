@@ -1,6 +1,8 @@
-import { prisma } from "@app/server/db";
 import type { RecurringFrequency, RecurringStatus } from "@prisma/client";
+
 import type { DiscountTypeValue } from "@app/shared/config/invoice-status";
+
+import { prisma } from "@app/server/db";
 
 export class ClientNotFoundError extends Error {
   constructor() {

@@ -1,15 +1,20 @@
 "use client";
 
 import * as React from "react";
-import { Box, Alert } from "@mui/material";
 import { useForm, useWatch } from "react-hook-form";
+
+import { Alert, Box } from "@mui/material";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { senderProfileFormSchema, SenderProfileFormInput } from "@app/shared/schemas";
+
+import { ApiError } from "@app/shared/api";
+import { SenderProfileFormInput, senderProfileFormSchema } from "@app/shared/schemas";
+import type { SenderProfile } from "@app/shared/schemas/api";
 import { LoadingButton } from "@app/shared/ui/loading-button";
 import { useToast } from "@app/shared/ui/toast";
+
 import { useUpdateSenderProfile } from "@app/features/settings";
-import { ApiError } from "@app/shared/api";
-import type { SenderProfile } from "@app/shared/schemas/api";
+
 import { CompanyInfoFields } from "./company-info-fields";
 import { ContactFields } from "./contact-fields";
 import { CurrencySelector } from "./currency-selector";
@@ -63,6 +68,7 @@ export function BusinessProfileTab({ profile }: BusinessProfileTabProps) {
       ...data,
       defaultRate: data.defaultRate ? Math.round(data.defaultRate * 100) : undefined,
     };
+
     updateProfileMutation.mutate(payload, {
       onSuccess: () => {
         toast.success("Settings saved successfully!");
@@ -70,6 +76,7 @@ export function BusinessProfileTab({ profile }: BusinessProfileTabProps) {
       },
       onError: (err) => {
         const message = err instanceof ApiError ? err.message : "Failed to update profile";
+
         setError(message);
         toast.error(message);
       },

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import { AUTOSAVE } from "@app/shared/config/config";
 import { storage } from "@app/shared/lib/storage";
 
@@ -26,9 +27,11 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
     if (!enabled || initialCheckDone.current) {
       return;
     }
+
     initialCheckDone.current = true;
 
     const saved = storage.getJson<AutosavePayload<T>>(key);
+
     if (saved?.data && saved?.timestamp) {
       setHasDraft(true);
     }
@@ -48,6 +51,7 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
         data,
         timestamp: new Date().toISOString(),
       };
+
       storage.setJson(key, payload);
       setLastSaved(new Date());
       setHasDraft(true);
@@ -62,10 +66,13 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
 
   const restoreDraft = React.useCallback(() => {
     const saved = storage.getJson<AutosavePayload<T>>(key);
+
     if (saved?.data && onRestore) {
       onRestore(saved.data);
+
       return true;
     }
+
     return false;
   }, [key, onRestore]);
 
@@ -77,9 +84,11 @@ export function useAutosave<T>({ key, data, onRestore, enabled = true }: UseAuto
 
   const getDraftTimestamp = React.useCallback((): Date | null => {
     const saved = storage.getJson<AutosavePayload<T>>(key);
+
     if (saved?.timestamp) {
       return new Date(saved.timestamp);
     }
+
     return null;
   }, [key]);
 

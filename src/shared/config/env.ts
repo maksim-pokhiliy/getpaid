@@ -43,17 +43,21 @@ function readClientRaw(): Record<string, unknown> {
 
 function validateServer(): ServerEnv {
   const result = serverSchema.safeParse(readServerRaw());
+
   if (!result.success) {
     throw new Error(`Invalid server environment variables:\n${result.error.message}`);
   }
+
   return result.data;
 }
 
 function validateClient(): ClientEnv {
   const result = clientSchema.safeParse(readClientRaw());
+
   if (!result.success) {
     throw new Error(`Invalid client environment variables:\n${result.error.message}`);
   }
+
   return result.data;
 }
 
@@ -80,21 +84,27 @@ export const env: Env = new Proxy({} as Env, {
     if (typeof prop !== "string") {
       return undefined;
     }
+
     if (prop.startsWith("NEXT_PUBLIC_")) {
       if (!clientCache) {
         clientCache = validateClient();
       }
+
       return clientCache[prop as keyof ClientEnv];
     }
+
     if (SERVER_KEYS.has(prop)) {
       if (typeof window !== "undefined") {
         throw new Error(`Server env "${prop}" cannot be accessed on the client`);
       }
+
       if (!serverCache) {
         serverCache = validateServer();
       }
+
       return serverCache[prop as keyof ServerEnv];
     }
+
     return undefined;
   },
 });

@@ -1,13 +1,16 @@
 "use client";
 
-import { Button, Paper } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DescriptionIcon from "@mui/icons-material/Description";
-import { TableSkeleton } from "@app/shared/ui/loading";
+import { Button, Paper } from "@mui/material";
+
 import { EmptyState, NoResults } from "@app/shared/ui/empty-state";
 import { EmptyTemplatesIllustration } from "@app/shared/ui/illustrations/empty-templates";
-import { TemplatesTable } from "./templates-table";
+import { TableSkeleton } from "@app/shared/ui/loading";
+
 import type { Template } from "@app/features/templates";
+
+import { TemplatesTable } from "./templates-table";
 
 interface TemplatesContentProps {
   isLoading: boolean;

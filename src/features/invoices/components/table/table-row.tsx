@@ -1,10 +1,12 @@
 "use client";
 
-import { Box, Checkbox, Chip, TableCell, Typography, alpha, useTheme } from "@mui/material";
-import { DataTableRow, DataTableActions } from "@app/shared/ui/data-table";
-import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
-import { STATUS_CONFIG, getStatusColor } from "../../constants/invoice";
+import { alpha, Box, Checkbox, Chip, TableCell, Typography, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
+import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
+import { DataTableActions, DataTableRow } from "@app/shared/ui/data-table";
+
+import { getStatusColor, STATUS_CONFIG } from "../../constants/invoice";
 import type { InvoiceData } from "../invoice-row";
 
 interface InvoiceTableRowProps {

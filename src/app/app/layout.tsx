@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+
 import { auth } from "@app/server/auth";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

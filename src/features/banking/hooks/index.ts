@@ -1,7 +1,9 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { queryKeys, STALE_TIME } from "@app/shared/config/query";
+
 import { bankingApi } from "../api";
 
 export function useConnections() {

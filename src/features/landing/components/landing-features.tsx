@@ -1,14 +1,16 @@
 "use client";
 
-import { Box, Container, Paper, Typography, alpha, useTheme } from "@mui/material";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import RepeatIcon from "@mui/icons-material/Repeat";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import { FEATURES } from "../constants";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import RepeatIcon from "@mui/icons-material/Repeat";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { alpha, Box, Container, Paper, Typography, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
+
+import { FEATURES } from "../constants";
 
 const FEATURE_ICONS: Record<string, React.ReactElement> = {
   Invoices: <ReceiptLongIcon />,

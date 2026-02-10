@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Box, Button, Fade, Grow, Paper, Typography, alpha, useTheme } from "@mui/material";
+
 import SearchIcon from "@mui/icons-material/Search";
+import { alpha, Box, Button, Fade, Grow, Paper, Typography, useTheme } from "@mui/material";
+
 import { ANIMATION, UI } from "@app/shared/config/config";
 
 interface EmptyStateProps {

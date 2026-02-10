@@ -1,13 +1,14 @@
 "use client";
 
-import { Box, Button, Chip, Typography, alpha, useTheme } from "@mui/material";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import { alpha, Box, Button, Chip, Typography, useTheme } from "@mui/material";
+
+import { UI } from "@app/shared/config/config";
+import { getStatusColor, STATUS_CONFIG } from "@app/shared/config/invoice-status";
+import { formatCurrency, formatDateShort } from "@app/shared/lib/format";
 import { EmptyState } from "@app/shared/ui/empty-state";
 import { EmptyInvoicesIllustration } from "@app/shared/ui/illustrations/empty-invoices";
 import { CardSkeleton } from "@app/shared/ui/loading";
-import { formatCurrency, formatDateShort } from "@app/shared/lib/format";
-import { STATUS_CONFIG, getStatusColor } from "@app/shared/config/invoice-status";
-import { UI } from "@app/shared/config/config";
 
 interface RecentInvoice {
   id: string;
@@ -56,6 +57,7 @@ export function RecentInvoicesContent({
     <Box>
       {invoices.map((invoice) => {
         const statusLabel = STATUS_CONFIG[invoice.status]?.label || invoice.status;
+
         return (
           <Box
             key={invoice.id}

@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
+
+import { errorResponse, withAuth } from "@app/shared/api/route-helpers";
+
 import {
-  sendInvoice,
-  InvoiceNotFoundError,
-  InvoiceAlreadySentError,
   EmailFailedError,
+  InvoiceAlreadySentError,
+  InvoiceNotFoundError,
+  sendInvoice,
 } from "@app/server/invoices/send";
-import { withAuth, errorResponse } from "@app/shared/api/route-helpers";
 
 export const POST = withAuth(
   async (user, _request, context) => {
     const { id } = await context.params;
     const updated = await sendInvoice(id, user.id);
+
     return NextResponse.json(updated);
   },
   [

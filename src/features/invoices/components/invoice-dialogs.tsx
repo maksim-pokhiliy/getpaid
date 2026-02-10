@@ -1,21 +1,23 @@
 "use client";
 
 import * as React from "react";
+
+import AddIcon from "@mui/icons-material/Add";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import SendIcon from "@mui/icons-material/Send";
 import {
   Button,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
+  DialogTitle,
   TextField,
   Typography,
 } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import AddIcon from "@mui/icons-material/Add";
-import { LoadingButton } from "@app/shared/ui/loading-button";
+
 import { formatCurrency } from "@app/shared/lib/format";
+import { LoadingButton } from "@app/shared/ui/loading-button";
 
 interface SendDialogProps {
   open: boolean;

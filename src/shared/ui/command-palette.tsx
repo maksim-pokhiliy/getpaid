@@ -1,40 +1,46 @@
 "use client";
 
 import * as React from "react";
+
+import SearchIcon from "@mui/icons-material/Search";
 import {
+  alpha,
+  Box,
   Dialog,
-  TextField,
+  Divider,
+  InputAdornment,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  TextField,
   Typography,
-  Box,
-  InputAdornment,
-  Divider,
-  alpha,
   useTheme,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import { useCommandPalette, type CommandItem } from "@app/shared/hooks/use-command-palette";
+
 import { UI } from "@app/shared/config/config";
+import { type CommandItem, useCommandPalette } from "@app/shared/hooks/use-command-palette";
 
 const GROUP_ORDER = ["Navigation", "Actions", "Recent"] as const;
 
 function groupItems(items: CommandItem[]) {
   const groups: Record<string, CommandItem[]> = {};
+
   for (const item of items) {
     if (!groups[item.group]) {
       groups[item.group] = [];
     }
+
     groups[item.group].push(item);
   }
+
   return groups;
 }
 
 function ShortcutBadge({ keys }: { keys: readonly string[] }) {
   const theme = useTheme();
+
   return (
     <Box sx={{ display: "flex", gap: 0.5, ml: 2 }}>
       {keys.map((key) => (
@@ -73,6 +79,7 @@ function PaletteItem({
   onSelect: () => void;
 }) {
   const theme = useTheme();
+
   return (
     <ListItemButton
       data-index={index}
@@ -106,6 +113,7 @@ function PaletteList({
 
   React.useEffect(() => {
     const selectedEl = listRef.current?.querySelector(`[data-index="${selectedIndex}"]`);
+
     selectedEl?.scrollIntoView({ block: "nearest" });
   }, [selectedIndex]);
 
@@ -121,9 +129,11 @@ function PaletteList({
       )}
       {GROUP_ORDER.map((groupName) => {
         const groupItems = groups[groupName];
+
         if (!groupItems?.length) {
           return null;
         }
+
         return (
           <React.Fragment key={groupName}>
             <ListItem sx={{ py: 0.5 }}>
@@ -138,6 +148,7 @@ function PaletteList({
             </ListItem>
             {groupItems.map((item) => {
               const currentIndex = flatIndex++;
+
               return (
                 <PaletteItem
                   key={item.id}
@@ -174,7 +185,9 @@ export function CommandPalette() {
     if (!query) {
       return items;
     }
+
     const lower = query.toLowerCase();
+
     return items.filter((item) => item.label.toLowerCase().includes(lower));
   }, [items, query]);
 

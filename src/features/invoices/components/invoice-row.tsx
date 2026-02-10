@@ -1,10 +1,12 @@
 "use client";
 
-import { TableRow, TableCell, Typography, Chip, IconButton, alpha, useTheme } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
-import { STATUS_CONFIG } from "../constants/invoice";
+import { alpha, Chip, IconButton, TableCell, TableRow, Typography, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
+import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
+
+import { STATUS_CONFIG } from "../constants/invoice";
 
 export interface InvoiceData {
   id: string;

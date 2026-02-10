@@ -1,20 +1,21 @@
 "use client";
 
+import ClearIcon from "@mui/icons-material/Clear";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Button,
-  Typography,
-  TextField,
-  InputAdornment,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import ClearIcon from "@mui/icons-material/Clear";
-import FilterListIcon from "@mui/icons-material/FilterList";
+
 import { FilterDrawer } from "@app/shared/ui/filter-drawer";
 
 const STATUS_OPTIONS = [

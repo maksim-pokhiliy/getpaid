@@ -1,4 +1,5 @@
 import { alpha } from "@mui/material/styles";
+
 import { ANIMATION, UI } from "@app/shared/config/config";
 
 export const brand = {

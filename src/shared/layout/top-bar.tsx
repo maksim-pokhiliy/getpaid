@@ -3,15 +3,19 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Box, IconButton, Tooltip } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
+
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { useThemeMode } from "@app/providers/theme-registry";
-import { useCommandPalette } from "@app/shared/hooks/use-command-palette";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, IconButton, Tooltip } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
+import { useCommandPalette } from "@app/shared/hooks/use-command-palette";
+
+import { useThemeMode } from "@app/providers/theme-registry";
+
 import { AccountMenu } from "./components/account-menu";
 
 interface TopBarProps {

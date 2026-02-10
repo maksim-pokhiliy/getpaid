@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
+
 import { Providers } from "@app/providers";
 
 const outfit = Outfit({

@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Box, Button, Paper, Typography } from "@mui/material";
+
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { Box, Button, Paper, Typography } from "@mui/material";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;

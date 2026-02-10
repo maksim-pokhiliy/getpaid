@@ -1,20 +1,22 @@
 "use client";
 
 import * as React from "react";
+
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import {
+  alpha,
   Box,
   Collapse,
   IconButton,
   LinearProgress,
   Paper,
   Typography,
-  alpha,
   useTheme,
 } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+
 import { STORAGE_KEYS, UI } from "@app/shared/config/config";
 import { storage } from "@app/shared/lib/storage";
 
@@ -100,7 +102,9 @@ export function OnboardingChecklist({ steps, isLoading, onNavigate }: Onboarding
 
   const handleToggle = () => {
     const next = !expanded;
+
     setExpanded(next);
+
     if (next) {
       storage.remove(COLLAPSED_KEY);
     } else {

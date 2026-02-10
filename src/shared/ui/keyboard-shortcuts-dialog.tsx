@@ -1,21 +1,23 @@
 "use client";
 
 import * as React from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Box,
-  Typography,
-  IconButton,
-  TextField,
-  InputAdornment,
-  alpha,
-  useTheme,
-} from "@mui/material";
+
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardIcon from "@mui/icons-material/Keyboard";
 import SearchIcon from "@mui/icons-material/Search";
+import {
+  alpha,
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  InputAdornment,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
+
 import { SHORTCUTS, UI } from "@app/shared/config/config";
 
 interface KeyboardShortcutsDialogProps {
@@ -31,6 +33,7 @@ const shortcutEntries = Object.values(SHORTCUTS).map((s) => ({
 
 function KeyCombo({ keys }: { keys: string[] }) {
   const theme = useTheme();
+
   return (
     <Box sx={{ display: "flex", gap: 0.5 }}>
       {keys.map((key, index) => (
@@ -73,7 +76,9 @@ function useFilteredShortcuts(filter: string) {
     if (!filter) {
       return shortcutEntries;
     }
+
     const lower = filter.toLowerCase();
+
     return shortcutEntries.filter(
       (s) =>
         s.description.toLowerCase().includes(lower) ||
@@ -83,12 +88,15 @@ function useFilteredShortcuts(filter: string) {
 
   const groups = React.useMemo(() => {
     const map: Record<string, typeof filtered> = {};
+
     for (const entry of filtered) {
       if (!map[entry.group]) {
         map[entry.group] = [];
       }
+
       map[entry.group].push(entry);
     }
+
     return map;
   }, [filtered]);
 
@@ -103,6 +111,7 @@ function ShortcutGroup({
   entries: typeof shortcutEntries;
 }) {
   const theme = useTheme();
+
   return (
     <Box>
       <Typography
@@ -136,6 +145,7 @@ function ShortcutGroup({
 
 export function KeyboardShortcutsDialog({ open, onClose }: KeyboardShortcutsDialogProps) {
   const [filter, setFilter] = React.useState("");
+
   React.useEffect(() => {
     if (open) {
       setFilter("");
@@ -178,9 +188,11 @@ export function KeyboardShortcutsDialog({ open, onClose }: KeyboardShortcutsDial
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {GROUP_ORDER.map((groupName) => {
             const entries = groups[groupName];
+
             if (!entries?.length) {
               return null;
             }
+
             return <ShortcutGroup key={groupName} groupName={groupName} entries={entries} />;
           })}
           {filtered.length === 0 && (

@@ -1,10 +1,11 @@
 "use client";
 
-import { Box, Paper, Typography, Grid, alpha, useTheme } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PaymentIcon from "@mui/icons-material/Payment";
 import SendIcon from "@mui/icons-material/Send";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import PaymentIcon from "@mui/icons-material/Payment";
+import { alpha, Box, Grid, Paper, Typography, useTheme } from "@mui/material";
+
 import { formatDate, formatDateTime } from "@app/shared/lib/format";
 
 interface InvoiceTimelineProps {

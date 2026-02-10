@@ -26,9 +26,7 @@ async function main() {
     const senderProfile = invoice.user.senderProfile;
 
     const senderName =
-      senderProfile?.companyName ||
-      senderProfile?.displayName ||
-      invoice.user.email;
+      senderProfile?.companyName || senderProfile?.displayName || invoice.user.email;
 
     const senderEmail = senderProfile?.emailFrom || invoice.user.email;
 

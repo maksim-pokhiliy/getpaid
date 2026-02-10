@@ -1,16 +1,20 @@
 "use client";
 
 import * as React from "react";
-import { Box, Typography, TextField, Divider, MenuItem } from "@mui/material";
-import { LoadingButton } from "@app/shared/ui/loading-button";
-import { useToast } from "@app/shared/ui/toast";
-import { useUpdateSenderProfile } from "@app/features/settings";
+
+import { Box, Divider, MenuItem, TextField, Typography } from "@mui/material";
+
 import { ApiError } from "@app/shared/api";
 import { BRANDING, FONT_FAMILY_MAP } from "@app/shared/config/config";
 import type { SenderProfile } from "@app/shared/schemas/api";
-import { LogoPreview } from "./logo-preview";
+import { LoadingButton } from "@app/shared/ui/loading-button";
+import { useToast } from "@app/shared/ui/toast";
+
+import { useUpdateSenderProfile } from "@app/features/settings";
+
 import { BrandColors } from "./brand-colors";
 import { BrandingPreview } from "./branding-preview";
+import { LogoPreview } from "./logo-preview";
 
 const toUndefined = (val: string | null | undefined): string | undefined => val || undefined;
 

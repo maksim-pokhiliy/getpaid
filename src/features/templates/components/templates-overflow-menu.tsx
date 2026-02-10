@@ -1,9 +1,11 @@
 "use client";
 
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+
 import { OverflowMenu } from "@app/shared/ui/overflow-menu";
+
 import type { Template } from "@app/features/templates";
 
 interface TemplatesOverflowMenuProps {

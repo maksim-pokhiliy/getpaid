@@ -1,12 +1,14 @@
 "use client";
 
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import EditIcon from "@mui/icons-material/Edit";
 import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ReceiptIcon from "@mui/icons-material/Receipt";
-import type { RecurringInvoice } from "@app/features/recurring";
+
 import { OverflowMenu } from "@app/shared/ui/overflow-menu";
+
+import type { RecurringInvoice } from "@app/features/recurring";
 
 interface RecurringOverflowMenuProps {
   anchorEl: HTMLElement | null;

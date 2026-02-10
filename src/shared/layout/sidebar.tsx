@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+
+import AddIcon from "@mui/icons-material/Add";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import SettingsIcon from "@mui/icons-material/Settings";
 import {
+  alpha,
   Box,
   Button,
   IconButton,
@@ -12,15 +18,12 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
-  alpha,
   useTheme,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Logo } from "@app/shared/ui/logo";
+
 import { ANIMATION, UI } from "@app/shared/config/config";
+import { Logo } from "@app/shared/ui/logo";
+
 import { SidebarNav } from "./components/sidebar-nav";
 import { SidebarUserProfile } from "./components/sidebar-user-profile";
 

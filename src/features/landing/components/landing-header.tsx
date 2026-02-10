@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Box, Button, Stack } from "@mui/material";
+
 import GitHubIcon from "@mui/icons-material/GitHub";
+import { Box, Button, Stack } from "@mui/material";
+
 import { Logo } from "@app/shared/ui/logo";
+
 import { GITHUB_URL } from "../constants";
 
 export function LandingHeader() {

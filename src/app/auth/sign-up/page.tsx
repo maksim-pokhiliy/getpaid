@@ -2,33 +2,37 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import {
-  Box,
-  Container,
-  TextField,
-  Typography,
-  Paper,
-  Link as MuiLink,
-  alpha,
-  useTheme,
-  InputAdornment,
-  IconButton,
-} from "@mui/material";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { Logo } from "@app/shared/ui/logo";
-import { LoadingButton } from "@app/shared/ui/loading-button";
-import { useToast } from "@app/shared/ui/toast";
-import { signUpSchema, SignUpInput } from "@app/shared/schemas";
-import { UI } from "@app/shared/config/config";
+import {
+  alpha,
+  Box,
+  Container,
+  IconButton,
+  InputAdornment,
+  Link as MuiLink,
+  Paper,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { ApiError } from "@app/shared/api/base";
+import { UI } from "@app/shared/config/config";
+import { SignUpInput, signUpSchema } from "@app/shared/schemas";
+import { LoadingButton } from "@app/shared/ui/loading-button";
+import { Logo } from "@app/shared/ui/logo";
+import { useToast } from "@app/shared/ui/toast";
+
 import { authApi } from "@app/features/auth";
 
 const FEATURES = [
@@ -68,6 +72,7 @@ export default function SignUpPage() {
       if (signInResult?.error) {
         toast.success("Account created! Please sign in.");
         router.push("/auth/sign-in");
+
         return;
       }
 
@@ -106,6 +111,7 @@ export default function SignUpPage() {
           pointerEvents: "none",
         }}
       />
+
       <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <Box sx={{ mb: 4 }}>
@@ -117,6 +123,7 @@ export default function SignUpPage() {
               <Typography variant="h5" fontWeight={700} gutterBottom>
                 Create your account
               </Typography>
+
               <Typography variant="body2" color="text.secondary">
                 Start managing invoices like a pro
               </Typography>
@@ -136,6 +143,7 @@ export default function SignUpPage() {
                   sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 0.75 }}
                 >
                   <CheckCircleIcon sx={{ fontSize: 18, color: "primary.main" }} />
+
                   <Typography variant="body2" color="text.secondary">
                     {feature}
                   </Typography>
@@ -161,6 +169,7 @@ export default function SignUpPage() {
                   ),
                 }}
               />
+
               <TextField
                 {...register("password")}
                 label="Password"
@@ -189,6 +198,7 @@ export default function SignUpPage() {
                   ),
                 }}
               />
+
               <LoadingButton
                 type="submit"
                 variant="contained"

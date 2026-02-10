@@ -1,2 +1,2 @@
-export { senderProfileApi, remindersApi, type ReminderSettings } from "./api";
+export { remindersApi, type ReminderSettings, senderProfileApi } from "./api";
 export * from "./hooks";

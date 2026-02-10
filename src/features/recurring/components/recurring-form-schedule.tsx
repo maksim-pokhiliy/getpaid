@@ -1,26 +1,29 @@
 "use client";
 
+import { type Control, Controller, type FieldErrors, type UseFormRegister } from "react-hook-form";
+
 import {
   Box,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
+  Switch,
   TextField,
   Typography,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-  Switch,
-  FormControlLabel,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
 import dayjs from "dayjs";
-import { Controller, type Control, type FieldErrors, type UseFormRegister } from "react-hook-form";
-import type { Client } from "@app/shared/schemas/api";
+
+import { VALIDATION } from "@app/shared/config/config";
 import { CURRENCIES } from "@app/shared/config/currencies";
 import { FREQUENCIES } from "@app/shared/config/frequencies";
-import { VALIDATION } from "@app/shared/config/config";
 import type { RecurringFormData } from "@app/shared/schemas";
+import type { Client } from "@app/shared/schemas/api";
 
 interface RecurringFormScheduleProps {
   register: UseFormRegister<RecurringFormData>;

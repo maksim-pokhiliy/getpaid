@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import { Box, Typography } from "@mui/material";
 
 interface InvoiceHeaderProps {
   logoUrl: string | null;

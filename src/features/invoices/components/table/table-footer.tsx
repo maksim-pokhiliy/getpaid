@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Button, TablePagination, Typography } from "@mui/material";
+
 import { PAGINATION } from "@app/shared/config/config";
 
 const SHOW_ALL_THRESHOLD = 50;

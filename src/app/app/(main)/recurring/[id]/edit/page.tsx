@@ -1,13 +1,16 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+
 import { Alert, Box, Button } from "@mui/material";
+
 import { AppLayout } from "@app/shared/layout/app-layout";
 import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
 import { CardSkeleton } from "@app/shared/ui/loading";
-import { RecurringForm } from "@app/features/recurring/components";
-import { useRecurringInvoice } from "@app/features/recurring";
+
 import { useClients } from "@app/features/clients";
+import { useRecurringInvoice } from "@app/features/recurring";
+import { RecurringForm } from "@app/features/recurring/components";
 
 export default function EditRecurringPage() {
   const params = useParams();
@@ -48,6 +51,7 @@ export default function EditRecurringPage() {
           { label: "Edit" },
         ]}
       />
+
       <RecurringForm
         mode="edit"
         recurringId={recurringId}

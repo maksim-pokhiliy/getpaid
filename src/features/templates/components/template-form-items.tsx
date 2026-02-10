@@ -1,5 +1,9 @@
 "use client";
 
+import type { FieldArrayWithId, FieldErrors, UseFormRegister } from "react-hook-form";
+
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   Box,
   Button,
@@ -11,9 +15,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
-import type { FieldArrayWithId, FieldErrors, UseFormRegister } from "react-hook-form";
+
 import type { TemplateFormData } from "@app/shared/schemas";
 
 interface LineItemRowProps {

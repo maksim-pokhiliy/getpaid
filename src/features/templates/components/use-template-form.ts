@@ -1,12 +1,15 @@
 "use client";
 
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@app/shared/ui/toast";
-import { useCreateTemplate, useUpdateTemplate } from "@app/features/templates";
+
 import { ApiError } from "@app/shared/api";
-import { templateFormSchema, type TemplateFormData } from "@app/shared/schemas";
+import { type TemplateFormData, templateFormSchema } from "@app/shared/schemas";
+import { useToast } from "@app/shared/ui/toast";
+
+import { useCreateTemplate, useUpdateTemplate } from "@app/features/templates";
 
 interface UseTemplateFormOptions {
   mode?: "create" | "edit";

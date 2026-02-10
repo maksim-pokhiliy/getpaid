@@ -1,11 +1,13 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { queryKeys, STALE_TIME } from "@app/shared/config/query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { INVOICE_STATUS } from "@app/shared/config/invoice-status";
-import { invoicesApi, type RecordPaymentInput } from "../api";
+import { queryKeys, STALE_TIME } from "@app/shared/config/query";
 import type { CreateInvoiceInput, UpdateInvoiceInput } from "@app/shared/schemas";
 import type { Invoice, InvoiceListItem } from "@app/shared/schemas/api";
+
+import { invoicesApi, type RecordPaymentInput } from "../api";
 
 export function useInvoices() {
   return useQuery({
@@ -77,6 +79,7 @@ export function useSendInvoice() {
       if (context?.previousInvoices) {
         queryClient.setQueryData(queryKeys.invoices, context.previousInvoices);
       }
+
       if (context?.previousInvoice) {
         queryClient.setQueryData(queryKeys.invoice(id), context.previousInvoice);
       }
@@ -118,6 +121,7 @@ export function useMarkInvoicePaid() {
       if (context?.previousInvoices) {
         queryClient.setQueryData(queryKeys.invoices, context.previousInvoices);
       }
+
       if (context?.previousInvoice) {
         queryClient.setQueryData(queryKeys.invoice(id), context.previousInvoice);
       }
@@ -137,9 +141,11 @@ export function useDeleteInvoice() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.invoices });
       const previousInvoices = queryClient.getQueryData<InvoiceListItem[]>(queryKeys.invoices);
+
       queryClient.setQueryData<InvoiceListItem[]>(queryKeys.invoices, (old) =>
         old?.filter((invoice) => invoice.id !== id)
       );
+
       return { previousInvoices };
     },
     onError: (_, __, context) => {

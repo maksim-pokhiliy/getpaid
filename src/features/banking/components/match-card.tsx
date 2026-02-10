@@ -1,22 +1,24 @@
 "use client";
 
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import {
+  alpha,
   Box,
+  Button,
   Card,
   CardContent,
-  Typography,
-  Button,
   Chip,
   Stack,
-  alpha,
+  Typography,
   useTheme,
 } from "@mui/material";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
 import { formatCurrency, formatDateCompact } from "@app/shared/lib/format";
-import { MATCH_CONFIDENCE_CONFIG, getConfidenceLevel } from "../constants";
+
 import type { BankTransactionData } from "../api";
+import { getConfidenceLevel, MATCH_CONFIDENCE_CONFIG } from "../constants";
 
 interface MatchCardProps {
   transaction: BankTransactionData;

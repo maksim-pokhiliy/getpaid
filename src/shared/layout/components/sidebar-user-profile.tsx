@@ -1,21 +1,24 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import LogoutIcon from "@mui/icons-material/Logout";
 import {
+  alpha,
   Avatar,
   Box,
   Divider,
   IconButton,
   Tooltip,
   Typography,
-  alpha,
   useTheme,
 } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { useThemeMode } from "@app/providers/theme-registry";
+
 import { UI } from "@app/shared/config/config";
+
+import { useThemeMode } from "@app/providers/theme-registry";
 
 function getInitials(email: string): string {
   return email.charAt(0).toUpperCase();

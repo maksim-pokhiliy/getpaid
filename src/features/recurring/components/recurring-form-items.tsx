@@ -1,22 +1,24 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Paper,
-  TextField,
-  Typography,
-  IconButton,
-  Divider,
-  alpha,
-  useTheme,
-  InputAdornment,
-  Tooltip,
-} from "@mui/material";
+import type { FieldArrayWithId, FieldErrors, UseFormRegister } from "react-hook-form";
+
 import AddIcon from "@mui/icons-material/Add";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
-import type { FieldErrors, UseFormRegister, FieldArrayWithId } from "react-hook-form";
+import {
+  alpha,
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  InputAdornment,
+  Paper,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
+
 import type { RecurringFormData } from "@app/shared/schemas";
 
 interface RecurringFormItemsProps {

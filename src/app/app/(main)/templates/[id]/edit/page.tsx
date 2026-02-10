@@ -1,12 +1,15 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+
 import { Alert, Box, Button } from "@mui/material";
+
 import { AppLayout } from "@app/shared/layout/app-layout";
 import { Breadcrumbs } from "@app/shared/ui/breadcrumbs";
 import { CardSkeleton } from "@app/shared/ui/loading";
-import { TemplateForm } from "@app/features/templates/components";
+
 import { useTemplate } from "@app/features/templates";
+import { TemplateForm } from "@app/features/templates/components";
 
 export default function EditTemplatePage() {
   const params = useParams();
@@ -28,6 +31,7 @@ export default function EditTemplatePage() {
         <Alert severity="error" sx={{ borderRadius: 2 }}>
           Failed to load template. Please try again.
         </Alert>
+
         <Box sx={{ mt: 2 }}>
           <Button variant="outlined" onClick={() => router.push("/app/templates")}>
             Back to Templates
@@ -46,6 +50,7 @@ export default function EditTemplatePage() {
           { label: "Edit" },
         ]}
       />
+
       <TemplateForm
         mode="edit"
         templateId={templateId}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Link as MuiLink, Typography } from "@mui/material";
+
 import { GITHUB_URL } from "../constants";
 
 export function LandingFooter() {

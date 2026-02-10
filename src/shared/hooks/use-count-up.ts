@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+
 import { ANIMATION } from "@app/shared/config/config";
 
 export function useCountUp(target: number, duration: number = ANIMATION.SLOW): number {
@@ -10,6 +11,7 @@ export function useCountUp(target: number, duration: number = ANIMATION.SLOW): n
 
   React.useEffect(() => {
     const startValue = previousTargetRef.current;
+
     previousTargetRef.current = target;
 
     if (target === 0 && startValue === 0) {

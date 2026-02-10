@@ -2,11 +2,14 @@ export function escapeCSVValue(value: string | number | null | undefined): strin
   if (value === null || value === undefined) {
     return "";
   }
+
   const str = String(value);
   const escaped = str.replace(/"/g, '""');
+
   if (escaped.includes(",") || escaped.includes("\n") || escaped.includes('"')) {
     return `"${escaped}"`;
   }
+
   return escaped;
 }
 
@@ -18,6 +21,7 @@ export function arrayToCSV<T extends Record<string, unknown>>(
   const rows = data.map((row) =>
     columns.map((col) => escapeCSVValue(row[col.key] as string | number | null)).join(",")
   );
+
   return [headers, ...rows].join("\n");
 }
 
@@ -25,6 +29,7 @@ export function downloadCSV(csv: string, filename: string): void {
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   link.href = url;
   link.download = filename;
   link.style.display = "none";
@@ -73,6 +78,7 @@ export function exportInvoicesToCSV(invoices: InvoiceExportData[]): void {
 
   const csv = arrayToCSV(formattedData, columns);
   const date = new Date().toISOString().split("T")[0];
+
   downloadCSV(csv, `invoices-${date}.csv`);
 }
 
@@ -98,5 +104,6 @@ export function exportClientsToCSV(clients: ClientExportData[]): void {
 
   const csv = arrayToCSV(formattedData, columns);
   const date = new Date().toISOString().split("T")[0];
+
   downloadCSV(csv, `clients-${date}.csv`);
 }

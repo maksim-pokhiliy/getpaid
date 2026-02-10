@@ -1,7 +1,10 @@
 "use client";
 
 import * as React from "react";
+
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
+  alpha,
   IconButton,
   Paper,
   Table,
@@ -13,10 +16,9 @@ import {
   TableRow,
   TableSortLabel,
   Tooltip,
-  alpha,
   useTheme,
 } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+
 import { PAGINATION, UI } from "@app/shared/config/config";
 
 export interface DataTableColumn {

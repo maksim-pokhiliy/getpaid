@@ -1,9 +1,9 @@
 "use client";
 
-import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
 
 interface DrawerFooterProps {
   mode: "light" | "dark";

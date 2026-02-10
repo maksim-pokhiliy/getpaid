@@ -2,19 +2,21 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "@app/shared/ui/toast";
-import { useConfirmDialog } from "@app/shared/ui/confirm-dialog";
-import { useRecentItems } from "@app/shared/hooks";
+
 import { ApiError } from "@app/shared/api";
+import { useRecentItems } from "@app/shared/hooks";
 import { generateInvoicePdf } from "@app/shared/lib/export";
 import type { Invoice } from "@app/shared/schemas/api";
+import { useConfirmDialog } from "@app/shared/ui/confirm-dialog";
+import { useToast } from "@app/shared/ui/toast";
+
 import {
-  useSendInvoice,
-  useMarkInvoicePaid,
   useDeleteInvoice,
-  useDuplicateInvoice,
-  useRecordPayment,
   useDeletePayment,
+  useDuplicateInvoice,
+  useMarkInvoicePaid,
+  useRecordPayment,
+  useSendInvoice,
 } from "@app/features/invoices";
 
 interface DialogControls {
@@ -47,10 +49,13 @@ function usePaymentHandlers(
 
   const handleRecordPayment = (amount: string, note: string) => {
     const amountInCents = Math.round(parseFloat(amount) * 100);
+
     if (isNaN(amountInCents) || amountInCents <= 0) {
       toast.error("Please enter a valid amount");
+
       return;
     }
+
     recordPaymentMutation.mutate(
       { invoiceId, data: { amount: amountInCents, method: "MANUAL", note: note || undefined } },
       {
@@ -117,7 +122,9 @@ function useInvoiceHandlers(
     if (!invoice) {
       return;
     }
+
     const url = `${window.location.origin}/i/${invoice.publicId}`;
+
     navigator.clipboard.writeText(url);
     toast.success("Link copied to clipboard!");
   };
@@ -152,6 +159,7 @@ function useInvoiceHandlers(
     if (!invoice) {
       return;
     }
+
     generateInvoicePdf({ ...invoice, sender: null });
     toast.success("PDF downloaded!");
   };

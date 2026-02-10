@@ -1,26 +1,29 @@
 import { NextResponse } from "next/server";
-import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
-import { handleConnectionSuccess, discoverNewConnections } from "@app/server/banking/connections";
+
+import { AuthenticationError, requireUser } from "@app/server/auth/require-user";
+import { discoverNewConnections, handleConnectionSuccess } from "@app/server/banking/connections";
 import { syncTransactions } from "@app/server/banking/sync";
 
 export async function POST(request: Request) {
   try {
     const user = await requireUser();
     let body: Record<string, unknown> = {};
+
     try {
       body = await request.json();
-    } catch {
-      /* empty body is valid for discovery flow */
-    }
+    } catch {}
+
     const connectionId = typeof body.connectionId === "string" ? body.connectionId : undefined;
 
     if (connectionId) {
       const connection = await handleConnectionSuccess(connectionId, user.id);
+
       try {
         await syncTransactions(connection.id);
       } catch (syncError) {
         console.error("Initial sync failed:", syncError);
       }
+
       return NextResponse.json(connection);
     }
 
@@ -42,7 +45,9 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+
     console.error("Complete connection error:", error);
+
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" } },
       { status: 500 }

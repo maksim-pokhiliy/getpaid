@@ -1,18 +1,19 @@
 "use client";
 
 import * as React from "react";
+
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
 import {
+  alpha,
   Box,
   Chip,
   IconButton,
   TextField,
   Tooltip,
   Typography,
-  alpha,
   useTheme,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 
 const MAX_REMINDER_DAYS = 5;
 const MIN_DAY = 1;
@@ -34,6 +35,7 @@ export function ReminderDaysEditor({
 
   const handleAddDay = () => {
     const day = parseInt(newDayInput, 10);
+
     if (!isNaN(day) && day >= MIN_DAY && day <= MAX_DAY && !days.includes(day)) {
       onDaysChange([...days, day].sort((a, b) => a - b));
       setNewDayInput("");

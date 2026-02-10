@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { markInvoiceViewed, getInvoiceByPublicId } from "@app/server/invoices";
+
+import { getInvoiceByPublicId, markInvoiceViewed } from "@app/server/invoices";
 
 export async function POST(
   _request: Request,
@@ -22,6 +23,7 @@ export async function POST(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Mark invoice viewed error:", error);
+
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" } },
       { status: 500 }

@@ -1,10 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { ThemeProvider, CssBaseline } from "@mui/material";
-import { lightTheme, darkTheme } from "./theme";
+
+import { CssBaseline, ThemeProvider } from "@mui/material";
+
 import { STORAGE_KEYS } from "@app/shared/config/config";
 import { storage } from "@app/shared/lib/storage";
+
+import { darkTheme, lightTheme } from "./theme";
 
 type ThemeMode = "light" | "dark";
 
@@ -29,6 +32,7 @@ export function ThemeRegistry({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     setMounted(true);
     const stored = storage.get(STORAGE_KEYS.THEME_MODE);
+
     if (stored === "light" || stored === "dark") {
       setMode(stored);
     } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
@@ -57,7 +61,9 @@ export function ThemeRegistry({ children }: { children: React.ReactNode }) {
   const toggleTheme = React.useCallback(() => {
     setMode((prev) => {
       const next = prev === "light" ? "dark" : "light";
+
       storage.set(STORAGE_KEYS.THEME_MODE, next);
+
       return next;
     });
   }, []);

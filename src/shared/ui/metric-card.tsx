@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Box, Paper, Typography, Chip, alpha, useTheme } from "@mui/material";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import { useCountUp } from "@app/shared/hooks";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import { alpha, Box, Chip, Paper, Typography, useTheme } from "@mui/material";
+
 import { ANIMATION, UI } from "@app/shared/config/config";
+import { useCountUp } from "@app/shared/hooks";
 
 interface MetricCardProps {
   title: string;

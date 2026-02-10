@@ -1,15 +1,18 @@
 "use client";
 
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@app/shared/ui/toast";
-import { useCreateRecurring, useUpdateRecurring } from "@app/features/recurring";
-import type { Client } from "@app/shared/schemas/api";
+
 import { ApiError } from "@app/shared/api";
-import { buildDiscountInput } from "@app/shared/lib/calculations";
 import { useUnsavedChanges } from "@app/shared/hooks";
-import { recurringFormSchema, type RecurringFormData } from "@app/shared/schemas";
+import { buildDiscountInput } from "@app/shared/lib/calculations";
+import { type RecurringFormData, recurringFormSchema } from "@app/shared/schemas";
+import type { Client } from "@app/shared/schemas/api";
+import { useToast } from "@app/shared/ui/toast";
+
+import { useCreateRecurring, useUpdateRecurring } from "@app/features/recurring";
 
 interface UseRecurringFormOptions {
   mode?: "create" | "edit";
@@ -137,6 +140,7 @@ export function useRecurringForm({
 
   const duplicateItem = (index: number) => {
     const item = items[index];
+
     if (item) {
       append({
         description: item.description,

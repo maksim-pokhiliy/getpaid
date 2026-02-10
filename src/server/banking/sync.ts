@@ -1,7 +1,9 @@
-import { prisma } from "@app/server/db";
-import * as saltEdge from "./salt-edge-client";
-import { matchTransaction } from "./matching";
 import { BANKING, CURRENCY, TIME } from "@app/shared/config/config";
+
+import { prisma } from "@app/server/db";
+
+import { matchTransaction } from "./matching";
+import * as saltEdge from "./salt-edge-client";
 
 export async function syncTransactions(connectionId: string) {
   const connection = await prisma.bankConnection.findUniqueOrThrow({
@@ -64,6 +66,7 @@ export async function syncConnectionForUser(connectionId: string, userId: string
   }
 
   await syncTransactions(connectionId);
+
   return { success: true };
 }
 

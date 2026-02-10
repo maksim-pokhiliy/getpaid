@@ -1,31 +1,40 @@
-import { nanoid } from "nanoid";
-import { prisma } from "@app/server/db";
-import { CreateInvoiceInput, UpdateInvoiceInput, InvoiceItemInput } from "@app/shared/schemas";
 import { Prisma } from "@prisma/client";
-import { NANOID, INVOICE, TIME } from "@app/shared/config/config";
-import { INVOICE_STATUS, INVOICE_EVENT } from "@app/shared/config/invoice-status";
+import { nanoid } from "nanoid";
+
+import { INVOICE, NANOID, TIME } from "@app/shared/config/config";
+import { INVOICE_EVENT, INVOICE_STATUS } from "@app/shared/config/invoice-status";
 import { calculateTotals, type DiscountInput } from "@app/shared/lib/calculations";
+import { CreateInvoiceInput, InvoiceItemInput, UpdateInvoiceInput } from "@app/shared/schemas";
+
+import { prisma } from "@app/server/db";
 
 function buildBasicUpdateFields(data: UpdateInvoiceInput): Prisma.InvoiceUncheckedUpdateInput {
   const updateData: Prisma.InvoiceUncheckedUpdateInput = {};
+
   if (data.clientId) {
     updateData.clientId = data.clientId;
   }
+
   if (data.currency) {
     updateData.currency = data.currency;
   }
+
   if (data.dueDate) {
     updateData.dueDate = data.dueDate;
   }
+
   if (data.notes !== undefined) {
     updateData.notes = data.notes;
   }
+
   if (data.tags !== undefined) {
     updateData.tags = data.tags;
   }
+
   if (data.taxRate !== undefined) {
     updateData.taxRate = data.taxRate;
   }
+
   return updateData;
 }
 
@@ -33,12 +42,14 @@ function buildDiscountFields(data: UpdateInvoiceInput): Prisma.InvoiceUncheckedU
   if (data.discount === undefined) {
     return {};
   }
+
   if (data.discount) {
     return {
       discountType: data.discount.type,
       discountValue: data.discount.value,
     };
   }
+
   return {
     discountType: null,
     discountValue: 0,
@@ -53,12 +64,14 @@ function resolveDiscount(
   if (data.discount !== undefined) {
     return data.discount;
   }
+
   if (invoice.discountType && invoice.discountValue !== null) {
     return {
       type: invoice.discountType as "PERCENTAGE" | "FIXED",
       value: invoice.discountValue,
     };
   }
+
   return null;
 }
 
@@ -128,9 +141,12 @@ async function getItemsForCalculation(
         amount: item.quantity * item.unitPrice,
       })),
     });
+
     return data.items;
   }
+
   const existingItems = await prisma.invoiceItem.findMany({ where: { invoiceId: id } });
+
   return existingItems.map((item) => ({
     description: item.description,
     quantity: item.quantity,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, CircularProgress, Box, type ButtonProps } from "@mui/material";
+import { Box, Button, type ButtonProps, CircularProgress } from "@mui/material";
 
 interface LoadingButtonProps extends ButtonProps {
   loading?: boolean;

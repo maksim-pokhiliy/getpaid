@@ -17,6 +17,7 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]) {
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
+
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
         return;
       }
@@ -32,12 +33,14 @@ export function useKeyboardShortcuts(shortcuts: Shortcut[]) {
         if (ctrlMatch && shiftMatch && altMatch && keyMatch) {
           event.preventDefault();
           shortcut.handler();
+
           return;
         }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
+
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [shortcuts]);
 }

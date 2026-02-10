@@ -1,6 +1,7 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+
 import { formatCurrency } from "@app/shared/lib/format";
 
 interface InvoiceItem {

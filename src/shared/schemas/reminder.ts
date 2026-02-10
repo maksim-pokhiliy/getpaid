@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { REMINDER } from "@app/shared/config/config";
 
 export const updateReminderSettingsSchema = z.object({

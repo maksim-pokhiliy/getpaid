@@ -1,11 +1,13 @@
 "use client";
 
-import { Box, Paper, Typography, Chip, Divider, Collapse, alpha, useTheme } from "@mui/material";
-import HistoryIcon from "@mui/icons-material/History";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import { formatDateTime } from "@app/shared/lib/format";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import HistoryIcon from "@mui/icons-material/History";
+import { alpha, Box, Chip, Collapse, Divider, Paper, Typography, useTheme } from "@mui/material";
+
 import { UI } from "@app/shared/config/config";
+import { formatDateTime } from "@app/shared/lib/format";
+
 import { EVENT_CONFIG } from "@app/features/invoices/constants/invoice";
 
 interface InvoiceEvent {

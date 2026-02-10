@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Divider, Typography } from "@mui/material";
+
 import { formatCurrency } from "@app/shared/lib/format";
 
 interface InvoiceTotalsProps {

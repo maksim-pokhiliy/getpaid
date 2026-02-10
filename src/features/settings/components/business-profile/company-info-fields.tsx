@@ -1,7 +1,9 @@
 "use client";
 
-import { Box, TextField, Typography, Divider } from "@mui/material";
-import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
+
+import { Box, Divider, TextField, Typography } from "@mui/material";
+
 import type { SenderProfileFormInput } from "@app/shared/schemas";
 
 interface CompanyInfoFieldsProps {

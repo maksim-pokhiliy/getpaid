@@ -1,29 +1,30 @@
 "use client";
 
+import DeleteIcon from "@mui/icons-material/Delete";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PaymentIcon from "@mui/icons-material/Payment";
 import {
+  alpha,
   Box,
+  Chip,
+  Collapse,
+  Divider,
+  IconButton,
   Paper,
-  Typography,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Chip,
-  IconButton,
   Tooltip,
-  Divider,
-  Collapse,
-  alpha,
+  Typography,
   useTheme,
 } from "@mui/material";
-import PaymentIcon from "@mui/icons-material/Payment";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import { formatCurrency, formatDateTime } from "@app/shared/lib/format";
+
 import { UI } from "@app/shared/config/config";
+import { formatCurrency, formatDateTime } from "@app/shared/lib/format";
 
 interface Payment {
   id: string;

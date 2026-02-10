@@ -1,13 +1,15 @@
 "use client";
 
-import { Paper } from "@mui/material";
-import { TableSkeleton } from "@app/shared/ui/loading";
-import { NoResults, EmptyState } from "@app/shared/ui/empty-state";
-import { ClientsTable } from "./clients-table";
-import PeopleIcon from "@mui/icons-material/People";
 import AddIcon from "@mui/icons-material/Add";
+import PeopleIcon from "@mui/icons-material/People";
+import { Paper } from "@mui/material";
 import { Button } from "@mui/material";
+
+import { EmptyState, NoResults } from "@app/shared/ui/empty-state";
 import { EmptyClientsIllustration } from "@app/shared/ui/illustrations/empty-clients";
+import { TableSkeleton } from "@app/shared/ui/loading";
+
+import { ClientsTable } from "./clients-table";
 
 interface Client {
   id: string;

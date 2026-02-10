@@ -1,12 +1,15 @@
 "use client";
 
 import * as React from "react";
+
 import { Checkbox } from "@mui/material";
-import { DataTable, type DataTableColumn } from "@app/shared/ui/data-table";
+
 import { useTableKeyboardNav } from "@app/shared/hooks";
-import { InvoicesTableFooter } from "./table-footer";
-import { VirtualizedRows, PaginatedRows } from "./table-rows";
+import { DataTable, type DataTableColumn } from "@app/shared/ui/data-table";
+
 import type { InvoiceData } from "../invoice-row";
+import { InvoicesTableFooter } from "./table-footer";
+import { PaginatedRows, VirtualizedRows } from "./table-rows";
 
 interface VirtualItem {
   index: number;
@@ -74,6 +77,7 @@ export function InvoicesTable({
   const { onKeyDown: tableKeyDown } = useTableKeyboardNav(displayedInvoices.length, {
     onActivate: (index) => {
       const invoice = displayedInvoices[index];
+
       if (invoice) {
         onRowClick(invoice.id);
       }
@@ -81,6 +85,7 @@ export function InvoicesTable({
     onToggleSelect: onToggleSelect
       ? (index) => {
           const invoice = displayedInvoices[index];
+
           if (invoice) {
             onToggleSelect(invoice.id);
           }

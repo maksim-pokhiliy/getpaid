@@ -1,15 +1,17 @@
 "use client";
 
-import { Box, Paper, Alert } from "@mui/material";
+import { Alert, Box, Paper } from "@mui/material";
+
+import type { CreateClientInput } from "@app/shared/schemas";
+import type { Client } from "@app/shared/schemas/api";
 import { PageHeader } from "@app/shared/ui/page-header";
+
 import { InlineClientDialog } from "./inline-client-dialog";
-import { InvoiceFormDraftBanner } from "./invoice-form-draft-banner";
 import { InvoiceFormDetails } from "./invoice-form-details";
+import { InvoiceFormDraftBanner } from "./invoice-form-draft-banner";
 import { InvoiceFormLineItems } from "./invoice-form-line-items";
 import { InvoiceFormTotals } from "./invoice-form-totals";
 import { useInvoiceForm } from "./use-invoice-form";
-import type { Client } from "@app/shared/schemas/api";
-import type { CreateClientInput } from "@app/shared/schemas";
 
 interface CreateClientMutation {
   mutate: (

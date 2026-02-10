@@ -7,10 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// ============================================================
-// Auth.js (NextAuth) tables
-// ============================================================
-
 model User {
   id                 String    @id @default(cuid())
   email              String    @unique
@@ -70,10 +66,6 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ============================================================
-// Application tables
-// ============================================================
-
 model SenderProfile {
   id              String   @id @default(cuid())
   userId          String   @unique
@@ -83,10 +75,9 @@ model SenderProfile {
   address         String?
   taxId           String?
   defaultCurrency String   @default("USD")
-  // Branding customization
   logoUrl         String?
-  primaryColor    String?  @default("#1976d2") // MUI default primary
-  accentColor     String?  @default("#9c27b0") // MUI default secondary
+  primaryColor    String?  @default("#1976d2")
+  accentColor     String?  @default("#9c27b0")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -138,15 +129,15 @@ model Invoice {
   status         InvoiceStatus  @default(DRAFT)
   subtotal       Int            @default(0)
   discountType   DiscountType?
-  discountValue  Int            @default(0) // Percentage (0-100) or fixed amount in cents
-  discountAmount Int            @default(0) // Calculated discount amount in cents
-  taxRate        Int            @default(0) // Tax rate as percentage (e.g., 20 for 20%)
-  taxAmount      Int            @default(0) // Calculated tax amount in cents
+  discountValue  Int            @default(0)
+  discountAmount Int            @default(0)
+  taxRate        Int            @default(0)
+  taxAmount      Int            @default(0)
   total          Int            @default(0)
-  paidAmount     Int            @default(0) // Total amount paid so far (in cents)
+  paidAmount     Int            @default(0)
   dueDate        DateTime
   notes          String?        @db.Text
-  tags           Json           @default("[]") // Array of tag strings
+  tags           Json           @default("[]")
   sentAt         DateTime?
   viewedAt       DateTime?
   paidAt         DateTime?
@@ -207,7 +198,7 @@ model InvoiceEvent {
 model Payment {
   id        String        @id @default(cuid())
   invoiceId String
-  amount    Int // Amount in cents
+  amount    Int
   method    PaymentMethod
   note      String?
   paidAt    DateTime      @default(now())
@@ -228,7 +219,7 @@ model InvoiceTemplate {
   discountValue Int           @default(0)
   taxRate       Int           @default(0)
   notes         String?       @db.Text
-  dueDays       Int           @default(30) // Days until due from invoice creation
+  dueDays       Int           @default(30)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -290,10 +281,6 @@ model FollowUpJob {
   @@index([status, scheduledFor])
 }
 
-// ============================================================
-// Recurring Invoices
-// ============================================================
-
 enum RecurringFrequency {
   WEEKLY
   BIWEEKLY
@@ -312,7 +299,7 @@ model RecurringInvoice {
   id            String             @id @default(cuid())
   userId        String
   clientId      String
-  name          String // Name/description for this recurring invoice
+  name          String
   frequency     RecurringFrequency @default(MONTHLY)
   status        RecurringStatus    @default(ACTIVE)
   currency      String             @default("USD")
@@ -320,11 +307,11 @@ model RecurringInvoice {
   discountValue Int                @default(0)
   taxRate       Int                @default(0)
   notes         String?            @db.Text
-  dueDays       Int                @default(30) // Days until due from invoice creation
-  autoSend      Boolean            @default(false) // Auto-send invoice when created
-  nextRunAt     DateTime // Next scheduled run date
-  lastRunAt     DateTime? // Last time an invoice was generated
-  endDate       DateTime? // Optional end date for the schedule
+  dueDays       Int                @default(30)
+  autoSend      Boolean            @default(false)
+  nextRunAt     DateTime
+  lastRunAt     DateTime?
+  endDate       DateTime?
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
 
@@ -348,10 +335,6 @@ model RecurringInvoiceItem {
 
   @@index([recurringInvoiceId])
 }
-
-// ============================================================
-// Banking Integration (Salt Edge)
-// ============================================================
 
 enum BankTransactionStatus {
   PENDING

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { requireUser, AuthenticationError } from "@app/server/auth/require-user";
+
+import { AuthenticationError, requireUser } from "@app/server/auth/require-user";
 import { confirmMatch } from "@app/server/banking/matching";
 
 interface RouteParams {
@@ -36,7 +37,9 @@ export async function POST(request: Request, { params }: RouteParams) {
         { status: 401 }
       );
     }
+
     console.error("Confirm match error:", error);
+
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" } },
       { status: 500 }

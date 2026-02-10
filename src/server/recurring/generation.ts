@@ -1,13 +1,15 @@
-import { prisma } from "@app/server/db";
-import { nanoid } from "nanoid";
 import type { RecurringFrequency } from "@prisma/client";
+import { nanoid } from "nanoid";
+
 import { NANOID } from "@app/shared/config/config";
-import { calculateTotals, buildDiscountInput } from "@app/shared/lib/calculations";
 import {
-  INVOICE_STATUS,
-  INVOICE_EVENT,
   type DiscountTypeValue,
+  INVOICE_EVENT,
+  INVOICE_STATUS,
 } from "@app/shared/config/invoice-status";
+import { buildDiscountInput, calculateTotals } from "@app/shared/lib/calculations";
+
+import { prisma } from "@app/server/db";
 
 export function calculateNextRunDate(currentDate: Date, frequency: RecurringFrequency): Date {
   const next = new Date(currentDate);
@@ -59,6 +61,7 @@ export async function generateInvoiceFromRecurring(recurringInvoice: {
   );
 
   const dueDate = new Date();
+
   dueDate.setDate(dueDate.getDate() + recurringInvoice.dueDays);
 
   const invoice = await prisma.invoice.create({
@@ -96,6 +99,7 @@ export async function generateInvoiceFromRecurring(recurringInvoice: {
   });
 
   const nextRunAt = calculateNextRunDate(new Date(), recurringInvoice.frequency);
+
   await prisma.recurringInvoice.update({
     where: { id: recurringInvoice.id },
     data: {
@@ -126,6 +130,7 @@ export async function processDueRecurringInvoices() {
   for (const recurring of dueRecurring) {
     try {
       const invoice = await generateInvoiceFromRecurring(recurring);
+
       results.push({ success: true, recurringId: recurring.id, invoiceId: invoice.id });
     } catch (error) {
       results.push({

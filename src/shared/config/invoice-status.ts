@@ -48,8 +48,10 @@ export const STATUS_CONFIG: Record<
 
 export function getStatusColor(theme: Theme, status: string): string {
   const config = STATUS_CONFIG[status];
+
   if (!config || config.color === "default") {
     return theme.palette.text.secondary;
   }
+
   return theme.palette[config.color].main;
 }

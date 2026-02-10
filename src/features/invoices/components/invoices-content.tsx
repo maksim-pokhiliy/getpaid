@@ -1,12 +1,15 @@
 "use client";
 
 import * as React from "react";
+
 import { Paper } from "@mui/material";
-import { TableSkeleton } from "@app/shared/ui/loading";
+
 import { NoResults } from "@app/shared/ui/empty-state";
+import { TableSkeleton } from "@app/shared/ui/loading";
+
 import { EmptyInvoicesState } from "./empty-states";
-import { InvoicesTable } from "./table";
 import type { InvoiceData } from "./invoice-row";
+import { InvoicesTable } from "./table";
 
 interface VirtualItem {
   index: number;

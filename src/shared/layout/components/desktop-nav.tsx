@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Box, Button, alpha, useTheme } from "@mui/material";
-import { UI } from "@app/shared/config/config";
+
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import PeopleIcon from "@mui/icons-material/People";
 import DescriptionIcon from "@mui/icons-material/Description";
+import PeopleIcon from "@mui/icons-material/People";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import RepeatIcon from "@mui/icons-material/Repeat";
+import { alpha, Box, Button, useTheme } from "@mui/material";
+
+import { UI } from "@app/shared/config/config";
 
 interface NavItem {
   label: string;
@@ -28,6 +30,7 @@ function isNavActive(pathname: string, item: NavItem) {
   if (item.exact) {
     return pathname === item.href;
   }
+
   return pathname.startsWith(item.href);
 }
 
@@ -42,6 +45,7 @@ export function DesktopNav({ pathname }: DesktopNavProps) {
     <Box sx={{ display: { xs: "none", md: "flex" }, gap: 0.5, flex: 1 }}>
       {NAV_ITEMS.map((item) => {
         const isActive = isNavActive(pathname, item);
+
         return (
           <Button
             key={item.href}
@@ -72,5 +76,5 @@ export function DesktopNav({ pathname }: DesktopNavProps) {
   );
 }
 
-export { NAV_ITEMS, isNavActive };
+export { isNavActive, NAV_ITEMS };
 export type { NavItem };

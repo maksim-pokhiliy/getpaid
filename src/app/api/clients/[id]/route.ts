@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { getClient, updateClient, deleteClient } from "@app/server/clients";
-import { withAuth, parseBody, notFoundResponse } from "@app/shared/api/route-helpers";
+
+import { notFoundResponse, parseBody, withAuth } from "@app/shared/api/route-helpers";
 import { updateClientSchema } from "@app/shared/schemas";
+
+import { deleteClient, getClient, updateClient } from "@app/server/clients";
 
 export const GET = withAuth(async (user, _request, context) => {
   const { id } = await context.params;

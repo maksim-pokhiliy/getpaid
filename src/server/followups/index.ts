@@ -1,6 +1,8 @@
-import { prisma } from "@app/server/db";
 import { FollowUpMode } from "@prisma/client";
+
 import { FOLLOWUP_STATUS } from "@app/shared/config/invoice-status";
+
+import { prisma } from "@app/server/db";
 
 export async function getFollowUpRule(userId: string) {
   return prisma.followUpRule.findFirst({
@@ -55,7 +57,9 @@ export async function scheduleFollowUps(
 
   const jobs = delays.map((days) => {
     const scheduledFor = new Date(baseDate);
+
     scheduledFor.setDate(scheduledFor.getDate() + days);
+
     return {
       invoiceId,
       scheduledFor,
