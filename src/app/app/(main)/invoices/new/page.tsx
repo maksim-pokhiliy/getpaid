@@ -9,6 +9,7 @@ import { useClients, useCreateClient } from "@app/features/clients";
 import { InvoiceForm } from "@app/features/invoices/components";
 import { useSenderProfile } from "@app/features/settings";
 import { useTemplate } from "@app/features/templates";
+import { TimeTrackingImportSection } from "@app/features/time-tracking/components";
 
 export default function NewInvoicePage() {
   const searchParams = useSearchParams();
@@ -34,6 +35,9 @@ export default function NewInvoicePage() {
         templateLoading={templateLoading}
         createClientMutation={createClientMutation}
         defaultRate={senderProfile?.defaultRate ?? undefined}
+        renderImport={({ addGroups, rateCents }) => (
+          <TimeTrackingImportSection onImport={addGroups} getpaidRateCents={rateCents} />
+        )}
       />
     </AppLayout>
   );

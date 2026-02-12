@@ -12,6 +12,7 @@ import { useClients, useCreateClient } from "@app/features/clients";
 import { useInvoice } from "@app/features/invoices";
 import { InvoiceForm } from "@app/features/invoices/components";
 import { useSenderProfile } from "@app/features/settings";
+import { TimeTrackingImportSection } from "@app/features/time-tracking/components";
 
 export default function EditInvoicePage() {
   const params = useParams();
@@ -73,9 +74,21 @@ export default function EditInvoicePage() {
           currency: invoice.currency,
           dueDate: new Date(invoice.dueDate).toISOString().split("T")[0],
           items: invoice.items.map((item) => ({
-            description: item.description,
+            title: item.title,
+            description: item.description ?? "",
             quantity: item.quantity,
             unitPrice: item.unitPrice / 100,
+          })),
+          itemGroups: invoice.itemGroups?.map((group) => ({
+            title: group.title,
+            sortOrder: group.sortOrder,
+            items: group.items.map((item) => ({
+              title: item.title,
+              description: item.description ?? "",
+              quantity: item.quantity,
+              unitPrice: item.unitPrice / 100,
+              sortOrder: item.sortOrder,
+            })),
           })),
           notes: invoice.notes || "",
         }}
@@ -85,6 +98,9 @@ export default function EditInvoicePage() {
         templateLoading={false}
         createClientMutation={createClientMutation}
         defaultRate={senderProfile?.defaultRate ?? undefined}
+        renderImport={({ addGroups, rateCents }) => (
+          <TimeTrackingImportSection onImport={addGroups} getpaidRateCents={rateCents} />
+        )}
       />
     </AppLayout>
   );

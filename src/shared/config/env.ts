@@ -13,6 +13,7 @@ const serverSchema = z.object({
   SALT_EDGE_SECRET: z.string().min(1).optional(),
   SALT_EDGE_BASE_URL: z.string().min(1).default("https://www.saltedge.com/api/v6"),
   CRON_SECRET: z.string().min(1).optional(),
+  ENCRYPTION_KEY: z.string().min(32).optional(),
 });
 
 const editionSchema = z.enum(EDITIONS).default(EDITIONS[0]);
@@ -39,6 +40,7 @@ function readServerRaw(): Record<string, string | undefined> {
     SALT_EDGE_SECRET: process.env.SALT_EDGE_SECRET || undefined,
     SALT_EDGE_BASE_URL: process.env.SALT_EDGE_BASE_URL || undefined,
     CRON_SECRET: process.env.CRON_SECRET || undefined,
+    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || undefined,
   };
 }
 
@@ -80,6 +82,7 @@ const SERVER_KEYS = new Set<string>([
   "SALT_EDGE_SECRET",
   "SALT_EDGE_BASE_URL",
   "CRON_SECRET",
+  "ENCRYPTION_KEY",
 ]);
 
 let serverCache: ServerEnv | undefined;

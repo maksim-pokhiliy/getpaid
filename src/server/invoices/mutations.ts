@@ -1,12 +1,14 @@
 import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
 
-import { INVOICE, NANOID, TIME } from "@app/shared/config/config";
+import { NANOID } from "@app/shared/config/config";
 import { INVOICE_EVENT, INVOICE_STATUS } from "@app/shared/config/invoice-status";
 import { calculateTotals, type DiscountInput } from "@app/shared/lib/calculations";
 import { CreateInvoiceInput, InvoiceItemInput, UpdateInvoiceInput } from "@app/shared/schemas";
 
 import { prisma } from "@app/server/db";
+
+import { createItemGroups, ITEM_GROUPS_INCLUDE } from "./item-groups";
 
 function buildBasicUpdateFields(data: UpdateInvoiceInput): Prisma.InvoiceUncheckedUpdateInput {
   const updateData: Prisma.InvoiceUncheckedUpdateInput = {};
@@ -76,8 +78,9 @@ function resolveDiscount(
 }
 
 export async function createInvoice(userId: string, data: CreateInvoiceInput) {
+  const allItems = [...data.items, ...(data.itemGroups?.flatMap((g) => g.items) ?? [])];
   const { subtotal, discountAmount, taxAmount, total } = calculateTotals(
-    data.items,
+    allItems,
     data.discount,
     data.taxRate
   );
@@ -101,19 +104,26 @@ export async function createInvoice(userId: string, data: CreateInvoiceInput) {
       total,
       status: INVOICE_STATUS.DRAFT,
       items: {
-        create: data.items.map((item) => ({
-          description: item.description,
+        create: data.items.map((item, index) => ({
+          title: item.title,
+          description: item.description ?? null,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
-          amount: item.quantity * item.unitPrice,
+          amount: Math.round(item.quantity * item.unitPrice),
+          sortOrder: index,
         })),
       },
     },
     include: {
       client: true,
       items: true,
+      itemGroups: ITEM_GROUPS_INCLUDE,
     },
   });
+
+  if (data.itemGroups?.length) {
+    await createItemGroups(invoice.id, data.itemGroups);
+  }
 
   await prisma.invoiceEvent.create({
     data: {
@@ -123,32 +133,52 @@ export async function createInvoice(userId: string, data: CreateInvoiceInput) {
     },
   });
 
-  return invoice;
+  return prisma.invoice.findUniqueOrThrow({
+    where: { id: invoice.id },
+    include: {
+      client: true,
+      items: { where: { groupId: null }, orderBy: { sortOrder: "asc" } },
+      itemGroups: ITEM_GROUPS_INCLUDE,
+    },
+  });
 }
 
 async function getItemsForCalculation(
   id: string,
   data: UpdateInvoiceInput
 ): Promise<InvoiceItemInput[]> {
-  if (data.items) {
-    await prisma.invoiceItem.deleteMany({ where: { invoiceId: id } });
-    await prisma.invoiceItem.createMany({
-      data: data.items.map((item) => ({
-        invoiceId: id,
-        description: item.description,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        amount: item.quantity * item.unitPrice,
-      })),
-    });
+  const hasItemChanges = data.items || data.itemGroups;
 
-    return data.items;
+  if (hasItemChanges) {
+    await prisma.invoiceItem.deleteMany({ where: { invoiceId: id } });
+    await prisma.invoiceItemGroup.deleteMany({ where: { invoiceId: id } });
+
+    if (data.items) {
+      await prisma.invoiceItem.createMany({
+        data: data.items.map((item, index) => ({
+          invoiceId: id,
+          title: item.title,
+          description: item.description ?? null,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          amount: Math.round(item.quantity * item.unitPrice),
+          sortOrder: index,
+        })),
+      });
+    }
+
+    if (data.itemGroups?.length) {
+      await createItemGroups(id, data.itemGroups);
+    }
+
+    return [...(data.items ?? []), ...(data.itemGroups?.flatMap((g) => g.items) ?? [])];
   }
 
   const existingItems = await prisma.invoiceItem.findMany({ where: { invoiceId: id } });
 
   return existingItems.map((item) => ({
-    description: item.description,
+    title: item.title,
+    description: item.description ?? undefined,
     quantity: item.quantity,
     unitPrice: item.unitPrice,
   }));
@@ -185,7 +215,11 @@ export async function updateInvoice(id: string, userId: string, data: UpdateInvo
   return prisma.invoice.update({
     where: { id },
     data: updateData,
-    include: { client: true, items: true },
+    include: {
+      client: true,
+      items: { where: { groupId: null }, orderBy: { sortOrder: "asc" } },
+      itemGroups: ITEM_GROUPS_INCLUDE,
+    },
   });
 }
 
@@ -207,46 +241,4 @@ export async function deleteInvoice(id: string, userId: string) {
   });
 
   return { success: true };
-}
-
-export async function duplicateInvoice(id: string, userId: string) {
-  const invoice = await prisma.invoice.findFirst({
-    where: { id, userId },
-    include: {
-      items: true,
-    },
-  });
-
-  if (!invoice) {
-    return null;
-  }
-
-  const publicId = nanoid(NANOID.PUBLIC_ID_LENGTH);
-  const newInvoice = await prisma.invoice.create({
-    data: {
-      userId,
-      clientId: invoice.clientId,
-      publicId,
-      currency: invoice.currency,
-      status: INVOICE_STATUS.DRAFT,
-      dueDate: new Date(Date.now() + INVOICE.DEFAULT_DUE_DAYS * TIME.DAY),
-      subtotal: invoice.subtotal,
-      total: invoice.total,
-      tags: invoice.tags as string[],
-      items: {
-        create: invoice.items.map((item) => ({
-          description: item.description,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          amount: item.amount,
-        })),
-      },
-    },
-    include: {
-      client: true,
-      items: true,
-    },
-  });
-
-  return newInvoice;
 }

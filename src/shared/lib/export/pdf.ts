@@ -26,10 +26,16 @@ const STATUS_COLORS: Record<string, RGB> = {
 };
 
 interface InvoiceItem {
-  description: string;
+  title: string;
+  description?: string | null;
   quantity: number;
   unitPrice: number;
   amount: number;
+}
+
+interface InvoiceItemGroup {
+  title: string;
+  items: InvoiceItem[];
 }
 
 interface InvoicePdfData {
@@ -55,6 +61,7 @@ interface InvoicePdfData {
     address?: string | null;
   } | null;
   items: InvoiceItem[];
+  itemGroups?: InvoiceItemGroup[];
 }
 
 function renderHeader(doc: jsPDF, invoice: InvoicePdfData): void {
@@ -160,17 +167,34 @@ function renderDates(doc: jsPDF, invoice: InvoicePdfData): void {
   }
 }
 
-function renderItemsTable(doc: jsPDF, invoice: InvoicePdfData): number {
-  const tableData = invoice.items.map((item) => [
-    item.description,
+function buildItemRow(item: InvoiceItem, currency: string, indent = false): string[] {
+  return [
+    indent ? `    ${item.title}` : item.title,
     item.quantity.toString(),
-    formatCurrency(item.unitPrice, invoice.currency),
-    formatCurrency(item.amount, invoice.currency),
-  ]);
+    formatCurrency(item.unitPrice, currency),
+    formatCurrency(item.amount, currency),
+  ];
+}
+
+function renderItemsTable(doc: jsPDF, invoice: InvoicePdfData): number {
+  const tableData: string[][] = [];
+
+  invoice.itemGroups?.forEach((group) => {
+    const groupTotal = group.items.reduce((sum, item) => sum + item.amount, 0);
+
+    tableData.push([group.title, "", "", formatCurrency(groupTotal, invoice.currency)]);
+    group.items.forEach((item) => {
+      tableData.push(buildItemRow(item, invoice.currency, true));
+    });
+  });
+
+  invoice.items.forEach((item) => {
+    tableData.push(buildItemRow(item, invoice.currency));
+  });
 
   autoTable(doc, {
     startY: 135,
-    head: [["Description", "Qty", "Unit Price", "Amount"]],
+    head: [["Item", "Qty", "Unit Price", "Amount"]],
     body: tableData,
     theme: "plain",
     headStyles: {

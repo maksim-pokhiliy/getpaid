@@ -18,10 +18,17 @@ import { SenderBillTo } from "./sender-bill-to";
 
 interface InvoiceItem {
   id: string;
-  description: string;
+  title: string;
+  description?: string | null;
   quantity: number;
   unitPrice: number;
   amount: number;
+}
+
+interface InvoiceItemGroup {
+  id: string;
+  title: string;
+  items: InvoiceItem[];
 }
 
 interface Invoice {
@@ -40,6 +47,7 @@ interface Invoice {
     email: string;
   };
   items: InvoiceItem[];
+  itemGroups?: InvoiceItemGroup[];
   sender: {
     name: string;
     address: string;
@@ -152,7 +160,11 @@ export default function PublicInvoiceView({ publicId, invoice, branding, justPai
             isOverdue={isOverdue}
           />
           <Divider sx={{ my: 3 }} />
-          <InvoiceItemsTable items={invoice.items} currency={invoice.currency} />
+          <InvoiceItemsTable
+            items={invoice.items}
+            itemGroups={invoice.itemGroups}
+            currency={invoice.currency}
+          />
           <Divider sx={{ my: 3 }} />
           <InvoiceTotals
             subtotal={invoice.subtotal}

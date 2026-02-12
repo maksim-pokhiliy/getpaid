@@ -23,10 +23,17 @@ import { PreviewTotals } from "./preview-totals";
 
 interface InvoiceItem {
   id: string;
-  description: string;
+  title: string;
+  description?: string | null;
   quantity: number;
   unitPrice: number;
   amount: number;
+}
+
+interface InvoiceItemGroup {
+  id: string;
+  title: string;
+  items: InvoiceItem[];
 }
 
 interface InvoicePreviewDialogProps {
@@ -45,6 +52,7 @@ interface InvoicePreviewDialogProps {
       email: string;
     };
     items: InvoiceItem[];
+    itemGroups?: InvoiceItemGroup[];
   };
 }
 
@@ -75,7 +83,11 @@ export function InvoicePreviewDialog({
           <PreviewParties client={invoice.client} />
           <PreviewDates createdAt={invoice.createdAt} dueDate={invoice.dueDate} />
           <Divider sx={{ my: 3 }} />
-          <PreviewItems items={invoice.items} currency={invoice.currency} />
+          <PreviewItems
+            items={invoice.items}
+            itemGroups={invoice.itemGroups}
+            currency={invoice.currency}
+          />
           <Divider sx={{ my: 3 }} />
           <PreviewTotals
             subtotal={invoice.subtotal}

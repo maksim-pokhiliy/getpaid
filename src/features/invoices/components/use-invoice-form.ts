@@ -10,15 +10,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { ApiError } from "@app/shared/api";
-import { INVOICE, TIME } from "@app/shared/config/config";
 import { queryKeys } from "@app/shared/config/query";
 import { useUnsavedChanges } from "@app/shared/hooks";
-import { CreateClientInput, InvoiceFormInput, invoiceFormSchema } from "@app/shared/schemas";
+import {
+  CreateClientInput,
+  InvoiceFormInput,
+  invoiceFormSchema,
+  InvoiceItemGroupInput,
+} from "@app/shared/schemas";
 import type { Client } from "@app/shared/schemas/api";
 import { useToast } from "@app/shared/ui/toast";
 
+import {
+  computeSubtotal,
+  type CreateClientMutation,
+  getDefaultDueDate,
+  getFormDefaults,
+  getTemplateDueDate,
+  type TemplateData,
+  useItemActions,
+} from "./invoice-form-utils";
 import { useInvoiceDraft } from "./use-invoice-draft";
 import { useInvoiceSubmit } from "./use-invoice-submit";
+
+export type { CreateClientMutation, TemplateData };
 
 function useDragReorder(
   fields: FieldArrayWithId<InvoiceFormInput, "items">[],
@@ -44,33 +59,6 @@ function useDragReorder(
   );
 
   return { sensors, handleDragEnd };
-}
-
-function getDefaultDueDate(): string {
-  return new Date(Date.now() + INVOICE.DEFAULT_DUE_DAYS * TIME.DAY).toISOString().split("T")[0];
-}
-
-function getTemplateDueDate(dueDays: number): string {
-  return new Date(Date.now() + dueDays * TIME.DAY).toISOString().split("T")[0];
-}
-
-interface TemplateData {
-  name: string;
-  currency: string;
-  dueDays: number;
-  notes: string | null;
-  items: { description: string; quantity: number; unitPrice: number }[];
-}
-
-interface CreateClientMutation {
-  mutate: (
-    data: CreateClientInput,
-    options: {
-      onSuccess: () => void;
-      onError: (err: Error) => void;
-    }
-  ) => void;
-  isPending: boolean;
 }
 
 function useInitialRate(
@@ -121,10 +109,12 @@ function useTemplateApplication(
         currency: template.currency,
         dueDate: getTemplateDueDate(template.dueDays),
         items: template.items.map((item) => ({
-          description: item.description,
+          title: item.description,
+          description: "",
           quantity: item.quantity,
           unitPrice: item.unitPrice / 100,
         })),
+        itemGroups: [],
         notes: template.notes || "",
       });
       setTemplateApplied(true);
@@ -176,6 +166,7 @@ interface UseInvoiceFormOptions {
     currency: string;
     dueDate: string;
     items: { description: string; quantity: number; unitPrice: number }[];
+    itemGroups?: InvoiceItemGroupInput[];
     notes: string;
   };
   templateId?: string;
@@ -201,26 +192,20 @@ export function useInvoiceForm({
   const clientDialog = useClientDialog(createClientMutation);
   const [defaultDueDate] = React.useState(getDefaultDueDate);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    setValue,
-    formState: { errors, isDirty },
-  } = useForm<InvoiceFormInput>({
+  const form = useForm<InvoiceFormInput>({
     resolver: zodResolver(invoiceFormSchema),
-    defaultValues: initialData || {
-      clientId: "",
-      currency: "USD",
-      dueDate: defaultDueDate,
-      items: [{ description: "", quantity: 1, unitPrice: 0 }],
-      notes: "",
-    },
+    defaultValues: initialData
+      ? { ...initialData, itemGroups: initialData.itemGroups ?? [] }
+      : getFormDefaults(defaultDueDate),
   });
+
+  const { register, handleSubmit, control, reset, setValue } = form;
+  const { errors, isDirty } = form.formState;
 
   const { fields, append, remove, move } = useFieldArray({ control, name: "items" });
   const { sensors, handleDragEnd } = useDragReorder(fields, move);
+
+  const groupArray = useFieldArray({ control, name: "itemGroups" });
 
   useUnsavedChanges(isDirty);
 
@@ -236,31 +221,19 @@ export function useInvoiceForm({
 
   const items = useWatch({ control, name: "items" });
   const currency = useWatch({ control, name: "currency" });
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + (item.quantity || 0) * (item.unitPrice || 0),
-    0
-  );
-
   const clientId = useWatch({ control, name: "clientId" });
+  const watchedGroups = useWatch({ control, name: "itemGroups" }) ?? [];
+  const subtotal = computeSubtotal(items, watchedGroups);
   const selectedClient = clients?.find((c) => c.id === clientId);
   const resolvedRate = selectedClient?.defaultRate ?? defaultRate;
 
   useInitialRate(mode, !!initialData, !!template, resolvedRate, items, setValue);
 
-  const duplicateItem = React.useCallback(
-    (index: number) => {
-      const item = items[index];
-
-      if (item) {
-        append({
-          description: item.description,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-        });
-      }
-    },
-    [items, append]
+  const { duplicateItem, addImportedGroups, addGroup } = useItemActions(
+    items,
+    append,
+    remove,
+    groupArray
   );
 
   return {
@@ -292,5 +265,10 @@ export function useInvoiceForm({
     clientsLoading,
     resolvedRate,
     duplicateItem,
+    groupFields: groupArray.fields,
+    removeGroup: groupArray.remove,
+    moveGroup: groupArray.move,
+    addImportedGroups,
+    addGroup,
   };
 }

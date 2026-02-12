@@ -54,10 +54,23 @@ export default async function PublicInvoicePage({ params, searchParams }: Props)
         },
         items: invoice.items.map((item) => ({
           id: item.id,
+          title: item.title,
           description: item.description,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           amount: item.amount,
+        })),
+        itemGroups: invoice.itemGroups.map((group) => ({
+          id: group.id,
+          title: group.title,
+          items: group.items.map((item) => ({
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            amount: item.amount,
+          })),
         })),
         sender: {
           name: senderName,

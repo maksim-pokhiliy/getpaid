@@ -22,6 +22,10 @@ export const AUTOSAVE = {
   DELAY_MS: 2000,
 } as const;
 
+export const SORT_ORDER = {
+  GAP: 10,
+} as const;
+
 export const EDITIONS = ["community", "pro"] as const;
 
 export const AUTH = {
@@ -76,6 +80,15 @@ export const BANKING = {
   POPUP_HEIGHT: 700,
   CONNECT_SUCCESS_DELAY: 1500,
   CONNECT_ERROR_DELAY: 3000,
+} as const;
+
+export const TIME_TRACKING = {
+  TOGGL_API_BASE_URL: "https://api.track.toggl.com/api/v9",
+  TOGGL_REPORTS_BASE_URL: "https://api.track.toggl.com/reports/api/v3",
+  ROUNDING_OPTIONS: [0, 1, 5, 6, 10, 12, 15, 30, 60] as readonly number[],
+  SECONDS_PER_HOUR: 3600,
+  IMPORT_DRAWER_WIDTH: 1000,
+  DEFAULT_DATE_RANGE_DAYS: 30,
 } as const;
 
 export const SEARCH = {
