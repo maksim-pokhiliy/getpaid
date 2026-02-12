@@ -13,7 +13,12 @@ import { ApiError } from "@app/shared/api";
 import { INVOICE, TIME } from "@app/shared/config/config";
 import { queryKeys } from "@app/shared/config/query";
 import { useUnsavedChanges } from "@app/shared/hooks";
-import { CreateClientInput, InvoiceFormInput, invoiceFormSchema } from "@app/shared/schemas";
+import {
+  CreateClientInput,
+  InvoiceFormInput,
+  invoiceFormSchema,
+  InvoiceItemGroupInput,
+} from "@app/shared/schemas";
 import type { Client } from "@app/shared/schemas/api";
 import { useToast } from "@app/shared/ui/toast";
 
@@ -54,7 +59,18 @@ function getTemplateDueDate(dueDays: number): string {
   return new Date(Date.now() + dueDays * TIME.DAY).toISOString().split("T")[0];
 }
 
-interface TemplateData {
+function getFormDefaults(dueDate: string): InvoiceFormInput {
+  return {
+    clientId: "",
+    currency: "USD",
+    dueDate,
+    items: [{ description: "", quantity: 1, unitPrice: 0 }],
+    itemGroups: [],
+    notes: "",
+  };
+}
+
+export interface TemplateData {
   name: string;
   currency: string;
   dueDays: number;
@@ -62,7 +78,7 @@ interface TemplateData {
   items: { description: string; quantity: number; unitPrice: number }[];
 }
 
-interface CreateClientMutation {
+export interface CreateClientMutation {
   mutate: (
     data: CreateClientInput,
     options: {
@@ -125,6 +141,7 @@ function useTemplateApplication(
           quantity: item.quantity,
           unitPrice: item.unitPrice / 100,
         })),
+        itemGroups: [],
         notes: template.notes || "",
       });
       setTemplateApplied(true);
@@ -168,6 +185,20 @@ function useClientDialog(createClientMutation: CreateClientMutation) {
   };
 }
 
+function computeSubtotal(items: InvoiceFormInput["items"], groups: InvoiceItemGroupInput[]) {
+  const itemsTotal = items.reduce(
+    (sum, item) => sum + (item.quantity || 0) * (item.unitPrice || 0),
+    0
+  );
+  const groupsTotal = groups.reduce(
+    (sum, group) =>
+      sum + group.items.reduce((gs, item) => gs + (item.quantity || 0) * (item.unitPrice || 0), 0),
+    0
+  );
+
+  return itemsTotal + groupsTotal;
+}
+
 interface UseInvoiceFormOptions {
   mode: "create" | "edit";
   invoiceId?: string;
@@ -176,6 +207,7 @@ interface UseInvoiceFormOptions {
     currency: string;
     dueDate: string;
     items: { description: string; quantity: number; unitPrice: number }[];
+    itemGroups?: InvoiceItemGroupInput[];
     notes: string;
   };
   templateId?: string;
@@ -201,26 +233,20 @@ export function useInvoiceForm({
   const clientDialog = useClientDialog(createClientMutation);
   const [defaultDueDate] = React.useState(getDefaultDueDate);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    setValue,
-    formState: { errors, isDirty },
-  } = useForm<InvoiceFormInput>({
+  const form = useForm<InvoiceFormInput>({
     resolver: zodResolver(invoiceFormSchema),
-    defaultValues: initialData || {
-      clientId: "",
-      currency: "USD",
-      dueDate: defaultDueDate,
-      items: [{ description: "", quantity: 1, unitPrice: 0 }],
-      notes: "",
-    },
+    defaultValues: initialData
+      ? { ...initialData, itemGroups: initialData.itemGroups ?? [] }
+      : getFormDefaults(defaultDueDate),
   });
+
+  const { register, handleSubmit, control, reset, setValue } = form;
+  const { errors, isDirty } = form.formState;
 
   const { fields, append, remove, move } = useFieldArray({ control, name: "items" });
   const { sensors, handleDragEnd } = useDragReorder(fields, move);
+
+  const groupArray = useFieldArray({ control, name: "itemGroups" });
 
   useUnsavedChanges(isDirty);
 
@@ -236,13 +262,9 @@ export function useInvoiceForm({
 
   const items = useWatch({ control, name: "items" });
   const currency = useWatch({ control, name: "currency" });
-
-  const subtotal = items.reduce(
-    (sum, item) => sum + (item.quantity || 0) * (item.unitPrice || 0),
-    0
-  );
-
   const clientId = useWatch({ control, name: "clientId" });
+  const watchedGroups = useWatch({ control, name: "itemGroups" }) ?? [];
+  const subtotal = computeSubtotal(items, watchedGroups);
   const selectedClient = clients?.find((c) => c.id === clientId);
   const resolvedRate = selectedClient?.defaultRate ?? defaultRate;
 
@@ -261,6 +283,13 @@ export function useInvoiceForm({
       }
     },
     [items, append]
+  );
+
+  const addImportedGroups = React.useCallback(
+    (groups: InvoiceItemGroupInput[]) => {
+      groups.forEach((group) => groupArray.append(group));
+    },
+    [groupArray]
   );
 
   return {
@@ -292,5 +321,9 @@ export function useInvoiceForm({
     clientsLoading,
     resolvedRate,
     duplicateItem,
+    groupFields: groupArray.fields,
+    removeGroup: groupArray.remove,
+    moveGroup: groupArray.move,
+    addImportedGroups,
   };
 }

@@ -86,7 +86,7 @@ export async function generateInvoiceFromRecurring(recurringInvoice: {
           description: item.description,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
-          amount: item.quantity * item.unitPrice,
+          amount: Math.round(item.quantity * item.unitPrice),
         })),
       },
       events: {

@@ -4,6 +4,8 @@ import { INVOICE_STATUS } from "@app/shared/config/invoice-status";
 
 import { prisma } from "@app/server/db";
 
+import { ITEM_GROUPS_INCLUDE } from "./item-groups";
+
 function computeOverdueStatus(invoice: {
   status: InvoiceStatus;
   dueDate: Date;
@@ -40,7 +42,8 @@ export async function getInvoices(userId: string) {
     where: { userId },
     include: {
       client: true,
-      items: true,
+      items: { orderBy: { sortOrder: "asc" } },
+      itemGroups: ITEM_GROUPS_INCLUDE,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -56,7 +59,8 @@ export async function getInvoice(id: string, userId: string) {
     where: { id, userId },
     include: {
       client: true,
-      items: true,
+      items: { orderBy: { sortOrder: "asc" } },
+      itemGroups: ITEM_GROUPS_INCLUDE,
       events: {
         orderBy: { createdAt: "desc" },
       },
@@ -81,7 +85,8 @@ export async function getInvoiceByPublicId(publicId: string) {
     where: { publicId },
     include: {
       client: true,
-      items: true,
+      items: { orderBy: { sortOrder: "asc" } },
+      itemGroups: ITEM_GROUPS_INCLUDE,
       user: {
         include: {
           senderProfile: true,

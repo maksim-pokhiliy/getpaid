@@ -1,6 +1,7 @@
 "use client";
 
-import { FieldArrayWithId, FieldErrors, UseFormRegister } from "react-hook-form";
+import type { Control, FieldArrayWithId } from "react-hook-form";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
 import AddIcon from "@mui/icons-material/Add";
 import { Box, Button, Divider, Typography } from "@mui/material";
@@ -16,6 +17,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 
 import type { InvoiceFormInput } from "@app/shared/schemas";
 
+import { InvoiceFormGroup } from "./invoice-form-group";
 import { SortableItem } from "./sortable-item";
 
 interface InvoiceFormLineItemsProps {
@@ -23,11 +25,14 @@ interface InvoiceFormLineItemsProps {
   sensors: SensorDescriptor<SensorOptions>[];
   handleDragEnd: (event: DragEndEvent) => void;
   register: UseFormRegister<InvoiceFormInput>;
+  control: Control<InvoiceFormInput>;
   errors: FieldErrors<InvoiceFormInput>;
   currency: string;
   onAppend: () => void;
   onRemove: (index: number) => void;
   onDuplicate: (index: number) => void;
+  groupFields: FieldArrayWithId<InvoiceFormInput, "itemGroups", "id">[];
+  onRemoveGroup: (index: number) => void;
 }
 
 export function InvoiceFormLineItems({
@@ -35,17 +40,35 @@ export function InvoiceFormLineItems({
   sensors,
   handleDragEnd,
   register,
+  control,
   errors,
   currency,
   onAppend,
   onRemove,
   onDuplicate,
+  groupFields,
+  onRemoveGroup,
 }: InvoiceFormLineItemsProps) {
   return (
     <>
       <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
         Line Items
       </Typography>
+
+      {groupFields.length > 0 && (
+        <Box sx={{ mb: 3 }}>
+          {groupFields.map((group, gi) => (
+            <InvoiceFormGroup
+              key={group.id}
+              groupIndex={gi}
+              control={control}
+              register={register}
+              currency={currency}
+              onRemoveGroup={() => onRemoveGroup(gi)}
+            />
+          ))}
+        </Box>
+      )}
 
       <Box
         sx={{
@@ -77,7 +100,7 @@ export function InvoiceFormLineItems({
               id={field.id}
               index={index}
               currency={currency}
-              canDelete={fields.length > 1}
+              canDelete={fields.length > 1 || groupFields.length > 0}
               register={register}
               errors={errors}
               onRemove={() => onRemove(index)}

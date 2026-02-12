@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 import BrushIcon from "@mui/icons-material/Brush";
 import BusinessIcon from "@mui/icons-material/Business";
+import ExtensionIcon from "@mui/icons-material/Extension";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { alpha, Box, Divider, Paper, Stack, Tab, Tabs, Typography, useTheme } from "@mui/material";
@@ -26,6 +27,7 @@ import {
   PaymentsTab,
   RemindersTab,
 } from "@app/features/settings/components";
+import { IntegrationsTab } from "@app/features/time-tracking/components";
 
 const BANKING_ENABLED = env.NEXT_PUBLIC_BANKING_ENABLED;
 
@@ -37,6 +39,7 @@ interface TabDef {
 
 const ALL_TABS: TabDef[] = [
   { key: "profile", label: "Business Profile", icon: <BusinessIcon /> },
+  { key: "integrations", label: "Integrations", icon: <ExtensionIcon /> },
   ...(BANKING_ENABLED ? [{ key: "payments", label: "Payments", icon: <PaymentIcon /> }] : []),
   { key: "reminders", label: "Reminders", icon: <NotificationsIcon /> },
   { key: "branding", label: "Branding", icon: <BrushIcon /> },
@@ -117,6 +120,10 @@ export default function SettingsPage() {
             <>
               <TabPanel tabKey="profile" activeKey={activeKey}>
                 <BusinessProfileTab profile={profile} />
+              </TabPanel>
+
+              <TabPanel tabKey="integrations" activeKey={activeKey}>
+                <IntegrationsTab />
               </TabPanel>
 
               {BANKING_ENABLED && (

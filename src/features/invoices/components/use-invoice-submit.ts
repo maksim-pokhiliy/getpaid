@@ -15,6 +15,25 @@ interface UseInvoiceSubmitOptions {
   onDraftClear: () => void;
 }
 
+function transformForSubmit(data: InvoiceFormInput) {
+  const items = data.items.map((item) => ({
+    ...item,
+    unitPrice: Math.round(item.unitPrice * 100),
+  }));
+
+  const itemGroups = data.itemGroups?.length
+    ? data.itemGroups.map((group) => ({
+        ...group,
+        items: group.items.map((item) => ({
+          ...item,
+          unitPrice: Math.round(item.unitPrice * 100),
+        })),
+      }))
+    : undefined;
+
+  return { items, itemGroups };
+}
+
 export function useInvoiceSubmit({ mode, invoiceId, onDraftClear }: UseInvoiceSubmitOptions) {
   const router = useRouter();
   const toast = useToast();
@@ -28,10 +47,7 @@ export function useInvoiceSubmit({ mode, invoiceId, onDraftClear }: UseInvoiceSu
   const onSubmit = React.useCallback(
     (data: InvoiceFormInput) => {
       setError(null);
-      const transformedItems = data.items.map((item) => ({
-        ...item,
-        unitPrice: Math.round(item.unitPrice * 100),
-      }));
+      const { items, itemGroups } = transformForSubmit(data);
 
       if (mode === "create") {
         createMutation.mutate(
@@ -39,7 +55,8 @@ export function useInvoiceSubmit({ mode, invoiceId, onDraftClear }: UseInvoiceSu
             clientId: data.clientId,
             currency: data.currency,
             dueDate: new Date(data.dueDate),
-            items: transformedItems,
+            items,
+            itemGroups,
             notes: data.notes || undefined,
           },
           {
@@ -73,7 +90,8 @@ export function useInvoiceSubmit({ mode, invoiceId, onDraftClear }: UseInvoiceSu
             clientId: data.clientId,
             currency: data.currency,
             dueDate: new Date(data.dueDate),
-            items: transformedItems,
+            items,
+            itemGroups,
             notes: data.notes || null,
           },
         },

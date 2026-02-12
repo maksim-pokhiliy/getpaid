@@ -1,3 +1,4 @@
+export * from "./duplicate";
 export * from "./lifecycle";
 export * from "./mutations";
 export * from "./payments";

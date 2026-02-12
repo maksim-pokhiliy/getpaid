@@ -20,7 +20,7 @@ export function calculateTotals(
   discount?: DiscountInput | null,
   taxRate?: number
 ): TotalsResult {
-  const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+  const subtotal = items.reduce((sum, item) => sum + Math.round(item.quantity * item.unitPrice), 0);
 
   let discountAmount = 0;
 

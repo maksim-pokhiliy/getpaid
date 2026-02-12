@@ -1,9 +1,10 @@
 "use client";
 
+import * as React from "react";
+
 import { Alert, Box, Paper } from "@mui/material";
 
-import type { CreateClientInput } from "@app/shared/schemas";
-import type { Client } from "@app/shared/schemas/api";
+import type { InvoiceItemGroupInput } from "@app/shared/schemas";
 import { PageHeader } from "@app/shared/ui/page-header";
 
 import { InlineClientDialog } from "./inline-client-dialog";
@@ -11,25 +12,12 @@ import { InvoiceFormDetails } from "./invoice-form-details";
 import { InvoiceFormDraftBanner } from "./invoice-form-draft-banner";
 import { InvoiceFormLineItems } from "./invoice-form-line-items";
 import { InvoiceFormTotals } from "./invoice-form-totals";
+import type { CreateClientMutation, TemplateData } from "./use-invoice-form";
 import { useInvoiceForm } from "./use-invoice-form";
 
-interface CreateClientMutation {
-  mutate: (
-    data: CreateClientInput,
-    options: {
-      onSuccess: () => void;
-      onError: (err: Error) => void;
-    }
-  ) => void;
-  isPending: boolean;
-}
-
-interface TemplateData {
-  name: string;
-  currency: string;
-  dueDays: number;
-  notes: string | null;
-  items: { description: string; quantity: number; unitPrice: number }[];
+interface ImportRenderProps {
+  addGroups: (groups: InvoiceItemGroupInput[]) => void;
+  rateCents: number;
 }
 
 interface InvoiceFormProps {
@@ -43,12 +31,13 @@ interface InvoiceFormProps {
     notes: string;
   };
   templateId?: string;
-  clients?: Client[];
+  clients?: import("@app/shared/schemas/api").Client[];
   clientsLoading: boolean;
   template?: TemplateData;
   templateLoading: boolean;
   createClientMutation: CreateClientMutation;
   defaultRate?: number;
+  renderImport?: (props: ImportRenderProps) => React.ReactNode;
 }
 
 export function InvoiceForm({
@@ -62,6 +51,7 @@ export function InvoiceForm({
   templateLoading,
   createClientMutation,
   defaultRate,
+  renderImport,
 }: InvoiceFormProps) {
   const form = useInvoiceForm({
     mode,
@@ -113,11 +103,13 @@ export function InvoiceForm({
             clientsLoading={form.clientsLoading}
             onAddClient={() => form.setClientDialogOpen(true)}
           />
+
           <InvoiceFormLineItems
             fields={form.fields}
             sensors={form.sensors}
             handleDragEnd={form.handleDragEnd}
             register={form.register}
+            control={form.control}
             errors={form.errors}
             currency={form.currency}
             onAppend={() =>
@@ -125,7 +117,15 @@ export function InvoiceForm({
             }
             onRemove={form.remove}
             onDuplicate={form.duplicateItem}
+            groupFields={form.groupFields}
+            onRemoveGroup={form.removeGroup}
           />
+
+          {renderImport?.({
+            addGroups: form.addImportedGroups,
+            rateCents: form.resolvedRate,
+          })}
+
           <InvoiceFormTotals
             subtotal={form.subtotal}
             currency={form.currency}
