@@ -5,7 +5,9 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import RepeatIcon from "@mui/icons-material/Repeat";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-export const SITE_URL = "https://getpaid.dev";
+import { SEO } from "@app/shared/config/seo";
+
+export const SITE_URL = SEO.SITE_URL;
 export const GITHUB_URL = "https://github.com/maksim-pokhiliy/getpaid";
 
 export const FEATURES = [
